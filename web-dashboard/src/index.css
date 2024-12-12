@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Armata&family=Mohave:ital,wght@0,300..700;1,300..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.light {
+  --background: 255, 255, 255;
+  --text: 0, 0, 0;
+  --border: 212, 212, 212;
+  --card: 245, 245, 245;
+  --card-text: 0, 0, 0;
+  --section: 212, 11, 11;
+}
+
+.dark {
+  --background: 0, 0, 0;
+  --text: 255, 255, 255;
+  --border: 38, 38, 38;
+  --card: 23, 23, 23;
+  --card-text: 255, 255, 255;
+  --section: 236, 65, 65;
+}
+
+.ocean {
+  --background: 30, 40, 80;
+  --text: 220, 230, 250;
+  --border: 60, 70, 90;
+  --card: 40, 50, 90;
+  --card-text: 255, 255, 255;
+  --section: 66, 65, 65;
+}
+
+html {
+  transition: all 200ms;
+  max-width: 1920px;
+}
+
+/* custom scrollbar  */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px rgba(158, 158, 158, 0.8); 
+  border-radius: 0px;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #ff7d19c2; 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.7); 
+}
+
