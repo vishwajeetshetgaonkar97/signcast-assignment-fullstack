@@ -23,6 +23,10 @@ interface LineOptions {
   strokeWidth?: number;
   isDraggable?: boolean;
   canvas: fabric.Canvas;
+  left?: number,
+  top?: number,
+  scaleX?: number,
+  scaleY?: number,
   setCanvasObjects: any;
 }
 
@@ -100,6 +104,10 @@ const addLineToCanvas = ({
   isDraggable = true,
   canvas,
   setCanvasObjects,
+  left= 10,
+  top = 20,
+  scaleX = 1,
+  scaleY = 1,
 }: LineOptions) => {
   const radians = (Math.PI / 180) * angle;
   const endX = startX + length * Math.cos(radians);
@@ -111,6 +119,10 @@ const addLineToCanvas = ({
     selectable: isDraggable,
     lockMovementX: !isDraggable,
     lockMovementY: !isDraggable,
+    left,
+    top,
+    scaleX,
+    scaleY,
   });
 
   // Add an `id` to track objects
@@ -137,6 +149,9 @@ const addLineToCanvas = ({
     },
   ]);
 };
+
+
+
 const addImageToCanvas = ({
   url,
   x = 0,

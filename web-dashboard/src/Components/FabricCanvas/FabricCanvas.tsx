@@ -94,7 +94,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   };
 
-
   const renderCanvasObjects = () => {
     if (fabricCanvasRef.current) {
       console.log("canvassssss render objjjjj", canvasObjects)
@@ -119,8 +118,12 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             addLineToCanvas({
               startX: obj.startX,
               startY: obj.startY,
+              scaleX: obj.scaleX,
+              scaleY: obj.scaleY,
               length: obj.length,
               angle: obj.angle,
+              top: obj.top,
+              left: obj.left,
               strokeColor: obj.strokeColor,
               strokeWidth: obj.strokeWidth,
               isDraggable: obj.isDraggable,
