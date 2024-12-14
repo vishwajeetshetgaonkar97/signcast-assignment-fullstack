@@ -1,6 +1,19 @@
 import * as fabric from 'fabric';
 import getDescriptionContainerTitle, { getDate, getDepartmentText, getDrawerName, getIfScreenOrientationVertical, getNicheDepth, getNicheHeight, getNicheWidth, getRBoxDepth, getRBoxHeight, getRBoxWidth, getScreenDistanceFromFloorLine, getScreenHeightDimension, getScreenSizeText, getScreenWidthDimension } from "./CanvasUtils";
 
+interface RectangleOptions {
+  x?: number;
+  y?: number;
+  width?: number; 
+  height?: number;
+  fillColor?: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+  isDraggable?: boolean;
+  canvas: fabric.Canvas;
+  setCanvasObjects: any;
+}
+
 const createLineWithAngle = (startX, startY, angle, length, borderColor) => {
   const radians = angle * (Math.PI / 180);
   const endX = startX + length * Math.cos(radians);
@@ -1131,5 +1144,54 @@ const createMovableReceptorBox = ({
   canvas.renderAll();
 };
 
+const addRectangleToCanvas = ({
+  x = 10,
+  y = 10,
+  width = 100,
+  height = 50,
+  fillColor = 'transparent',
+  strokeColor = 'black',
+  strokeWidth = 2,
+  isDraggable = true,
+  canvas,
+  setCanvasObjects,
+}: RectangleOptions) => {
+  const rectangle = new fabric.Rect({
+    left: x,
+    top: y,
+    width,
+    height,
+    fill: fillColor,
+    stroke: strokeColor,
+    strokeWidth,
+    selectable: isDraggable,
+    lockMovementX: !isDraggable,
+    lockMovementY: !isDraggable,
+  });
 
-export { createScreenDimensionBox, createNicheDimensionBox, createNotesBox, createDescriptionBox, createDimensionBoxDiagram, createMovableReceptorBox };
+  // Add an `id` to track objects
+  rectangle.id = `rect-${Date.now()}`;
+
+  canvas.add(rectangle);
+  canvas.renderAll();
+
+  // Add to the state
+  setCanvasObjects((prevObjects) => [
+    ...prevObjects,
+    {
+      id: rectangle.id,
+      type: 'rectangle',
+      x,
+      y,
+      width,
+      height,
+      fillColor,
+      strokeColor,
+      strokeWidth,
+      isDraggable,
+    },
+  ]);
+};
+
+
+export { createScreenDimensionBox, createNicheDimensionBox, createNotesBox, createDescriptionBox, createDimensionBoxDiagram, createMovableReceptorBox, addRectangleToCanvas };

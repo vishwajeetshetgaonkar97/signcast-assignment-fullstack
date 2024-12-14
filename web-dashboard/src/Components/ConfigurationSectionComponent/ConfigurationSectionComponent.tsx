@@ -1,9 +1,8 @@
 import { AiOutlineDownload } from 'react-icons/ai';
 import * as fabric from 'fabric';
-import ConfigurationComponent from "../ConfigurationComponent/ConfigurationComponent";
-import DescriptionConfigComponent from "../DescriptionConfigComponent/DescriptionConfigComponent";
 import { downloadCanvasAsPdf } from '../../utils/CanvasUtils';
 import { useState } from 'react';
+import AddingToCanvasComponent from '../AddingToCanvasComponent/AddingToCanvasComponent';
 
 interface CanvusProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas>;
@@ -23,8 +22,7 @@ const ConfigurationSectionComponent : React.FC <CanvusProps> = ({fabricCanvasRef
   return (
     <div className="flex flex-col gap-4 max-h-full overflow-y-auto ">
       <div className="flex flex-col gap-4 max-h-full overflow-y-auto border-border-color border-b border-opacity-50">
-        <ConfigurationComponent />
-        <DescriptionConfigComponent />
+        <AddingToCanvasComponent fabricCanvasRef={fabricCanvasRef}   />
       </div>
 
 

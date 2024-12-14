@@ -1,59 +1,21 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import * as fabric from 'fabric';
-import SelectedConfigurationContext from '../../Contexts/SelectedConfigurationContext';
-import AdditionalConfigurationContext from '../../Contexts/AdditionalConfigurationContext';
-import DescriptionDataContext from '../../Contexts/DescripotionDataContext';
+import CanvasObjectsDataContext from '../../Contexts/CanvasObjectsDataContext';
+import { addRectangleToCanvas } from '../../utils/CanvasDrawingsUtils';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
 }
 
 
-interface RectangleOptions {
-  x?: number;
-  y?: number;
-  width?: number; 
-  height?: number;
-  fillColor?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
-  isDraggable?: boolean;
-  canvas: fabric.Canvas;
-}
-
-interface LineOptions {
-  length?: number;
-  color?: string;
-  strokeWidth?: number;
-  orientation?: 'horizontal' | 'vertical';
-  canvas: fabric.Canvas;
-  x?: number;
-  y?: number;
-}
-
-interface ImageOptions {
-  imageUrl: string;
-  x?: number;
-  y?: number;
-  scaleFactor?: number;
-  isDraggable?: boolean;
-  canvas: fabric.Canvas;
-}
 
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
-  const { selectedConfiguration } = useContext(SelectedConfigurationContext);
-  const { additionalConfiguration } = useContext(AdditionalConfigurationContext);
-  const { descriptionConfiguration } = useContext(DescriptionDataContext);
+  const { canvasObjects, setCanvasObjects } = useContext(CanvasObjectsDataContext)
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
-  const [selectedConfigValues, setSelectedConfigValues] = useState(selectedConfiguration);
 
-  useEffect(() => {
-    setSelectedConfigValues(selectedConfiguration);
-  }, [selectedConfiguration]);
-
+  console.log("canvas local array", canvasObjects)
   const initializeCanvas = () => {
     if (canvasRef.current && !fabricCanvasRef.current) {
       fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
@@ -63,33 +25,28 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
       });
 
       fabric.Text.prototype.fontFamily = 'Poppins';
-      
-      // Add event listener for object modifications
+
       fabricCanvasRef.current.on('object:modified', (e) => {
         if (e.target) {
-          sendCanvasObjectData({
-            type: 'updateObject',
-            object: {
-              id: e.target.id, // Assuming objects have an `id` property
-              left: e.target.left,
-              top: e.target.top,
-              scaleX: e.target.scaleX,
-              scaleY: e.target.scaleY,
-              angle: e.target.angle,
-            },
+          updateCanvasObject({
+            id: e.target.id, // Assuming objects have an `id` property
+            left: e.target.left,
+            top: e.target.top,
+            scaleX: e.target.scaleX,
+            scaleY: e.target.scaleY,
+            angle: e.target.angle,
+            width: e.target.width,
+            height: e.target.height,
           });
         }
       });
 
       fabricCanvasRef.current.on('object:moving', (e) => {
         if (e.target) {
-          sendCanvasObjectData({
-            type: 'moveObject',
-            object: {
-              id: e.target.id, // Assuming objects have an `id` property
-              left: e.target.left,
-              top: e.target.top,
-            },
+          updateCanvasObject({
+            id: e.target.id,
+            left: e.target.left,
+            top: e.target.top,
           });
         }
       });
@@ -121,41 +78,14 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   };
 
-  const addRectangle = ({ x = 10, y = 10, width = 100, height = 50, fillColor = 'transparent', strokeColor = 'black', strokeWidth = 2, isDraggable = true, canvas, }: RectangleOptions) => {
-    const rectangle = new fabric.Rect({
-      left: x,
-      top: y,
-      width,
-      height,
-      fill: fillColor,
-      stroke: strokeColor,
-      strokeWidth,
-      selectable: isDraggable,
-      lockMovementX: !isDraggable,
-      lockMovementY: !isDraggable,
-    });
 
-    // Add an `id` to track objects
-    rectangle.id = `rect-${Date.now()}`;
 
-    canvas.add(rectangle);
-    canvas.renderAll();
-
-    // Send rectangle data via WebSocket
-    sendCanvasObjectData({
-      type: 'addRectangle',
-      object: {
-        id: rectangle.id,
-        x,
-        y,
-        width,
-        height,
-        fillColor,
-        strokeColor,
-        strokeWidth,
-        isDraggable,
-      },
-    });
+  const updateCanvasObject = (updatedObject: any) => {
+    setCanvasObjects((prevObjects) =>
+      prevObjects.map((obj) =>
+        obj.id === updatedObject.id ? { ...obj, ...updatedObject } : obj
+      )
+    );
   };
 
   const sendCanvasObjectData = (data: any) => {
@@ -182,7 +112,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         const canvas = fabricCanvasRef.current;
         switch (data.type) {
           case "addRectangle":
-            addRectangle({
+            addRectangleToCanvas({
               x: data.object.x,
               y: data.object.y,
               width: data.object.width,
@@ -191,7 +121,8 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
               strokeColor: data.object.strokeColor,
               strokeWidth: data.object.strokeWidth,
               isDraggable: data.object.isDraggable,
-              canvas,
+              canvas: fabricCanvasRef.current,
+              setCanvasObjects: sendCanvasObjectData,
             });
             break;
           // Handle other cases if needed
@@ -224,18 +155,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   return (
     <div ref={containerRef} className="h-full w-full">
       <canvas ref={canvasRef} className="border border-gray-300 h-full w-full" />
-      <div className="flex justify-center items-center gap-2 pt-2">
-        <button
-          onClick={() => {
-            if (fabricCanvasRef.current) {
-              addRectangle({ canvas: fabricCanvasRef.current });
-            }
-          }}
-          className="btn-primary"
-        >
-          Add Rectangle
-        </button>
-      </div>
+    
     </div>
   );
 };
