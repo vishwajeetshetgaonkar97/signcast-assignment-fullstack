@@ -54,44 +54,6 @@ const ConfigurationSectionComponent: React.FC<CanvusProps> = ({ fabricCanvasRef 
         )}
       </div>
 
-      {/* Preview Button */}
-      <>
-        <button
-          onClick={() => showCanvasPreview(fabricCanvasRef.current)}
-          className="w-full py-2 text-xs bg-blue-700 text-blue-50 border border-border-color focus:outline-none hover:bg-blue-600 flex items-center justify-between gap-2"
-        >
-          <span className="flex-1 text-center">Preview</span>
-          <div className="border-l border-blue-50 border-opacity-50 px-2 flex items-center">
-            <AiOutlineDownload size={18} />
-          </div>
-        </button>
-
-        {isModalOpen && (
-          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-            <div className="bg-white p-4 rounded-lg w-96">
-              <h2 className="text-xl mb-4">Canvas Preview</h2>
-              <img src={canvasPreview!} alt="Canvas Preview" className="w-full h-auto mb-4" />
-              <div className="flex justify-between gap-4">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="py-2 px-4 bg-gray-500 text-white rounded"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => {
-                    downloadCanvasAsPdf(fabricCanvasRef.current);
-                    setIsModalOpen(false);
-                  }}
-                  className="py-2 px-4 bg-blue-700 text-white rounded"
-                >
-                  Download
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
 
       {/* Download Button */}
       <div className="flex">

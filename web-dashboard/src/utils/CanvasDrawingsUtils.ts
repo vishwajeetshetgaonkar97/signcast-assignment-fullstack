@@ -127,6 +127,7 @@ const addLineToCanvas = ({
 
   // Add an `id` to track objects
   line.id = `line-${Date.now()}`;
+  const isVisible = true;
 
   canvas.add(line);
   canvas.renderAll();
@@ -146,6 +147,7 @@ const addLineToCanvas = ({
       strokeColor,
       strokeWidth,
       isDraggable,
+      isVisible,
     },
   ]);
 };
