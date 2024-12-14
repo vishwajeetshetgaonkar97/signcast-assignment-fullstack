@@ -41,12 +41,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
       fabricCanvasRef.current.on('object:moving', (e) => {
         if (e.target) {
           console.log("on move", e.target);
-          updateCanvasObject({
-            id: e.target.id,
-            left: e.target.left,
-            top: e.target.top,
-            angle: e.target.angle,
-          });
+      
         }
       });
     }
@@ -77,13 +72,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   };
 
-  const updateCanvasObject = (updatedObject: any) => {
-    setCanvasObjects((prevObjects) =>
-      prevObjects.map((obj) =>
-        obj.id === updatedObject.id ? { ...obj, ...updatedObject } : obj
-      )
-    );
-  };
+
 
   const sendCanvasObjectData = (data: any) => {
     if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
@@ -122,7 +111,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
               isDraggable: data.object.isDraggable,
               canvas: fabricCanvasRef.current,
               angle: data.object.angle,
-              setCanvasObjects: sendCanvasObjectData,
             });
             break;
           case "addLine":
@@ -135,7 +123,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
               strokeWidth: data.object.strokeWidth,
               isDraggable: data.object.isDraggable,
               canvas: fabricCanvasRef.current,
-              setCanvasObjects: sendCanvasObjectData,
             });
             break;
           case "addImage":

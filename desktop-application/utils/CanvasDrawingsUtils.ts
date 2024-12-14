@@ -10,7 +10,6 @@ interface RectangleOptions {
   strokeWidth?: number;
   isDraggable?: boolean;
   canvas: fabric.Canvas;
-  setCanvasObjects: any;
   angle?: number;
 }
 
@@ -27,7 +26,6 @@ interface LineOptions {
   top?: number,
   scaleX?: number,
   scaleY?: number,
-  setCanvasObjects: any;
 }
 
 interface ImageOptions {
