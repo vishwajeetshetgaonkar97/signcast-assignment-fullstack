@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useContext } from 'react';
 import * as fabric from 'fabric';
-import { addRectangleToCanvas, addLineToCanvas, addImageToCanvas } from '../../../utils/CanvasDrawingsUtils';
+import { addRectangleToCanvas, addLineToCanvas } from '../../../utils/CanvasDrawingsUtils';
  
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>; 
@@ -25,16 +25,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
       fabricCanvasRef.current.on('object:modified', (e) => {
         if (e.target) {
-          updateCanvasObject({
-            id: e.target.id, // Assuming objects have an `id` property
-            left: e.target.left,
-            top: e.target.top,
-            scaleX: e.target.scaleX,
-            scaleY: e.target.scaleY,
-            angle: e.target.angle,
-            width: e.target.width,
-            height: e.target.height,
-          });
+    
         }
       });
 
@@ -125,18 +116,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
               canvas: fabricCanvasRef.current,
             });
             break;
-          case "addImage":
-            addImageToCanvas({
-              imageUrl: data.object.imageUrl,
-              canvas: fabricCanvasRef.current,
-              setCanvasObjects: sendCanvasObjectData,
-              x: data.object.top,
-              y: data.object.left,
-              scaleFactor: data.object.scaleFactor,
-              isDraggable: data.object.isDraggable,
-            });
-            break;
-          // Handle other cases if needed
         }
       }
     };

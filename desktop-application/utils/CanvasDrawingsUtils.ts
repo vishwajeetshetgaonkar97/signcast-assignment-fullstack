@@ -37,7 +37,7 @@ interface ImageOptions {
   angle?: number;
   isDraggable?: boolean;
   canvas: fabric.Canvas;
-  setCanvasObjects: any;
+  setCanvasObjects?: any;
 }
 
 const addRectangleToCanvas = ({
@@ -110,60 +110,4 @@ const addLineToCanvas = ({
 };
 
 
-
-const addImageToCanvas = ({
-  url,
-  x = 0,
-  y = 0,
-  width,
-  height,
-  angle = 0,
-  isDraggable = true,
-  canvas,
-  setCanvasObjects,
-}: ImageOptions) => {
-  fabric.Image.fromURL(url, (img, isError) => {
-    if (isError) {
-      console.error(`Error loading image: ${url}`);
-      return;
-    }
-    img.set({
-      left: x,
-      top: y,
-      angle: angle,
-      selectable: isDraggable,
-      lockMovementX: !isDraggable,
-      lockMovementY: !isDraggable,
-    });
-
-    if (width && height) {
-      img.scaleToWidth(width);
-      img.scaleToHeight(height);
-    }
-
-    // Add an `id` to track objects
-    img.id = `image-${Date.now()}`;
-
-    canvas.add(img);
-    canvas.renderAll();
-
-    // Add to the state
-    setCanvasObjects((prevObjects) => [
-      ...prevObjects,
-      {
-        id: img.id,
-        type: 'image',
-        url,
-        x,
-        y,
-        width,
-        height,
-        angle,
-        isDraggable,
-      },
-    ]);
-  });
-};
-
-
-export { addRectangleToCanvas, addLineToCanvas, addImageToCanvas };
+export { addRectangleToCanvas, addLineToCanvas };
