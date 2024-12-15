@@ -24,6 +24,20 @@ interface RectangleOptions {
   visible?: boolean;
 }
 
+interface LineOptions {
+  x1?: number;
+  y1?: number;
+  x2?: number;
+  y2?: number;
+  strokeColor?: string;
+  strokeWidth?: number;
+  isDraggable?: boolean;
+  canvas: fabric.Canvas;
+  setCanvasObjects: any;
+  visible?: boolean;
+}
+
+
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
   const { selectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext);
@@ -81,25 +95,48 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     canvas.clear();
     canvasObjects.forEach(obj => {
       if (obj.visible) {
-        let rectangle = new fabric.Rect({
-          left: obj.x,
-          top: obj.y,
-          width: obj.width,
-          height: obj.height,
-          fill: obj.fillColor,
-          stroke: obj.strokeColor,
-          strokeWidth: obj.strokeWidth,
-          selectable: obj.isDraggable,
-          lockMovementX: !obj.isDraggable,
-          lockMovementY: !obj.isDraggable,
-          angle: obj.angle,
-        });
-        rectangle.id = obj.id;
-        canvas.add(rectangle);
+        let canvasObject;
+        if (obj.type === 'rectangle') {
+          canvasObject = new fabric.Rect({
+            left: obj.x,
+            top: obj.y,
+            width: obj.width,
+            height: obj.height,
+            fill: obj.fillColor,
+            stroke: obj.strokeColor,
+            strokeWidth: obj.strokeWidth,
+            selectable: obj.isDraggable,
+            lockMovementX: !obj.isDraggable,
+            lockMovementY: !obj.isDraggable,
+            angle: obj.angle,
+          });
+        } else if (obj.type === 'line') {
+
+          // need improvement angle affects positioning
+          
+          console.log("inside line modify",obj);
+
+          const x1 = obj.x1 + obj.x ;
+          const y1 = obj.y1 + obj.y;
+          const x2 = obj.x2 + obj.x;
+          const y2 = obj.y2 + obj.y;
+          const angle = obj.angle;
+          canvasObject = new fabric.Line([x1, y1, x2, y2], {
+            stroke: obj.strokeColor,
+            strokeWidth: obj.strokeWidth,
+            selectable: obj.isDraggable,
+            lockMovementX: !obj.isDraggable,
+            lockMovementY: !obj.isDraggable,
+            angle: angle,
+          });
+        }
+        canvasObject.id = obj.id;
+        canvas.add(canvasObject);
       }
     });
     canvas.renderAll();
   };
+  
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -212,6 +249,54 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     ]);
   };
 
+  const addLineToCanvas = ({
+    x1 = 10,
+    y1 = 0,
+    x2 = 100,
+    y2 = 0,
+    strokeColor = 'black',
+    strokeWidth = 2,
+    isDraggable = true,
+    canvas,
+    setCanvasObjects,
+    visible = true,
+  }: LineOptions) => {
+    const line = new fabric.Line([x1, y1, x2, y2], {
+      stroke: strokeColor,
+      strokeWidth,
+      selectable: isDraggable,
+      lockMovementX: !isDraggable,
+      lockMovementY: !isDraggable,
+    });
+  
+    // Add an `id` to track objects
+    line.id = `line-${canvasObjects.length + 1}`;
+  
+    canvas.add(line);
+    canvas.renderAll();
+  
+    // Add to the state
+    setCanvasObjects((prevObjects) => [
+      ...prevObjects,
+      {
+        id: line.id,
+        type: 'line',
+        x1,
+        y1,
+        x2,
+        y2,
+        x:0,
+        y:0,
+        angle:0,
+        strokeColor,
+        strokeWidth,
+        isDraggable,
+        visible,
+      },
+    ]);
+  };
+
+  
   const handleAddRectangle = () => {
     if (fabricCanvasRef.current) {
       addRectangleToCanvas({
@@ -221,6 +306,15 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   };
 
+  const handleAddLine = () => {
+    if (fabricCanvasRef.current) {
+      addLineToCanvas({
+        canvas: fabricCanvasRef.current,
+        setCanvasObjects,
+      });
+    }
+  };
+  
   const handleSyncCanvas = async () => {
     const updateCanvasPostBody = {
       canvasId: allcanvases[selectedCanvasIndex]._id,
@@ -251,6 +345,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         ))}
       </div>
       <button onClick={handleAddRectangle}>Add Rectangle</button>
+      <button onClick={handleAddLine}>Add Line</button>
       <button onClick={handleSyncCanvas}>Sync</button>
     </div>
   );
