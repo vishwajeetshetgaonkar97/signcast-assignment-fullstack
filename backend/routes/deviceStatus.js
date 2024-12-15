@@ -12,8 +12,8 @@ function DeiceStatusRouter(database) {
   router.get("/", async (req, res) => {
     let data = await database.collections;
     let devicesOp = await database.collections.devices.find().toArray();
-    console.log("devices", devices);
-    res.json({ devices });
+    console.log("devices", devicesOp);
+    res.json({ devicesOp });
   });
 
   // Route to add a new canvas
@@ -24,6 +24,7 @@ function DeiceStatusRouter(database) {
     const ref = {
       name: data.name,
       isMonitoring: data.isMonitoring,
+      pairingCode: data.pairingCode,
     };
     try {
       let devicesop = await database.collections.devices.insertOne(ref);
@@ -43,6 +44,8 @@ function DeiceStatusRouter(database) {
     const updatedDevice = {
       name: data.name,
       isMonitoring: data.isMonitoring,
+      pairingCode: data.pairingCode,
+
     };
 
 
