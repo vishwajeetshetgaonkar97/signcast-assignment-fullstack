@@ -1,53 +1,70 @@
-// Required modules
-const express = require("express");
-const bodyParser = require("body-parser");
-const path = require("path");
-const database = require("./database/database.js");
-const mongodb = require("mongodb");
-const CanvasRouter = require("./routes/canvases.js");
-
-const PORT = 3000;
-const cors = require("cors");
-const logger = require('morgan');
+const express = require('express');
+const mongoose = require('mongoose');
+require('dotenv').config();  // To load environment variables
 
 const app = express();
+const port = 3000;
 
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// Middleware to parse JSON bodies (native Express method)
+app.use(express.json()); // Replacing body-parser with express.json()
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.raw({ type: 'application/json' }));  // to handle raw JSON streams
+// MongoDB connection string
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://vishwajeetshetgaonkar999:MMDD209@cluster.cnzoamb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster';
 
+// Connect to MongoDB
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error: ', err));
 
-app.use('/public', express.static('public'));
-app.use('/uploads', express.static('uploads'));
+// Define Canvas schema
+const canvasSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  data: {
+    type: Object,
+    required: true,
+  },
+}, { timestamps: true });
 
-app.use('/canvases', CanvasRouter(database));
+// Create Canvas model
+const Canvas = mongoose.model('Canvas', canvasSchema);
 
-app.use((req, res, next) => {
-  console.log("Request body: ", req.body);
-  next();
-});
-
-app.post('/example', (req, res) => {
+// POST route to create a new canvas
+app.post('/api/canvas', async (req, res) => {
   console.log("Request body:", req.body); // Log the request body
-  res.send('Request body received');
+
+  const { name, category, data } = req.body;
+
+  try {
+    if (!name || !category || !data) {
+      return res.status(400).json({ error: "Missing required fields: name, category, or data." });
+    }
+
+    // Create a new canvas document
+    const newCanvas = new Canvas({
+      name,
+      category,
+      data,
+    });
+
+    // Save the new canvas to the database
+    await newCanvas.save();
+
+    // Respond with the created canvas
+    res.status(201).json(newCanvas);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: 'Failed to create canvas', message: err.message });
+  }
 });
 
-app.listen(PORT, async () => {
-  await database.setup();
-  console.log(`Server started on port ${PORT}`);
-});
-
-process.on("SIGTERM", () => {
-  app.close(() => {
-    database.client.close();
-  });
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
