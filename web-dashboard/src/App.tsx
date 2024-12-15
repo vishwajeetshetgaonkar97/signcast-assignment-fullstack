@@ -27,7 +27,7 @@ const App: React.FC = () => {
       const postData = {
         name: "test canvas",
         category: 'cricket',
-        data: "testing",
+        data: [{test: 'test'},{test: 'test'}],
       };
       const log = await addCanvas(postData);
       console.log("log addition ", log);

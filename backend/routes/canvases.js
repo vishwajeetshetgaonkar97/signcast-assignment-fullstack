@@ -26,7 +26,7 @@ function CanvasRouter(database) {
     const ref = {
       name: data.name,
       category: data.category,
-      data: Array.isArray(data.data) ? data.data : [data.data], 
+      data: Array.isArray(data.data) ? data.data : [data.data],
     };
     try {
       let canvases = await database.collections.canvases.insertOne(ref);
@@ -37,7 +37,59 @@ function CanvasRouter(database) {
     }
   });
 
+  router.post("/updateCanvas/:canvasID", async (req, res) => {
+    let data = req.body;
+    console.log("data", data);
+    const canvasID = req.params.canvasID;
+    console.log("canvasID", canvasID);
+
+    const updatedCanvas = {
+      name: data.name,
+      category: data.category,
+      data: Array.isArray(data.data) ? data.data : [data.data],
+    };
+
+
+    try {
+      console.log("ref", updatedCanvas);
+      let canvasMongoId = new mongodb.ObjectId(canvasID);
+      console.log("canvasID", canvasMongoId);
+      const updatednewCanvas = await database.collections.canvases.updateOne({ _id: canvasMongoId }, { $set: updatedCanvas });
+
+      res.json({ message: "Canvas updated successfully", updatednewCanvas });
+    } catch (error) {
+      console.log("Error updating article: ", error);
+    }
+
+  });
+
+  router.get("/canvas/:canvasID", async (req, res) => {
+    const canvasID = req.params.canvasID;
+
+    try {
+      // Convert `canvasID` to a MongoDB ObjectId
+      const canvasObjectId = new mongodb.ObjectId(canvasID);
+
+      // Find the canvas by its `_id`
+      const canvas = await database.collections.canvases.findOne({ _id: canvasObjectId });
+
+      if (canvas) {
+        res.json({ canvas });
+      } else {
+        res.status(404).json({ error: "Canvas not found" });
+      }
+    } catch (error) {
+      console.error("Error fetching canvas by ID:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+
   return router; // Ensure the router is returned properly
 }
+
+
+
+
 
 module.exports = CanvasRouter;

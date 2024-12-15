@@ -1,29 +1,16 @@
 import { BASE_URL } from '../../constants';
 
-const addCanvas = async () => {
-  const test = {
-    name: "Canvas 4 from dash",
-    category: "Art",
-    data: [{
-      "width": 800,
-      "height": 600,
-      "elements": ["circle", "rectangle"]
-    },
-    {
-      "width": 8000,
-      "height": 600,
-      "elements": ["circle", "rectangle"]
-    }]
-  }
+const addCanvas = async (postData) => {
 
-  console.log('Hardcoded payload:', JSON.stringify(test));
+
+  console.log('Hardcoded payload:', JSON.stringify(postData));
 
   const response = await fetch(`${BASE_URL}/canvases/addCanvas`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json', // Ensure JSON content type
     },
-    body: JSON.stringify(test),
+    body: JSON.stringify(postData),
   });
 
   console.log('Response:', response);
