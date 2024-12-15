@@ -1,59 +1,41 @@
 import React, { useRef, useEffect, useContext } from 'react';
 import * as fabric from 'fabric';
 import CanvasObjectsDataContext from '../../Contexts/CanvasObjectsDataContext';
-import { addRectangleToCanvas, addLineToCanvas, addImageToCanvas } from '../../utils/CanvasDrawingsUtils';
+import AllCanvasesObjectsDataContext from '../../Contexts/AllCanvasesObjectsDataContext';
+import SelectedCanvasObjectIndexDataContext from '../../Contexts/SelectedCanvasObjectIndexDataContext';
+import updateCanvas from '../../api/updateCanvas';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
 }
 
+interface RectangleOptions {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  fillColor?: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+  isDraggable?: boolean;
+  canvas: fabric.Canvas;
+  setCanvasObjects: any;
+  angle?: number;
+}
+
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
+  const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
+  const { selectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext);
   const { canvasObjects, setCanvasObjects } = useContext(CanvasObjectsDataContext);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
 
+  const isIndexCanvasSelected = (index: number) => {
+    return selectedCanvasIndex === index;
+  };
 
   console.log("canvas local array", canvasObjects);
-
-  const initializeCanvas = () => {
-    if (canvasRef.current && !fabricCanvasRef.current) {
-      fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
-        preserveObjectStacking: true,
-        selection: true,
-        backgroundColor: 'white',
-      });
-
-      fabric.Text.prototype.fontFamily = 'Poppins';
-
-      fabricCanvasRef.current.on('object:modified', (e) => {
-        if (e.target) {
-          updateCanvasObject({
-            id: e.target.id, // Assuming objects have an `id` property
-            left: e.target.left,
-            top: e.target.top,
-            scaleX: e.target.scaleX,
-            scaleY: e.target.scaleY,
-            angle: e.target.angle,
-            width: e.target.width,
-            height: e.target.height,
-          });
-        }
-      });
-
-      fabricCanvasRef.current.on('object:moving', (e) => {
-        if (e.target) {
-          console.log("on move", e.target);
-          updateCanvasObject({
-            id: e.target.id,
-            left: e.target.left,
-            top: e.target.top,
-            angle: e.target.angle,
-          });
-        }
-      });
-    }
-  };
 
   const updateCanvasSize = () => {
     if (containerRef.current && fabricCanvasRef.current) {
@@ -94,123 +76,55 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   };
 
-  const renderCanvasObjects = () => {
-    if (fabricCanvasRef.current) {
-      console.log("canvassssss render objjjjj", canvasObjects)
-      canvasObjects.forEach((obj) => {
-        switch (obj.type) {
-          case 'rectangle':
-            addRectangleToCanvas({
-              x: obj.x,
-              y: obj.y,
-              width: obj.width,
-              height: obj.height,
-              fillColor: obj.fillColor,
-              strokeColor: obj.strokeColor,
-              strokeWidth: obj.strokeWidth,
-              isDraggable: obj.isDraggable,
-              canvas: fabricCanvasRef.current,
-              angle: obj.angle,
-              setCanvasObjects: setCanvasObjects,
-            });
-            break;
-          case 'line':
-            addLineToCanvas({
-              startX: obj.startX,
-              startY: obj.startY,
-              scaleX: obj.scaleX,
-              scaleY: obj.scaleY,
-              length: obj.length,
-              angle: obj.angle,
-              top: obj.top,
-              left: obj.left,
-              strokeColor: obj.strokeColor,
-              strokeWidth: obj.strokeWidth,
-              isDraggable: obj.isDraggable,
-              canvas: fabricCanvasRef.current,
-              setCanvasObjects: setCanvasObjects,
-            });
-            break;
-          case 'image':
-            addImageToCanvas({
-              imageUrl: obj.imageUrl,
-              canvas: fabricCanvasRef.current,
-              setCanvasObjects: setCanvasObjects,
-              x: obj.x,
-              y: obj.y,
-              scaleFactor: obj.scaleFactor,
-              isDraggable: obj.isDraggable,
-            });
-            break;
-          default:
-            break;
-        }
+  const renderCanvasObjects = (canvasObjects, canvas) => {
+    canvas.clear();
+    canvasObjects.forEach(obj => {
+      let rectangle = new fabric.Rect({
+        left: obj.x,
+        top: obj.y,
+        width: obj.width,
+        height: obj.height,
+        fill: obj.fillColor,
+        stroke: obj.strokeColor,
+        strokeWidth: obj.strokeWidth,
+        selectable: obj.isDraggable,
+        lockMovementX: !obj.isDraggable,
+        lockMovementY: !obj.isDraggable,
+        angle: obj.angle,
       });
-    }
+      rectangle.id = obj.id;
+      canvas.add(rectangle);
+    });
+    canvas.renderAll();
   };
 
   useEffect(() => {
-    initializeCanvas();
+    if (canvasRef.current) {
+      fabricCanvasRef.current = new fabric.Canvas(canvasRef.current);
+
+      fabricCanvasRef.current.on('object:modified', (e) => {
+        const modifiedObject = e.target;
+        updateCanvasObject({
+          id: modifiedObject?.id,
+          x: modifiedObject?.left,
+          y: modifiedObject?.top,
+          width: modifiedObject?.width * modifiedObject?.scaleX,
+          height: modifiedObject?.height * modifiedObject?.scaleY,
+          angle: modifiedObject?.angle,
+        });
+      });
+
+      renderCanvasObjects(canvasObjects, fabricCanvasRef.current);
+    }
+
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize);
-
-    // Render existing canvas objects
-    renderCanvasObjects();
 
     // Establish WebSocket connection
     websocketRef.current = new WebSocket("ws://localhost:3000");
 
     websocketRef.current.onopen = () => {
       console.log("WebSocket connected");
-    };
-
-    
-    websocketRef.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (fabricCanvasRef.current) {
-        switch (data.type) {
-          case "addRectangle":
-            addRectangleToCanvas({
-              x: data.object.top,
-              y: data.object.left,
-              width: data.object.width,
-              height: data.object.height,
-              fillColor: data.object.fillColor,
-              strokeColor: data.object.strokeColor,
-              strokeWidth: data.object.strokeWidth,
-              isDraggable: data.object.isDraggable,
-              canvas: fabricCanvasRef.current,
-              angle: data.object.angle,
-              setCanvasObjects: sendCanvasObjectData,
-            });
-            break;
-          case "addLine":
-            addLineToCanvas({
-              startX: data.object.startX,
-              startY: data.object.startY,
-              length: data.object.length,
-              angle: data.object.angle,
-              strokeColor: data.object.strokeColor,
-              strokeWidth: data.object.strokeWidth,
-              isDraggable: data.object.isDraggable,
-              canvas: fabricCanvasRef.current,
-              setCanvasObjects: sendCanvasObjectData,
-            });
-            break;
-          case "addImage":
-            addImageToCanvas({
-              imageUrl: data.object.imageUrl,
-              canvas: fabricCanvasRef.current,
-              setCanvasObjects: sendCanvasObjectData,
-              x: data.object.top,
-              y: data.object.left,
-              scaleFactor: data.object.scaleFactor,
-              isDraggable: data.object.isDraggable,
-            });
-            break;
-          // Handle other cases if needed
-        }
-      }
     };
 
     websocketRef.current.onclose = () => {
@@ -235,9 +149,105 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (fabricCanvasRef.current) {
+      renderCanvasObjects(canvasObjects, fabricCanvasRef.current);
+    }
+  }, [canvasObjects]);
+
+  const addRectangleToCanvas = ({
+    x = 10,
+    y = 10,
+    width = 100,
+    height = 50,
+    fillColor = 'transparent',
+    strokeColor = 'black',
+    strokeWidth = 2,
+    isDraggable = true,
+    canvas,
+    angle = 0,
+    setCanvasObjects,
+  }: RectangleOptions) => {
+    const rectangle = new fabric.Rect({
+      left: x,
+      top: y,
+      width,
+      height,
+      fill: fillColor,
+      stroke: strokeColor,
+      strokeWidth,
+      selectable: isDraggable,
+      lockMovementX: !isDraggable,
+      lockMovementY: !isDraggable,
+      angle,
+    });
+
+    // Add an `id` to track objects
+    rectangle.id = `rect-${canvasObjects.length + 1}`;
+
+    canvas.add(rectangle);
+    canvas.renderAll();
+
+    // Add to the state
+    setCanvasObjects((prevObjects) => [
+      ...prevObjects,
+      {
+        id: rectangle.id,
+        type: 'rectangle',
+        x,
+        y,
+        width,
+        height,
+        fillColor,
+        strokeColor,
+        strokeWidth,
+        isDraggable,
+        angle,
+      },
+    ]);
+  };
+
+  const handleAddRectangle = () => {
+    if (fabricCanvasRef.current) {
+      addRectangleToCanvas({
+        canvas: fabricCanvasRef.current,
+        setCanvasObjects,
+      });
+    }
+  };
+
+  const handleSyncCanvas = async() => {
+
+    const updateCanvasPostBody = {
+      canvasId: allcanvases[selectedCanvasIndex]._id,
+      name: allcanvases[selectedCanvasIndex].name,
+      category: allcanvases[selectedCanvasIndex].category,
+      data: canvasObjects,
+    } 
+    
+    try {
+      const log = await updateCanvas(updateCanvasPostBody);
+      console.log("log addition ", log);
+    } catch (error) {
+      console.log(`canvas get issue ${error}`);
+    }
+  }
+
   return (
-    <div ref={containerRef} className="h-full w-full">
+    <div ref={containerRef} className="h-full w-[80%]">
       <canvas ref={canvasRef} className="border border-gray-300 h-full w-full" />
+      <div>
+        {allcanvases.map((canvas, index) => (
+          <div
+            key={index}
+            className={`p-2 border border-gray-300 w-fit cursor-pointer ${isIndexCanvasSelected(index) ? 'bg-gray-200' : ''}`}
+          >
+            {canvas.name}
+          </div>
+        ))}
+      </div>
+      <button onClick={handleAddRectangle}>Add Rectangle</button>
+      <button onClick={handleSyncCanvas}>Sync</button>
     </div>
   );
 };

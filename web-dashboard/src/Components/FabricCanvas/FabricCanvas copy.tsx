@@ -291,3 +291,53 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 };
 
 export default FabricCanvas;
+
+
+
+websocketRef.current.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  if (fabricCanvasRef.current) {
+    switch (data.type) {
+      case "addRectangle":
+        addRectangleToCanvas({
+          x: data.object.top,
+          y: data.object.left,
+          width: data.object.width,
+          height: data.object.height,
+          fillColor: data.object.fillColor,
+          strokeColor: data.object.strokeColor,
+          strokeWidth: data.object.strokeWidth,
+          isDraggable: data.object.isDraggable,
+          canvas: fabricCanvasRef.current,
+          angle: data.object.angle,
+          setCanvasObjects: sendCanvasObjectData,
+        });
+        break;
+      case "addLine":
+        addLineToCanvas({
+          startX: data.object.startX,
+          startY: data.object.startY,
+          length: data.object.length,
+          angle: data.object.angle,
+          strokeColor: data.object.strokeColor,
+          strokeWidth: data.object.strokeWidth,
+          isDraggable: data.object.isDraggable,
+          canvas: fabricCanvasRef.current,
+          setCanvasObjects: sendCanvasObjectData,
+        });
+        break;
+      case "addImage":
+        addImageToCanvas({
+          imageUrl: data.object.imageUrl,
+          canvas: fabricCanvasRef.current,
+          setCanvasObjects: sendCanvasObjectData,
+          x: data.object.top,
+          y: data.object.left,
+          scaleFactor: data.object.scaleFactor,
+          isDraggable: data.object.isDraggable,
+        });
+        break;
+      // Handle other cases if needed
+    }
+  }
+};
