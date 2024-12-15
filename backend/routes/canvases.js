@@ -10,8 +10,7 @@ function CanvasRouter(database) {
 
   // Route for the homepage
   router.get("/", async (req, res) => {
-    console.log("Logged in user:", res.locals.user);
-    let data = await database.collections
+    let data = await database.collections;
     console.log("data", data);
     let users = await database.collections.users.find().toArray();
     let canvases = await database.collections.canvases.find().toArray();
@@ -19,11 +18,26 @@ function CanvasRouter(database) {
     res.json({ canvases });
   });
 
+  // Route to add a new canvas
+  router.post("/addCanvas", async (req, res) => {
+    console.log("Received request:", req.body);
+    let data = req.body;
+    console.log("Parsed data:", data);
+    const ref = {
+      name: data.name,
+      category: data.category,
+      data: Array.isArray(data.data) ? data.data : [data.data], 
+    };
+    try {
+      let canvases = await database.collections.canvases.insertOne(ref);
+      res.json({ canvases });
+    } catch (error) {
+      console.error("Error inserting canvas:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
-  router.post("/addCanvas", async (req, res) => { console.log("Received request:", req.body); let data = req.body; console.log("Parsed data:", data); const ref = { name: data.name, category: data.category, data: data.data, }; try { let canvases = await database.collections.canvases.insertOne(ref); res.json({ canvases }); } catch (error) { console.error("Error inserting canvas:", error); res.status(500).json({ error: "Internal server error" }); } });
-
- 
-
-
+  return router; // Ensure the router is returned properly
+}
 
 module.exports = CanvasRouter;

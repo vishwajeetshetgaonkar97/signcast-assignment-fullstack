@@ -27,7 +27,7 @@ const App: React.FC = () => {
       const postData = {
         name: "test canvas",
         category: 'cricket',
-        data: `[{"type":"addRectangle","object":{"x":0,"y":0,"width":100,"height":100,"fillColor":"#ff0000","strokeColor":"#000000","strokeWidth":1,"isDraggable":true}}]`,
+        data: "testing",
       };
       const log = await addCanvas(postData);
       console.log("log addition ", log);
@@ -40,7 +40,7 @@ const App: React.FC = () => {
 
 
   useEffect(() => {
-    getCanvasData();
+    // getCanvasData();
     handleAddCanvas();
   }, []);
 
