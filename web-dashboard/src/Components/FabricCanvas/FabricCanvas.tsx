@@ -21,6 +21,7 @@ interface RectangleOptions {
   canvas: fabric.Canvas;
   setCanvasObjects: any;
   angle?: number;
+  visible?: boolean;
 }
 
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
@@ -79,21 +80,23 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const renderCanvasObjects = (canvasObjects, canvas) => {
     canvas.clear();
     canvasObjects.forEach(obj => {
-      let rectangle = new fabric.Rect({
-        left: obj.x,
-        top: obj.y,
-        width: obj.width,
-        height: obj.height,
-        fill: obj.fillColor,
-        stroke: obj.strokeColor,
-        strokeWidth: obj.strokeWidth,
-        selectable: obj.isDraggable,
-        lockMovementX: !obj.isDraggable,
-        lockMovementY: !obj.isDraggable,
-        angle: obj.angle,
-      });
-      rectangle.id = obj.id;
-      canvas.add(rectangle);
+      if (obj.visible) {
+        let rectangle = new fabric.Rect({
+          left: obj.x,
+          top: obj.y,
+          width: obj.width,
+          height: obj.height,
+          fill: obj.fillColor,
+          stroke: obj.strokeColor,
+          strokeWidth: obj.strokeWidth,
+          selectable: obj.isDraggable,
+          lockMovementX: !obj.isDraggable,
+          lockMovementY: !obj.isDraggable,
+          angle: obj.angle,
+        });
+        rectangle.id = obj.id;
+        canvas.add(rectangle);
+      }
     });
     canvas.renderAll();
   };
@@ -167,6 +170,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     canvas,
     angle = 0,
     setCanvasObjects,
+    visible = true,
   }: RectangleOptions) => {
     const rectangle = new fabric.Rect({
       left: x,
@@ -203,6 +207,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         strokeWidth,
         isDraggable,
         angle,
+        visible,
       },
     ]);
   };
@@ -216,15 +221,14 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   };
 
-  const handleSyncCanvas = async() => {
-
+  const handleSyncCanvas = async () => {
     const updateCanvasPostBody = {
       canvasId: allcanvases[selectedCanvasIndex]._id,
       name: allcanvases[selectedCanvasIndex].name,
       category: allcanvases[selectedCanvasIndex].category,
       data: canvasObjects,
-    } 
-    
+    }
+
     try {
       const log = await updateCanvas(updateCanvasPostBody);
       console.log("log addition ", log);

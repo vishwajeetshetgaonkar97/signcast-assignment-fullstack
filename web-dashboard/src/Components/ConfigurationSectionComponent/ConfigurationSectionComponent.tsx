@@ -1,28 +1,27 @@
 import { AiOutlineDownload } from 'react-icons/ai';
-import { MdDeleteForever } from "react-icons/md";
+import { MdDeleteForever } from 'react-icons/md';
 import * as fabric from 'fabric';
 import { downloadCanvasAsPdf } from '../../utils/CanvasUtils';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import AddingToCanvasComponent from '../AddingToCanvasComponent/AddingToCanvasComponent';
 import CanvasObjectsDataContext from '../../Contexts/CanvasObjectsDataContext';
 
-interface CanvusProps {
+interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas>;
 }
 
-const ConfigurationSectionComponent: React.FC<CanvusProps> = ({ fabricCanvasRef }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [canvasPreview, setCanvasPreview] = useState<string | null>(null);
+const ConfigurationSectionComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const { canvasObjects, setCanvasObjects } = useContext(CanvasObjectsDataContext);
-
-  const showCanvasPreview = (canvas: fabric.Canvas) => {
-    const dataUrl = canvas.toDataURL();
-    setCanvasPreview(dataUrl);
-    setIsModalOpen(true);
-  };
 
   const deleteObject = (index: number) => {
     const updatedObjects = canvasObjects.filter((_, i) => i !== index);
+    setCanvasObjects(updatedObjects);
+  };
+
+  const toggleVisibility = (index: number) => {
+    const updatedObjects = canvasObjects.map((obj, i) =>
+      i === index ? { ...obj, visible: !obj.visible } : obj
+    );
     setCanvasObjects(updatedObjects);
   };
 
@@ -34,18 +33,29 @@ const ConfigurationSectionComponent: React.FC<CanvusProps> = ({ fabricCanvasRef 
 
       {/* Render canvasObjects content */}
       <div className="h-max px-4 py-3 space-y-0 border border-border-color">
-      <h4 className="font-semibold text-sm pb-1 opacity-80">Layers</h4>
+        <h4 className="font-semibold text-sm pb-1 opacity-80">Layers</h4>
         {canvasObjects.length > 0 ? (
           <ul className="space-y-2">
             {canvasObjects.map((object, index) => (
-              <li key={index} className="flex flex-col justify-between items-center p-2 bg-gray-100 rounded-md shadow-sm">
+              <li key={index} className="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
                 <span>{object.id || `Object ${index + 1}`}</span>
-                <button
-                  onClick={() => deleteObject(index)}
-                  className="py-1 px-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
-                >
-                  <MdDeleteForever size={18} />
-                </button>
+                <div className="flex items-center space-x-2">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={object.visible}
+                      onChange={() => toggleVisibility(index)}
+                      className="mr-2"
+                    />
+                    Visible
+                  </label>
+                  <button
+                    onClick={() => deleteObject(index)}
+                    className="py-1 px-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
+                  >
+                    <MdDeleteForever size={18} />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -53,7 +63,6 @@ const ConfigurationSectionComponent: React.FC<CanvusProps> = ({ fabricCanvasRef 
           <p className="text-gray-500 text-sm">No objects added to the canvas.</p>
         )}
       </div>
-
 
       {/* Download Button */}
       <div className="flex">
