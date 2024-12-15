@@ -1,0 +1,64 @@
+<%- include('../partials/head.ejs', {page: "Create new Pin" }) %>
+
+<!-- Modal for Confirmation -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to submit this registration?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmRegistration">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Registration Form -->
+<div class="container">
+  <div class="row gx-5 justify-content-center">
+    <div class="col-sm-9 col-md-7 col-lg-5">
+      <div class="card border-0 shadow rounded-3 my-5">
+        <div class="card-body p-2 p-sm-5">
+          <div class="mb-3 d-flex justify-content-center">
+            <img class="logo" style="height: 10vh" src="https://i.ibb.co/XCDcTMs/d40f61d0-37fa-4a12-902c-954acc70dafa.png" />
+          </div>
+          <h5 class="card-title text-center mb-3 fs-5">Register</h5>
+          <form action="/register" method="POST" enctype="multipart/form-data" id="registrationForm">
+            <div class="mb-3">
+              <label for="firstName" class="form-label">First Name</label>
+              <input name="firstName" type="text" class="form-control" id="firstName" required />
+            </div>
+            <div class="mb-3">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input name="lastName" type="text" class="form-control" id="lastName" required />
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input name="email" type="email" class="form-control" id="email" required />
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input name="password" type="password" class="form-control" id="password" required />
+            </div>
+            <div class="mb-3">
+              <label for="profileImage" class="form-label">Profile Image</label>
+              <input name="profileImage" type="file" class="form-control" id="profileImage" />
+            </div>
+            <div class="d-grid py-2">
+              <button type="button" class="btn btn-primary btn-login text-uppercase fw-bold" data-bs-toggle="modal" data-bs-target="#confirmationModal">Register</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer.ejs') %> <%- include('../partials/foot.ejs') %>
+

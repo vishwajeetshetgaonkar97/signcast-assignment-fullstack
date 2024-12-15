@@ -1,6 +1,6 @@
 const DatabaseService = require("../database/database.js");
 const express = require("express");
-// const helpers = require("../helpers/auth.js");
+const helpers = require("../helpers/auth.js");
 const mongodb = require("mongodb");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -17,7 +17,9 @@ function ArticlesRouter(database) {
   
     let userId = res.locals.user && res.locals.user._id  ? res.locals.user._id : "";
     console.log("user", userId);
-    res.render("index", { articles: articles,isLoggedIn:!!res.locals.user , loggedInUserId:userId});
+    // res.render("index", { articles: articles,isLoggedIn:!!res.locals.user , loggedInUserId:userId});
+    res.json({ articles });
+
   });
 
   router.get(

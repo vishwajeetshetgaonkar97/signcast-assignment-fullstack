@@ -1,0 +1,52 @@
+<nav class="d-flex justify-content-around align-items-center flex-column py-3" style="background-color: rgba(220, 220, 220, 0.461);">
+  <div>
+
+  </div>
+  <div>
+    <img class="logo" src="https://i.ibb.co/XCDcTMs/d40f61d0-37fa-4a12-902c-954acc70dafa.png">
+  </div>
+  <div class="d-flex py-2 align-items-center">
+    <% if (locals.user) { %>
+      <span class="navbar-text fw-bold">
+        <img class="profileImage-navbar" src="/<%= (locals.user && locals.user.profileImage) ?? 'uploads/avatar-placeholder.jpg' %>" alt="Profile Image">
+        <%= locals.user.firstName %>  <%= locals.user.lastName %>
+      </span>
+      <li class="nav-item px-3">
+        <a class="nav-link text-primary text-uppercase fw-bold" href="/">Home</a>
+      </li>
+      <li class="nav-item px-3">
+        <a class="nav-link text-success text-uppercase fw-bold" href="/add-Articles">Add Articles</a>
+      </li>
+      <li class="nav-item px-3">
+        <a class="nav-link text-danger text-uppercase fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
+      </li>
+    <% } else { %>
+      <li class="nav-item px-3">
+        <a class="nav-link text-primary text-uppercase fw-bold" href="/login">Login</a>
+      </li>
+      <li class="nav-item px-3">
+        <a class="nav-link text-success text-uppercase fw-bold" href="/register">Register</a>
+      </li>
+    <% } %>
+  </div>
+</nav>
+
+<!-- Logout Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to logout?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="/logout" class="btn btn-danger">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+
