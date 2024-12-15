@@ -11,7 +11,7 @@ function ArticlesRouter(database) {
   // Route for the homepage
   router.get("/", async (req, res) => {
     console.log("Logged in user:", res.locals.user);
-  let data = await  database.collections
+    let data = await database.collections
     console.log("data", data);
     let users = await database.collections.users.find().toArray();
     let canvases = await database.collections.canvases.find().toArray();
@@ -26,8 +26,8 @@ function ArticlesRouter(database) {
       // Convert the ID from the URL into the proper ObjectId format expected by MongoDB
       let objectId = new mongodb.ObjectId(id);
       let articles = await database.collections.articles.find().toArray();
-      let articlesObject = articles.find((item) => item._id.equals(objectId));  
-      console.log("articlesObject",articlesObject);
+      let articlesObject = articles.find((item) => item._id.equals(objectId));
+      console.log("articlesObject", articlesObject);
 
       res.render("articles/editArticles", { articlesObject: articlesObject });
     }
@@ -51,16 +51,16 @@ function ArticlesRouter(database) {
       console.log("ref", updateCanvas);
       let canvasMongoId = new mongodb.ObjectId(canvasID);
       console.log("canvasID", canvasMongoId);
-    let canvases =   await database.collections.canvases.updateOne(        { _id: canvasMongoId },  { $set: updateCanvas });
+      let canvases = await database.collections.canvases.updateOne({ _id: canvasMongoId }, { $set: updateCanvas });
 
- 
-       res.json({ canvases });
+
+      res.json({ canvases });
 
 
     } catch (error) {
       console.log("Error updating article: ", error);
     }
-   
+
   });
 
   router.get(
