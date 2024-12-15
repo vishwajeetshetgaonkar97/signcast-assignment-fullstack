@@ -85,11 +85,8 @@ function CanvasRouter(database) {
   });
 
 
-  return router; // Ensure the router is returned properly
+  return router; 
 }
-
-
-
 
 
 module.exports = CanvasRouter;

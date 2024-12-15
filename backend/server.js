@@ -9,6 +9,7 @@ const mongodb = require("mongodb");
 const ArticlesRouter = require("./routes/articles.js");
 const AuthRouter = require("./routes/auth.js");
 const canvasesRouter = require("./routes/canvases.js");
+const deviceStatusRouter = require("./routes/deviceStatus.js");
 const cors = require('cors');
 const PORT = 3000;
 
@@ -31,6 +32,7 @@ app.use('/uploads', express.static('uploads'));
 // app.use('/', AuthRouter(database));
 // app.use('/', ArticlesRouter(database));
 app.use('/canvases', canvasesRouter(database));
+app.use('/devices', deviceStatusRouter(database));
 
 app.listen(PORT, async () => {
   await database.setup();
