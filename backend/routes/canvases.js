@@ -7,8 +7,19 @@ const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
 const path = require("path");
 
-function CanvasRouter(database) {
+function CanvasRouter(database,wss) {
   var router = express.Router();
+
+  const notifyClients = async () => {
+    console.log("Notifying clients...");
+    const canvases = await database.collections.canvases.find().toArray();
+    console.log("canvases", canvases);
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ action: "updateAllCanvas", canvases }));
+      }
+    });
+  };
 
   // Route for the homepage
   router.get("/", async (req, res) => {
@@ -57,6 +68,9 @@ function CanvasRouter(database) {
       let canvasMongoId = new mongodb.ObjectId(canvasID);
       console.log("canvasID", canvasMongoId);
       const updatednewCanvas = await database.collections.canvases.updateOne({ _id: canvasMongoId }, { $set: updatedCanvas });
+
+       // Notify WebSocket clients
+       await notifyClients();
 
       res.json({ message: "Canvas updated successfully", updatednewCanvas });
     } catch (error) {

@@ -2,9 +2,6 @@ import { BASE_URL } from '../../constants';
 
 const updateCanvas = async (postData) => {
 
-  console.log("payload", postData);
-  console.log("canvasId", postData.canvasId);
-
   const response = await fetch(`${BASE_URL}/canvases/updateCanvas/${postData.canvasId}`, {
     method: 'POST',
     headers: {

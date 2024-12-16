@@ -57,6 +57,7 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
   };
 
   const handleSyncCanvas = async () => {
+    console.log("canvasObjects", allcanvases);
     const updateCanvasPostBody = {
       canvasId: allcanvases[selectedCanvasIndex]._id,
       name: allcanvases[selectedCanvasIndex].name,
@@ -65,11 +66,13 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
     };
 
     try {
+      console.log("updateCanvasPostBody", updateCanvasPostBody);
       const log = await updateCanvas(updateCanvasPostBody);
       console.log("log addition", log);
-      setIsSyncRequired(false); // Sync successful, no need to sync anymore
+      setIsSyncRequired(false); 
     } catch (error) {
       console.log(`canvas sync issue ${error}`);
+      alert('Error to sync canvas');
     }
   };
 

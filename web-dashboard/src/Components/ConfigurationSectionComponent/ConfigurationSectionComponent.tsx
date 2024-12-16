@@ -27,7 +27,7 @@ const ConfigurationSectionComponent: React.FC<CanvasProps> = ({ fabricCanvasRef 
   };
 
   return (
-    <div className="flex flex-col gap-4 max-h-full overflow-y-auto">
+    <div className="flex flex-col gap-4 max-h-full overflow-y-auto w-[20%]">
       <div className="flex flex-col gap-4 max-h-full overflow-y-auto border-border-color border-b border-opacity-50">
         <AddingToCanvasComponent fabricCanvasRef={fabricCanvasRef} />
       </div>
