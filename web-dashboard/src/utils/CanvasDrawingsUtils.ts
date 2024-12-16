@@ -1,5 +1,4 @@
 import * as fabric from 'fabric';
-import uploadImage from '../api/uploadImage';
 
 interface RectangleOptions {
   x?: number;
@@ -154,8 +153,9 @@ const addLineToCanvas = ({
 };
 
 
-const addImageToCanvas = async ({
-  file, // Accept a File object here
+
+const addImageToCanvas = ({
+  url,
   x = 0,
   y = 0,
   width,
@@ -164,49 +164,49 @@ const addImageToCanvas = async ({
   isDraggable = true,
   canvas,
   setCanvasObjects,
-  visible = true,
-}) => {
-  try {
-    // Upload the file to the backend
-    const uploadedImage = await uploadImage(file);
+}: ImageOptions) => {
+  fabric.Image.fromURL(url, (img, isError) => {
+    if (isError) {
+      console.error(`Error loading image: ${url}`);
+      return;
+    }
+    img.set({
+      left: x,
+      top: y,
+      angle: angle,
+      selectable: isDraggable,
+      lockMovementX: !isDraggable,
+      lockMovementY: !isDraggable,
+    });
 
-    const imgElement = new Image();
-    imgElement.src = uploadedImage.filePath; // Use the path returned from the backend
-    imgElement.onload = () => {
-      const imgInstance = new fabric.Image(imgElement, {
-        left: x,
-        top: y,
-        width: width || imgElement.width,
-        height: height || imgElement.height,
-        selectable: isDraggable,
-        angle: angle,
-      });
-      canvas.add(imgInstance);
-      canvas.renderAll();
-    };
+    if (width && height) {
+      img.scaleToWidth(width);
+      img.scaleToHeight(height);
+    }
 
     // Add an `id` to track objects
-    const id = `image-${canvas.getObjects().length + 1}`;
+    img.id = `image-${Date.now()}`;
 
-    // Update the state with the new canvas object
+    canvas.add(img);
+    canvas.renderAll();
+
+    // Add to the state
     setCanvasObjects((prevObjects) => [
       ...prevObjects,
       {
-        id: id,
+        id: img.id,
         type: 'image',
-        url: uploadedImage.filePath, // Save the uploaded image path
+        url,
         x,
         y,
         width,
         height,
         angle,
         isDraggable,
-        visible,
       },
     ]);
-  } catch (error) {
-    console.error('Error adding image to canvas:', error);
-  }
+  });
 };
+
 
 export { addRectangleToCanvas, addLineToCanvas, addImageToCanvas };

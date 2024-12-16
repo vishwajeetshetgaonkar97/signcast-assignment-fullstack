@@ -4,7 +4,6 @@ import CanvasObjectsDataContext from '../../Contexts/CanvasObjectsDataContext';
 import AllCanvasesObjectsDataContext from '../../Contexts/AllCanvasesObjectsDataContext';
 import SelectedCanvasObjectIndexDataContext from '../../Contexts/SelectedCanvasObjectIndexDataContext';
 import updateCanvas from '../../api/updateCanvas';
-import uploadImage from '../../api/uploadImage';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -39,18 +38,6 @@ interface LineOptions {
 }
 
 
-interface ImageOptions {
-  url: string;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  angle?: number;
-  isDraggable?: boolean;
-  canvas: fabric.Canvas;
-  setCanvasObjects: any;
-  visible?: boolean;
-}
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
   const { selectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext);
@@ -58,8 +45,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
 
   const isIndexCanvasSelected = (index: number) => {
     return selectedCanvasIndex === index;
@@ -106,27 +91,9 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   };
 
-  function extractAfterUploads(inputString) {
-    const match = inputString.match(/uploads\/(.+)$/);
-    return match ? match[1] : null;
-  }
-  const getImagePath = async(path: any) => {
-  console.log("path", path);
-  console.log("image path", extractAfterUploads(path));
-  const imagePath = extractAfterUploads(path);
-
-  console.log("image path down ", imagePath);
-
-  const response = await getImagePath(path);
-  console.log("response urll", response);
-
-  return response
-
-  }
-
-  const renderCanvasObjects = async (canvasObjects, canvas) => {
+  const renderCanvasObjects = (canvasObjects, canvas) => {
     canvas.clear();
-    for (const obj of canvasObjects) {
+    canvasObjects.forEach(obj => {
       if (obj.visible) {
         let canvasObject;
         if (obj.type === 'rectangle') {
@@ -144,12 +111,16 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             angle: obj.angle,
           });
         } else if (obj.type === 'line') {
-          const x1 = obj.x1 + obj.x;
+
+          // need improvement angle affects positioning
+          
+          console.log("inside line modify",obj);
+
+          const x1 = obj.x1 + obj.x ;
           const y1 = obj.y1 + obj.y;
           const x2 = obj.x2 + obj.x;
           const y2 = obj.y2 + obj.y;
           const angle = obj.angle;
-    
           canvasObject = new fabric.Line([x1, y1, x2, y2], {
             stroke: obj.strokeColor,
             strokeWidth: obj.strokeWidth,
@@ -158,35 +129,13 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             lockMovementY: !obj.isDraggable,
             angle: angle,
           });
-        } else if (obj.type === 'image') {
-         
-          // Load the image using fabric.Image.fromURL
-          fabric.Image.fromURL(imagePath, (img) => {
-            img.set({
-              left: obj.x,
-              top: obj.y,
-              scaleX: obj.scaleX || 1,
-              scaleY: obj.scaleY || 1,
-              angle: obj.angle || 0,
-              selectable: obj.isDraggable,
-              lockMovementX: !obj.isDraggable,
-              lockMovementY: !obj.isDraggable,
-            });
-            img.id = obj.id; // Assign custom id
-            canvas.add(img); // Add image to the canvas
-            canvas.renderAll(); // Ensure canvas updates with the image
-          });
         }
-        if (canvasObject && obj.type !== 'image') {
-          canvasObject.id = obj.id;
-          canvas.add(canvasObject);
-        }
+        canvasObject.id = obj.id;
+        canvas.add(canvasObject);
       }
-    }
+    });
     canvas.renderAll();
   };
-  
-  
   
 
   useEffect(() => {
@@ -302,9 +251,9 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
   const addLineToCanvas = ({
     x1 = 10,
-    y1 = 0,
+    y1 = 10,
     x2 = 100,
-    y2 = 0,
+    y2 = 100,
     strokeColor = 'black',
     strokeWidth = 2,
     isDraggable = true,
@@ -347,64 +296,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     ]);
   };
 
-
-
-
-  const addImageToCanvas = async ({
-    url, // Accept a File object here
-    x = 0,
-    y = 0,
-    width,
-    height,
-    angle = 0,
-    isDraggable = true,
-    canvas,
-    setCanvasObjects,
-    visible = true,
-  }) => {
-    try {
-      // Upload the file to the backend
-      // const uploadedImage = await uploadImage(url);
-  
-      const imgElement = new Image();
-      imgElement.src = url; // Use the path returned from the backend
-      imgElement.onload = () => {
-        const imgInstance = new fabric.Image(imgElement, {
-          left: x,
-          top: y,
-          width: width || imgElement.width,
-          height: height || imgElement.height,
-          selectable: isDraggable,
-          angle: angle,
-        });
-        canvas.add(imgInstance);
-        canvas.renderAll();
-      };
-  
-      // Add an `id` to track objects
-      const id = `image-${canvas.getObjects().length + 1}`;
-  
-      // Update the state with the new canvas object
-      setCanvasObjects((prevObjects) => [
-        ...prevObjects,
-        {
-          id: id,
-          type: 'image',
-          url: uploadedImage.filePath, // Save the uploaded image path
-          x,
-          y,
-          width,
-          height,
-          angle,
-          isDraggable,
-          visible,
-        },
-      ]);
-    } catch (error) {
-      console.error('Error adding image to canvas:', error);
-    }
-  };
-
   
   const handleAddRectangle = () => {
     if (fabricCanvasRef.current) {
@@ -423,32 +314,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
       });
     }
   };
-
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    console.log("file here");
-    if (file && fabricCanvasRef.current) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result?.toString();
-        if (dataUrl) {
-          console.log("file here ee");
-          addImageToCanvas({ url: dataUrl, canvas: fabricCanvasRef.current , setCanvasObjects: setCanvasObjects});
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-
-
-  const handleUploadImage = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
+  
   const handleSyncCanvas = async () => {
     const updateCanvasPostBody = {
       canvasId: allcanvases[selectedCanvasIndex]._id,
@@ -480,27 +346,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
       </div>
       <button onClick={handleAddRectangle}>Add Rectangle</button>
       <button onClick={handleAddLine}>Add Line</button>
-      <button onClick={handleUploadImage}>Upload Image</button>
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          onChange={handleFileUpload}
-        />
-
       <button onClick={handleSyncCanvas}>Sync</button>
-      
-      {canvasObjects.map((object, index) => {
-
-       if( object.type === 'image') {
-        return (
-          <div key={index}>
-            <img src={object.url} alt={`Image ${index}`} />
-          </div>
-        );
-       }
-      })}
     </div>
   );
 };
