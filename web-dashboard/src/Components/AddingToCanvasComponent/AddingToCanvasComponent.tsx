@@ -29,6 +29,8 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
       reader.readAsDataURL(file);
     }
   };
+
+  
   return (
     <div className="h-max px-4 py-3 space-y-0 border border-border-color">
       <h4 className="font-semibold text-sm pb-1 opacity-80">Components</h4>

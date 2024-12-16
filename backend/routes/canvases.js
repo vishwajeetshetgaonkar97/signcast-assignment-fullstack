@@ -4,6 +4,8 @@ const helpers = require("../helpers/auth.js");
 const mongodb = require("mongodb");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+const fs = require("fs");
+const path = require("path");
 
 function CanvasRouter(database) {
   var router = express.Router();
@@ -84,6 +86,50 @@ function CanvasRouter(database) {
     }
   });
 
+  router.post("/uploadImage", upload.single("image"), async (req, res) => {
+    try {
+      console.log("Received request:", req.body);
+      console.log("Received file:", req.file);
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+  
+      // Save file information in the database
+      const imageMetadata = {
+        filename: req.file.filename,
+        filepath: req.file.path,
+        mimetype: req.file.mimetype,
+        uploadedAt: new Date(),
+      };
+  
+      const result = await database.collections.images.insertOne(imageMetadata);
+  
+      res.json({
+        message: "Image uploaded successfully",
+        imageId: result.insertedId,
+        filePath: req.file.path,
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  router.get("/images/:filename", (req, res) => {
+    const filename = req.params.filename;
+    console.log("filename", filename);
+    const filepath = path.join(__dirname, "../uploads", filename);
+  
+    // Check if the file exists
+    fs.access(filepath, fs.constants.F_OK, (err) => {
+      if (err) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+  
+      // Serve the image
+      res.sendFile(filepath);
+    });
+  });
 
   return router; 
 }

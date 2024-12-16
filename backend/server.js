@@ -33,7 +33,7 @@ app.use('/uploads', express.static('uploads'));
 // app.use('/', ArticlesRouter(database));
 app.use('/canvases', canvasesRouter(database));
 app.use('/devices', deviceStatusRouter(database));
-
+        
 app.listen(PORT, async () => {
   await database.setup();
   console.log(`Server started on port ${PORT}`);

@@ -3,7 +3,8 @@ const ObjectId = mongodb.ObjectId;
 var collections = {
     users:null,
     canvases:null,
-    devices:null
+    devices:null,
+    images:null
 };
 var client = null;
 var database = null;
