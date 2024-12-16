@@ -13,7 +13,7 @@ interface CanvasProps {
 
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
-  const { selectedCanvasIndex , setSelectedCanvasIndex} = useContext(SelectedCanvasObjectIndexDataContext);
+  const { selectedCanvasIndex, setSelectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext);
   const { canvasObjects, setCanvasObjects } = useContext(CanvasObjectsDataContext);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -34,7 +34,10 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const updateCanvasSize = () => {
     if (containerRef.current && fabricCanvasRef.current) {
       const containerWidth = containerRef.current.offsetWidth;
+
+
       const newHeight = (containerWidth * 9) / 16;
+
       const canvas = fabricCanvasRef.current;
       const prevWidth = canvas.width || 1;
       const prevHeight = canvas.height || 1;
@@ -45,6 +48,23 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
       const scaleX = containerWidth / prevWidth;
       const scaleY = newHeight / prevHeight;
 
+
+      //  this code is to enable explicit 1920x1080 canvas size i have commented it for demonstration purpose 
+
+      //   const canvasWidth = 1920;
+      // const canvasHeight = 1080;
+
+      // const canvas = fabricCanvasRef.current;
+      // const prevWidth = canvas.width || 1;
+      // const prevHeight = canvas.height || 1;
+
+      // canvas.setWidth(canvasWidth);
+      // canvas.setHeight(canvasHeight);
+
+      // const scaleX = canvasWidth / prevWidth;
+      // const scaleY = canvasHeight / prevHeight;
+
+
       canvas.getObjects().forEach((obj) => {
         obj.scaleX = (obj.scaleX || 1) * scaleX;
         obj.scaleY = (obj.scaleY || 1) * scaleY;
@@ -52,14 +72,23 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         obj.top = (obj.top || 0) * scaleY;
         obj.setCoords();
       });
+
       canvas.renderAll();
     }
   };
 
   const updateCanvasObject = (updatedObject: any) => {
+    console.log("function", updatedObject);
     setCanvasObjects((prevObjects) =>
-      prevObjects.map((obj) =>
-        obj.id === updatedObject.id ? { ...obj, ...updatedObject } : obj
+      prevObjects.map((obj) => {
+        if (obj.id === updatedObject.id) {
+          return { ...obj, ...updatedObject }
+        }
+
+
+        return obj
+      }
+
       )
     );
   };
@@ -72,10 +101,13 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
   const renderCanvasObjects = (canvasObjects, canvas) => {
     canvas.clear();
+
     canvasObjects.forEach(obj => {
       if (obj.visible) {
         let canvasObject;
+
         if (obj.type === 'rectangle') {
+          console.log("inside rectangle ", obj);
           canvasObject = new fabric.Rect({
             left: obj.x,
             top: obj.y,
@@ -90,16 +122,26 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             angle: obj.angle,
           });
         } else if (obj.type === 'line') {
-
-          // need improvement angle affects positioning
-
-
+          // Adjust the line positions based on the angle
           const x1 = obj.x1 + obj.x;
           const y1 = obj.y1 + obj.y;
           const x2 = obj.x2 + obj.x;
           const y2 = obj.y2 + obj.y;
+
           const angle = obj.angle;
-          canvasObject = new fabric.Line([x1, y1, x2, y2], {
+
+          // Calculate the new start and end positions based on the angle
+          const radian = fabric.util.degreesToRadians(angle);
+          const centerX = (x1 + x2) / 2;
+          const centerY = (y1 + y2) / 2;
+
+          const newX1 = centerX + (x1 - centerX) * Math.cos(radian) - (y1 - centerY) * Math.sin(radian);
+          const newY1 = centerY + (x1 - centerX) * Math.sin(radian) + (y1 - centerY) * Math.cos(radian);
+
+          const newX2 = centerX + (x2 - centerX) * Math.cos(radian) - (y2 - centerY) * Math.sin(radian);
+          const newY2 = centerY + (x2 - centerX) * Math.sin(radian) + (y2 - centerY) * Math.cos(radian);
+
+          canvasObject = new fabric.Line([newX1, newY1, newX2, newY2], {
             stroke: obj.strokeColor,
             strokeWidth: obj.strokeWidth,
             selectable: obj.isDraggable,
@@ -107,21 +149,61 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             lockMovementY: !obj.isDraggable,
             angle: angle,
           });
+        } else if (obj.type === 'image') {
+          console.log('image moving value', obj);
+          const imgElement = new Image();
+          imgElement.src = obj.url;
+
+          imgElement.onload = () => {
+            // Create the fabric image instance
+            const imgInstance = new fabric.Image(imgElement, {
+              left: obj.x,
+              top: obj.y,
+              width: obj.width,
+              height: obj.height,
+              angle: obj.angle,
+              selectable: obj.isDraggable,
+              lockMovementX: !obj.isDraggable,
+              lockMovementY: !obj.isDraggable,
+              originX: 'center',
+              originY: 'center',  // Ensure rotation happens around the center
+            });
+
+            // Apply the angle transformation to the image
+            imgInstance.set({
+              angle: obj.angle,
+              originX: 'center',  // Center the rotation
+              originY: 'center',  // Center the rotation
+              left: obj.x,
+              top: obj.y,
+            });
+
+            // Add the image instance to the canvas
+            canvas.add(imgInstance);
+          };
         }
-        canvasObject.id = obj.id;
-        canvas.add(canvasObject);
+
+        // If it's not an image, we continue with the created canvasObject
+        if (obj.type !== 'image') {
+          canvasObject.id = obj.id;
+          canvas.add(canvasObject);
+        }
       }
     });
+
     canvas.renderAll();
   };
+
 
 
   useEffect(() => {
     if (canvasRef.current) {
       fabricCanvasRef.current = new fabric.Canvas(canvasRef.current);
-  
+
+
       fabricCanvasRef.current.on('object:modified', (e) => {
         const modifiedObject = e.target;
+        console.log("Object modified:", modifiedObject);
         updateCanvasObject({
           id: modifiedObject?.id,
           x: modifiedObject?.left,
@@ -131,26 +213,26 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
           angle: modifiedObject?.angle,
         });
       });
-  
+
       renderCanvasObjects(canvasObjects, fabricCanvasRef.current);
     }
-  
+
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize);
-  
+
     // Establish WebSocket connection
     websocketRef.current = new WebSocket("ws://localhost:3000");
-  
+
     websocketRef.current.onopen = () => {
       console.log("WebSocket connected");
     };
-  
+
     websocketRef.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         console.log("Received data:", data);
 
-  
+
         // Example: Handle received data
         if (data.type === "updateAllCanvas") {
           // Update canvas objects with the received data
@@ -172,25 +254,25 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     websocketRef.current.onclose = () => {
       console.log("WebSocket disconnected");
     };
-  
+
     websocketRef.current.onerror = (error) => {
       console.error("WebSocket error:", error);
     };
-  
+
     return () => {
       window.removeEventListener('resize', updateCanvasSize);
       if (fabricCanvasRef.current) {
         fabricCanvasRef.current.dispose();
         fabricCanvasRef.current = null;
       }
-  
+
       // Close WebSocket connection
       if (websocketRef.current) {
         websocketRef.current.close();
       }
     };
   }, []);
-  
+
 
   useEffect(() => {
     if (fabricCanvasRef.current) {
@@ -224,7 +306,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   }
 
   const handleSelectedCanvas = (index: number) => {
-    setSelectedCanvasIndex(index); 
+    setSelectedCanvasIndex(index);
     fabricCanvasRef.current.clear();
     setCanvasObjects(allcanvases[index].data);
   }

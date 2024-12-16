@@ -23,7 +23,7 @@ const uploadImage = async (file) => {
   const formData = new FormData();
   formData.append("image", fileinnew); // 'image' must match the key in multer's `upload.single("image")`
 
-  const response = await fetch(`${BASE_URL}/canvases/uploadImage`, {
+  const response = await fetch(`${BASE_URL}/uploadImage`, {
     method: 'POST',
     body: formData, // Send FormData directly
   });

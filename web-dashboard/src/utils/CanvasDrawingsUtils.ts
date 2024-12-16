@@ -41,6 +41,8 @@ interface ImageOptions {
   isDraggable?: boolean;
   canvas: fabric.Canvas;
   setCanvasObjects: any;
+  canvasObjects?: any;
+  visible?: boolean;
 }
 
 const addRectangleToCanvas = ({
@@ -147,7 +149,6 @@ const addLineToCanvas = ({
 };
 
 
-
 const addImageToCanvas = ({
   url,
   x = 0,
@@ -157,38 +158,37 @@ const addImageToCanvas = ({
   angle = 0,
   isDraggable = true,
   canvas,
+  canvasObjects,
   setCanvasObjects,
+  visible = true,
 }: ImageOptions) => {
-  fabric.Image.fromURL(url, (img, isError) => {
-    if (isError) {
-      console.error(`Error loading image: ${url}`);
-      return;
-    }
-    img.set({
+  if (!canvas) return;
+
+  const imgElement = new Image();
+  
+  imgElement.onload = () => {
+    // Create the fabric image instance after the image loads
+    const imgInstance = new fabric.Image(imgElement, {
       left: x,
       top: y,
+      scaleX: width / imgElement.width, // Scale the image according to the provided width
+      scaleY: height / imgElement.height, // Scale the image according to the provided height
       angle: angle,
       selectable: isDraggable,
-      lockMovementX: !isDraggable,
-      lockMovementY: !isDraggable,
     });
 
-    if (width && height) {
-      img.scaleToWidth(width);
-      img.scaleToHeight(height);
-    }
+    // Assign a unique ID to the image for tracking purposes
+    imgInstance.id = `image-${canvasObjects.length + 1}`;
 
-    // Add an `id` to track objects
-    img.id = `image-${Date.now()}`;
-
-    canvas.add(img);
+    // Add the image instance to the canvas
+    canvas.add(imgInstance);
     canvas.renderAll();
 
-    // Add to the state
+    // Update the canvas objects state with the new image
     setCanvasObjects((prevObjects) => [
       ...prevObjects,
       {
-        id: img.id,
+        id: imgInstance.id,
         type: 'image',
         url,
         x,
@@ -197,10 +197,15 @@ const addImageToCanvas = ({
         height,
         angle,
         isDraggable,
+        visible,
       },
     ]);
-  });
+  };
+
+  // Set the image source to trigger the image loading process
+  imgElement.src = url;
 };
+
 
 
 export { addRectangleToCanvas, addLineToCanvas, addImageToCanvas };

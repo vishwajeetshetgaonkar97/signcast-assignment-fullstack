@@ -5,6 +5,7 @@ import CanvasObjectsDataContext from "../../Contexts/CanvasObjectsDataContext";
 import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesObjectsDataContext";
 import updateCanvas from "../../api/updateCanvas";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
+import uploadImage from "../../api/uploadImage";
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas>;
@@ -34,15 +35,24 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
     const file = e.target.files?.[0];
     if (file && fabricCanvasRef.current) {
       const reader = new FileReader();
-      reader.onload = (event) => {
+  
+      reader.onload = async (event) => {
         const dataUrl = event.target?.result?.toString();
         if (dataUrl) {
-          addImageToCanvas({ url: dataUrl, canvas: fabricCanvasRef.current, setCanvasObjects });
+          try {
+            const imageUrl = await uploadImage(dataUrl);  
+            console.log('Image URL:', imageUrl.imageUrl);
+            addImageToCanvas({ url: imageUrl.imageUrl, canvas: fabricCanvasRef.current, canvasObjects, setCanvasObjects });
+          } catch (error) {
+            console.error('Error uploading image:', error);
+          }
         }
       };
+  
       reader.readAsDataURL(file);
     }
   };
+  
 
   const handleAddRectangle = () => {
     if (fabricCanvasRef.current) {
