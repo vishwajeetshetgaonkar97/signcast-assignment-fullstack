@@ -9,33 +9,6 @@ interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
 }
 
-interface RectangleOptions {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  fillColor?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
-  isDraggable?: boolean;
-  canvas: fabric.Canvas;
-  setCanvasObjects: any;
-  angle?: number;
-  visible?: boolean;
-}
-
-interface LineOptions {
-  x1?: number;
-  y1?: number;
-  x2?: number;
-  y2?: number;
-  strokeColor?: string;
-  strokeWidth?: number;
-  isDraggable?: boolean;
-  canvas: fabric.Canvas;
-  setCanvasObjects: any;
-  visible?: boolean;
-}
 
 
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
@@ -195,141 +168,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     }
   }, [canvasObjects]);
 
-  const addRectangleToCanvas = ({
-    x = 10,
-    y = 10,
-    width = 100,
-    height = 50,
-    fillColor = 'transparent',
-    strokeColor = 'black',
-    strokeWidth = 2,
-    isDraggable = true,
-    canvas,
-    angle = 0,
-    setCanvasObjects,
-    visible = true,
-  }: RectangleOptions) => {
-    const rectangle = new fabric.Rect({
-      left: x,
-      top: y,
-      width,
-      height,
-      fill: fillColor,
-      stroke: strokeColor,
-      strokeWidth,
-      selectable: isDraggable,
-      lockMovementX: !isDraggable,
-      lockMovementY: !isDraggable,
-      angle,
-    });
-
-    // Add an `id` to track objects
-    rectangle.id = `rect-${canvasObjects.length + 1}`;
-
-    canvas.add(rectangle);
-    canvas.renderAll();
-
-    // Add to the state
-    setCanvasObjects((prevObjects) => [
-      ...prevObjects,
-      {
-        id: rectangle.id,
-        type: 'rectangle',
-        x,
-        y,
-        width,
-        height,
-        fillColor,
-        strokeColor,
-        strokeWidth,
-        isDraggable,
-        angle,
-        visible,
-      },
-    ]);
-  };
-
-  const addLineToCanvas = ({
-    x1 = 10,
-    y1 = 10,
-    x2 = 100,
-    y2 = 100,
-    strokeColor = 'black',
-    strokeWidth = 2,
-    isDraggable = true,
-    canvas,
-    setCanvasObjects,
-    visible = true,
-  }: LineOptions) => {
-    const line = new fabric.Line([x1, y1, x2, y2], {
-      stroke: strokeColor,
-      strokeWidth,
-      selectable: isDraggable,
-      lockMovementX: !isDraggable,
-      lockMovementY: !isDraggable,
-    });
   
-    // Add an `id` to track objects
-    line.id = `line-${canvasObjects.length + 1}`;
-  
-    canvas.add(line);
-    canvas.renderAll();
-  
-    // Add to the state
-    setCanvasObjects((prevObjects) => [
-      ...prevObjects,
-      {
-        id: line.id,
-        type: 'line',
-        x1,
-        y1,
-        x2,
-        y2,
-        x:0,
-        y:0,
-        angle:0,
-        strokeColor,
-        strokeWidth,
-        isDraggable,
-        visible,
-      },
-    ]);
-  };
-
-  
-  const handleAddRectangle = () => {
-    if (fabricCanvasRef.current) {
-      addRectangleToCanvas({
-        canvas: fabricCanvasRef.current,
-        setCanvasObjects,
-      });
-    }
-  };
-
-  const handleAddLine = () => {
-    if (fabricCanvasRef.current) {
-      addLineToCanvas({
-        canvas: fabricCanvasRef.current,
-        setCanvasObjects,
-      });
-    }
-  };
-  
-  const handleSyncCanvas = async () => {
-    const updateCanvasPostBody = {
-      canvasId: allcanvases[selectedCanvasIndex]._id,
-      name: allcanvases[selectedCanvasIndex].name,
-      category: allcanvases[selectedCanvasIndex].category,
-      data: canvasObjects,
-    }
-
-    try {
-      const log = await updateCanvas(updateCanvasPostBody);
-      console.log("log addition ", log);
-    } catch (error) {
-      console.log(`canvas get issue ${error}`);
-    }
-  }
 
   return (
     <div ref={containerRef} className="h-full w-[80%]">
@@ -344,9 +183,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
           </div>
         ))}
       </div>
-      <button onClick={handleAddRectangle}>Add Rectangle</button>
-      <button onClick={handleAddLine}>Add Line</button>
-      <button onClick={handleSyncCanvas}>Sync</button>
     </div>
   );
 };

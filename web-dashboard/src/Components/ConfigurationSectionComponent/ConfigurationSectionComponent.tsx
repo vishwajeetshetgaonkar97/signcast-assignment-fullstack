@@ -1,5 +1,6 @@
 import { AiOutlineDownload } from 'react-icons/ai';
 import { MdDeleteForever } from 'react-icons/md';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'; // Importing visibility icons
 import * as fabric from 'fabric';
 import { downloadCanvasAsPdf } from '../../utils/CanvasUtils';
 import { useContext } from 'react';
@@ -40,15 +41,17 @@ const ConfigurationSectionComponent: React.FC<CanvasProps> = ({ fabricCanvasRef 
               <li key={index} className="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
                 <span>{object.id || `Object ${index + 1}`}</span>
                 <div className="flex items-center space-x-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={object.visible}
-                      onChange={() => toggleVisibility(index)}
-                      className="mr-2"
-                    />
-                    Visible
-                  </label>
+                  {/* Use icons instead of checkbox */}
+                  <button
+                    onClick={() => toggleVisibility(index)}
+                    className="text-lg text-gray-700"
+                  >
+                    {object.visible ? (
+                      <AiOutlineEye size={18} /> // Eye icon for visible
+                    ) : (
+                      <AiOutlineEyeInvisible size={18} /> // Eye Invisible icon for hidden
+                    )}
+                  </button>
                   <button
                     onClick={() => deleteObject(index)}
                     className="py-1 px-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"

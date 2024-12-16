@@ -12,23 +12,24 @@ interface RectangleOptions {
   canvas: fabric.Canvas;
   setCanvasObjects: any;
   angle?: number;
+  visible?: boolean;
+  canvasObjects?: any;
 }
 
 interface LineOptions {
-  startX?: number;
-  startY?: number;
-  length?: number;
-  angle?: number;
+  x1?: number;
+  y1?: number;
+  x2?: number;
+  y2?: number;
   strokeColor?: string;
   strokeWidth?: number;
   isDraggable?: boolean;
   canvas: fabric.Canvas;
-  left?: number,
-  top?: number,
-  scaleX?: number,
-  scaleY?: number,
   setCanvasObjects: any;
+  visible?: boolean;
+  canvasObjects?: any;
 }
+
 
 interface ImageOptions {
   url: string;
@@ -54,10 +55,12 @@ const addRectangleToCanvas = ({
   canvas,
   angle = 0,
   setCanvasObjects,
+  visible = true,
+  canvasObjects = [],
 }: RectangleOptions) => {
   const rectangle = new fabric.Rect({
-    x: x,
-    y: y,
+    left: x,
+    top: y,
     width,
     height,
     fill: fillColor,
@@ -70,7 +73,7 @@ const addRectangleToCanvas = ({
   });
 
   // Add an `id` to track objects
-  rectangle.id = `rect-${Date.now()}`;
+  rectangle.id = `rect-${canvasObjects.length + 1}`;
 
   canvas.add(rectangle);
   canvas.renderAll();
@@ -90,44 +93,34 @@ const addRectangleToCanvas = ({
       strokeWidth,
       isDraggable,
       angle,
+      visible,
     },
   ]);
 };
 
 const addLineToCanvas = ({
-  startX = 0,
-  startY = 0,
-  length = 100,
-  angle = 0,
+  x1 = 10,
+  y1 = 10,
+  x2 = 100,
+  y2 = 100,
   strokeColor = 'black',
   strokeWidth = 2,
   isDraggable = true,
   canvas,
   setCanvasObjects,
-  left= 10,
-  top = 20,
-  scaleX = 1,
-  scaleY = 1,
+  visible = true,
+  canvasObjects = [],
 }: LineOptions) => {
-  const radians = (Math.PI / 180) * angle;
-  const endX = startX + length * Math.cos(radians);
-  const endY = startY + length * Math.sin(radians);
-
-  const line = new fabric.Line([startX, startY, endX, endY], {
+  const line = new fabric.Line([x1, y1, x2, y2], {
     stroke: strokeColor,
-    strokeWidth: strokeWidth,
+    strokeWidth,
     selectable: isDraggable,
     lockMovementX: !isDraggable,
     lockMovementY: !isDraggable,
-    left,
-    top,
-    scaleX,
-    scaleY,
   });
 
   // Add an `id` to track objects
-  line.id = `line-${Date.now()}`;
-  const isVisible = true;
+  line.id = `line-${canvasObjects.length + 1}`;
 
   canvas.add(line);
   canvas.renderAll();
@@ -138,16 +131,17 @@ const addLineToCanvas = ({
     {
       id: line.id,
       type: 'line',
-      startX,
-      startY,
-      endX,
-      endY,
-      length,
-      angle,
+      x1,
+      y1,
+      x2,
+      y2,
+      x:0,
+      y:0,
+      angle:0,
       strokeColor,
       strokeWidth,
       isDraggable,
-      isVisible,
+      visible,
     },
   ]);
 };
