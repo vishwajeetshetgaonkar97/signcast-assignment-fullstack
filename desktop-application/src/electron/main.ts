@@ -13,45 +13,6 @@ app.on('ready', () => {
     },
   });
 
-
-  // const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
-
-  
-
-//   const wss = new WebSocket("ws://localhost:3001");
-
-//   wss.onopen = () => {
-//     console.log("WebSocket connected");
-//   };
-//   wss.onmessage = (event: any ) => {
-//     try {
-//       const data = JSON.parse(event.data);
-//       console.log("Received data:", data);
-
-
-//       if (data.type === "updateAllCanvas") {
-//         console.log("Updating canvas objects for all:", data);
-//         ipcMain.emit('get-socket-response', data.canvases);
-// console.log("Updating canvas objects for all:", data);
-//       } else if (data.type === "notification") {
-//         console.log("Notification:", data.message);
-//       }
-//     } catch (error) {
-//       console.error("Error parsing WebSocket message:", error);
-//     }
-//   };
-
-  // ipcMain.handle('get-socket',()=>{
-  //   return wss
-  // })
-
-  // wss.onclose = () => {
-  //   console.log("WebSocket disconnected");
- 
-  // };
-
-
-
   ipcMain.handle('get-canvases', async () => {
     try {
       const response = await fetch('https://signcast-assignment-fullstack-production.up.railway.app/canvases');

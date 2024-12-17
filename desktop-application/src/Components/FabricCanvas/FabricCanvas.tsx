@@ -30,7 +30,7 @@ const [isConnected, setIsConnected] = useState<boolean>(false);
       setCanvasObjects(canvases[selectedCanvasIndex].data);
 
 
-      const wss = new WebSocket("ws://localhost:3001");
+      const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
 
       wss.onopen = () => {
         console.log("WebSocket connected");
@@ -166,7 +166,7 @@ const [isConnected, setIsConnected] = useState<boolean>(false);
 
           const imgElement = new Image();
           let currentIndex = 0;
-          imgElement.src = images[currentIndex]; // Pre-load the first image
+          imgElement.src = images[currentIndex];
 
           imgElement.onload = () => {
             const slideshowImage = new fabric.Image(imgElement, {
