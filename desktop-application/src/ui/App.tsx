@@ -28,7 +28,10 @@ const updateOnlineStatus = () => setIsMonitoring(navigator.onLine);
       window.removeEventListener('online', updateOnlineStatus);
       window.removeEventListener('offline', updateOnlineStatus);
     };
+    
   }, []);
+
+
 
   return (
     <MonitoringStateContext.Provider value={monitoringStateContextValue}>

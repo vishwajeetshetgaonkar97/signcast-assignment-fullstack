@@ -16,9 +16,11 @@ const updateOnlineStatus = () => setIsMonitoring(navigator.onLine);
 
 useEffect(() => {
   window.addEventListener('offline', updateOnlineStatus);
+  window.addEventListener('online', updateOnlineStatus);
 
   // Clean up event listeners when component unmounts
   return () => {
+    window.removeEventListener('online', updateOnlineStatus);
     window.removeEventListener('offline', updateOnlineStatus);
   };
 }, []);

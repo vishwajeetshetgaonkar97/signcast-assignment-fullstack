@@ -17,6 +17,8 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
   const socket = useRef<any>(null); 
 
+  
+
   // Fetch canvases from main process using IPC
   const getAllCanvases = async () => {
     try {

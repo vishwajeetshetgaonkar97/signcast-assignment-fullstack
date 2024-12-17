@@ -11,6 +11,7 @@ app.on('ready', () => {
     },
   });
 
+
   // Handle request to get canvases from renderer
   ipcMain.handle('get-canvases', async () => {
     try {
