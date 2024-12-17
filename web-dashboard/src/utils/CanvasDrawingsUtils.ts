@@ -286,7 +286,7 @@ const addTextToCanvas = ({
 
 
 const addSlideshowToCanvas = ({
-  images = ["https://signcast-assignment-fullstack.vercel.app/uploads/1734466424768.png", "https://signcast-assignment-fullstack.vercel.app/uploads/1734466436597.png", "https://signcast-assignment-fullstack.vercel.app/uploads/1734466443994.png"],
+  images = ["https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466424768.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466436597.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466443994.png"],
   x = 50,
   y = 50,
   width = 890,
