@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as fabric from 'fabric';
-import { io } from 'socket.io-client';
+import getCanvases from '../../api/getCanvases';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -32,21 +32,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   };
   useEffect(() => {
     getAllCanvases(); 
-
-    socket.current = io('http://localhost:3001'); 
-
-    socket.current.on('canvas-update', (updatedObject: any) => {
-      console.log('Received canvas update:', updatedObject);
-      setCanvasObjects((prevObjects) => {
-        return prevObjects.map((obj) =>
-          obj.id === updatedObject.id ? { ...obj, ...updatedObject } : obj
-        );
-      });
-    });
-
-    return () => {
-      socket.current?.disconnect();
-    };
   }, []);
 
   console.log('canvases value', allcanvases);

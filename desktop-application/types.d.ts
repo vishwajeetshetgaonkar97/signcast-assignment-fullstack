@@ -22,3 +22,10 @@ declare global {
     };
   }
 }
+
+interface Window {
+  electron: {
+    getCanvases: () => Promise<any[]>; // Adjust the return type as needed
+    // Define other methods here if needed
+  };
+}
