@@ -4,9 +4,13 @@ const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
 const path = require("path");
+const WebSocket = require("ws");
 
 function CanvasRouter(database,wss) {
   var router = express.Router();
+
+  
+console.log("Wssss log Canvas Router file", wss)
 
   const notifyClients = async () => {
     console.log("Notifying clients...");

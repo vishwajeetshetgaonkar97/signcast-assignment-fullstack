@@ -10,6 +10,8 @@ const WebSocket = require("ws");
 
 const PORT = 3001;
 
+
+
 const app = express();
 app.use(cors({
   origin: "*",
@@ -28,6 +30,8 @@ app.use((req, res, next) => {
   
   next();
 });
+
+
 
 app.set("view engine", "ejs");
 
@@ -89,9 +93,11 @@ const server = app.listen(PORT, async () => {
   console.log(`Server started on port ${PORT}`);
 });
 
-// Setup WebSocket server
 const wss = new WebSocket.Server({ server });
 
+console.log("Wssss log server file", wss)
+
+// Setup WebSocket server
 wss.on("connection", (ws) => {
   console.log("New WebSocket connection established");
 
