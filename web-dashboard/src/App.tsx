@@ -7,6 +7,7 @@ const App: React.FC = () => {
   const [themeMode, setThemeMode] = useState("light");
 const [isMonitoring, setIsMonitoring] = useState(false);
 
+
 const monitoringStateContextValue = useMemo(
   () => ({ isMonitoring, setIsMonitoring}), 
   [isMonitoring, setIsMonitoring]
