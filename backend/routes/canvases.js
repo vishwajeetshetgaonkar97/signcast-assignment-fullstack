@@ -1,6 +1,4 @@
-const DatabaseService = require("../database/database.js");
 const express = require("express");
-const helpers = require("../helpers/auth.js");
 const mongodb = require("mongodb");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -43,6 +41,9 @@ function CanvasRouter(database,wss) {
     };
     try {
       let canvases = await database.collections.canvases.insertOne(ref);
+
+      await notifyClients();
+      
       res.json({ canvases });
     } catch (error) {
       console.error("Error inserting canvas:", error);
@@ -69,7 +70,6 @@ function CanvasRouter(database,wss) {
       console.log("canvasID", canvasMongoId);
       const updatednewCanvas = await database.collections.canvases.updateOne({ _id: canvasMongoId }, { $set: updatedCanvas });
 
-       // Notify WebSocket clients
        await notifyClients();
 
       res.json({ message: "Canvas updated successfully", updatednewCanvas });

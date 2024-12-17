@@ -1,14 +1,10 @@
-const DatabaseService = require("../database/database.js");
 const express = require("express");
-const helpers = require("../helpers/auth.js");
 const mongodb = require("mongodb");
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
 
 function DeiceStatusRouter(database) {
   var router = express.Router();
 
-  // Route for the homepage
+
   router.get("/", async (req, res) => {
     let data = await database.collections;
     let devicesOp = await database.collections.devices.find().toArray();
@@ -16,7 +12,7 @@ function DeiceStatusRouter(database) {
     res.json({ devicesOp });
   });
 
-  // Route to add a new canvas
+
   router.post("/addDevice", async (req, res) => {
     console.log("Received request:", req.body);
     let data = req.body;
@@ -65,10 +61,8 @@ function DeiceStatusRouter(database) {
     const deviceID = req.params.deviceID;
 
     try {
-      // Convert `canvasID` to a MongoDB ObjectId
+   
       const deviceObjectId = new mongodb.ObjectId(deviceID);
-
-      // Find the canvas by its `_id`
       const deviceop = await database.collections.devices.findOne({ _id: deviceObjectId });
 
       if (deviceop) {
