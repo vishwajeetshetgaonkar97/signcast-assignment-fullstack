@@ -54,7 +54,7 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
 
     const result = await database.collections.images.insertOne(imageMetadata);
 
-    const imageUrl = `http://localhost:3001/uploads/${req.file.filename}`;
+    const imageUrl = `https://signcast-assignment-fullstack-production.up.railway.app/uploads/${req.file.filename}`;
 
     console.log("Image uploaded successfully");
 

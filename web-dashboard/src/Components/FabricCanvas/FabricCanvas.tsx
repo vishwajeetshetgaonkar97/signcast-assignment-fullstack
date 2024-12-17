@@ -260,7 +260,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize);
 
-    websocketRef.current = new WebSocket("ws://localhost:3001");
+    websocketRef.current = new WebSocket("ws://signcast-assignment-fullstack-production.up.railway.app/");
 
     websocketRef.current.onopen = () => {
       console.log("WebSocket connected");
