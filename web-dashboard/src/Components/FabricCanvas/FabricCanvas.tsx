@@ -93,12 +93,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     );
   };
 
-  const sendCanvasObjectData = (data: any) => {
-    if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
-      websocketRef.current.send(JSON.stringify(data));
-    }
-  };
-
   const sendDeviceMonitoringStatus = (data: any) => {
     if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
       websocketRef.current.send(JSON.stringify(data));

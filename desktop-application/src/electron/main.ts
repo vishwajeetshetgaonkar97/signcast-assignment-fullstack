@@ -3,12 +3,39 @@ import { isDev } from './util.js';
 import { getPreloadPath, getUIPath } from './pathResolver.js';
 import { createTray } from './tray.js';
 import { createMenu } from './menu.js';
+import WebSocket, { WebSocketServer } from 'ws'; 
 
 app.on('ready', () => {
   const mainWindow = new BrowserWindow({
     webPreferences: {
       preload: getPreloadPath(),
     },
+  });
+
+  const wss = new WebSocketServer({ port: 3001 }); 
+
+  // When a client connects
+  wss.on('connection', (ws: WebSocket) => {
+    console.log('A new client connected');
+
+    // Send a message to the client when they connect
+    ws.send('Hello Client!');
+
+    // Listen for messages from the client
+    ws.on('message', (message: string) => {
+      console.log('Received:', message);
+      // You can broadcast the message to all connected clients if needed
+      wss.clients.forEach((client: WebSocket) => {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.send(message);
+        }
+      });
+    });
+
+    // Handle client disconnection
+    ws.on('close', () => {
+      console.log('A client disconnected');
+    });
   });
 
   // Handle request to get canvases from renderer
@@ -23,6 +50,7 @@ app.on('ready', () => {
     }
   });
 
+  // Load the appropriate URL or file based on the environment
   if (isDev()) {
     mainWindow.loadURL('http://localhost:5123');
     mainWindow.webContents.openDevTools();

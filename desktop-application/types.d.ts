@@ -15,3 +15,10 @@ interface Window {
   };
 }
 
+declare global {
+  interface Window {
+    electron: {
+      getCanvases: () => Promise<any[]>; // Define the return type appropriately
+    };
+  }
+}
