@@ -50,7 +50,6 @@ function DeiceStatusRouter(database) {
 
 
     try {
-      console.log("ref", updatedDevice);
       let deviceMongoId = new mongodb.ObjectId(deviceID);
       console.log("deviceID", deviceMongoId);
       const updatednewDevice = await database.collections.devices.updateOne({ _id: deviceMongoId }, { $set: updatedDevice });

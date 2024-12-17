@@ -6,7 +6,7 @@ import { createMenu } from './menu.js';
 
 app.on('ready', () => {
   const mainWindow = new BrowserWindow({
-    webPreferences: {
+    webPreferences: { 
       preload: getPreloadPath(),
     },
   });
@@ -22,6 +22,19 @@ app.on('ready', () => {
     } catch (error) {
       console.error(`Error fetching canvases: ${error}`);
       throw new Error('Error fetching canvases');
+    }
+  });
+
+  ipcMain.handle('get-devices', async () => {
+    try {
+      const response = await fetch('http://localhost:3001/devices/device/675f2e50e23a9c8e760a8839');
+      console.log("Response", response);
+      const data = await response.json();
+      console.log("Device Data", data.deviceop);
+      return data.deviceop; 
+    } catch (error) {
+      console.error(`Error fetching Devices: ${error}`);
+      throw new Error('Error fetching Devices');
     }
   });
 
