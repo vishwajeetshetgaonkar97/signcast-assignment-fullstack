@@ -1,6 +1,6 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
 import * as fabric from 'fabric';
-import { addImageToCanvas, addLineToCanvas, addRectangleToCanvas, addSlideshowToCanvas, addTextToCanvas, addVideoToCanvas } from "../../utils/CanvasDrawingsUtils";
+import { addImageToCanvas, addLineToCanvas, addRectangleToCanvas, addSlideshowToCanvas, addTextToCanvas } from "../../utils/CanvasDrawingsUtils";
 import CanvasObjectsDataContext from "../../Contexts/CanvasObjectsDataContext";
 import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesObjectsDataContext";
 import updateCanvas from "../../api/updateCanvas";
@@ -12,7 +12,7 @@ interface CanvasProps {
 }
 
 const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
-  const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
+  const { allcanvases } = useContext(AllCanvasesObjectsDataContext);
   const { canvasObjects, setCanvasObjects } = useContext(CanvasObjectsDataContext);
   const { selectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -96,77 +96,79 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
   };
 
   return (
-    <div className="h-max  px-4 py-3 space-y-0 border border-border-color">
-      <div className="flex justify-between items-center pb-3 ">
-        <button
-          onClick={handleSyncCanvas}
-          disabled={!isSyncRequired}
-          className={`w-full py-2 px-4 text-xs border ${isSyncRequired ? 'bg-green-700 text-white' : 'bg-gray-300 text-gray-600'}`}
-        >
-          {isSyncRequired ? 'Sync Changes' : 'No Sync Required'}
-        </button>
-      </div>
-      <h4 className="font-semibold text-xs pb-1 opacity-80">Add Components</h4>
-      <div className="flex flex-wrap min-h-fit w-full pt-2 gap-2">
-        <button
-          onClick={() => {
-            if (fabricCanvasRef.current) {
-              handleAddRectangle();
-            }
-          }}
-          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
-        >
-          Add Rectangle
-        </button>
+    <div className="flex flex-col gap-4 max-h-full overflow-y-auto border-border-color border-b border-opacity-50">
+      <div className="h-max  px-4 py-3 space-y-0 border border-border-color">
+        <div className="flex justify-between items-center pb-3 ">
+          <button
+            onClick={handleSyncCanvas}
+            disabled={!isSyncRequired}
+            className={`w-full py-2 px-4 text-xs border ${isSyncRequired ? 'bg-green-700 text-white' : 'bg-gray-300 text-gray-600'}`}
+          >
+            {isSyncRequired ? 'Sync Changes' : 'No Sync Required'}
+          </button>
+        </div>
+        <h4 className="font-semibold text-xs pb-1 opacity-80">Add Components</h4>
+        <div className="flex flex-wrap min-h-fit w-full pt-2 gap-2">
+          <button
+            onClick={() => {
+              if (fabricCanvasRef.current) {
+                handleAddRectangle();
+              }
+            }}
+            className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          >
+            Add Rectangle
+          </button>
 
-        <button
-          onClick={() => {
-            if (fabricCanvasRef.current) {
-              handleAddLine();
-            }
-          }}
-          className="bg-transparent w-full  hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
-        >
-          Add Line
-        </button>
+          <button
+            onClick={() => {
+              if (fabricCanvasRef.current) {
+                handleAddLine();
+              }
+            }}
+            className="bg-transparent w-full  hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          >
+            Add Line
+          </button>
 
-        <button
-          onClick={() => {
-            if (fabricCanvasRef.current) {
-              handleAddText();
-            }
-          }}
-          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
-        >
-          Add Text
-        </button>
+          <button
+            onClick={() => {
+              if (fabricCanvasRef.current) {
+                handleAddText();
+              }
+            }}
+            className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          >
+            Add Text
+          </button>
 
-        <button
-          onClick={() => {
-            if (fabricCanvasRef.current) {
-              addSlideshowToCanvas( { canvas: fabricCanvasRef.current, setCanvasObjects, canvasObjects });
-            }
-          }}
-          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
-        >
-          Add Image SlideShow
-        </button>
+          <button
+            onClick={() => {
+              if (fabricCanvasRef.current) {
+                addSlideshowToCanvas({ canvas: fabricCanvasRef.current, setCanvasObjects, canvasObjects });
+              }
+            }}
+            className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          >
+            Add Image SlideShow
+          </button>
 
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          style={{ display: 'none' }}
-        />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
-        >
-          Add Image
-        </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            style={{ display: 'none' }}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          >
+            Add Image
+          </button>
 
 
 
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import FabricCanvas from "../FabricCanvas/FabricCanvas";
-import ConfigurationSectionComponent from "../ConfigurationSectionComponent/ConfigurationSectionComponent";
+import CanvasControlComponent from "../CanvasControlComponent/CanvasControlComponent";
 import CanvasObjectsDataContext from "../../Contexts/CanvasObjectsDataContext";
 import * as fabric from "fabric";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
@@ -8,9 +8,8 @@ import getCanvases from "../../api/getCanvases";
 import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesObjectsDataContext";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
 
-const DigitalDrawingToolComponent: React.FC = () => {
+const MainControlComponent: React.FC = () => {
   // local state references to data
-
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const [allcanvases, setAllCanvases] = useState<any[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
@@ -51,7 +50,6 @@ const DigitalDrawingToolComponent: React.FC = () => {
     }
   };
 
-
   useEffect(() => {
     getAllCanvases();
   }, []);
@@ -69,7 +67,7 @@ const DigitalDrawingToolComponent: React.FC = () => {
         <CanvasObjectsDataContext.Provider value={CanvasObjectsDataContextValue}>
           <div className="flex h-full pb-2 align-center justify-center w-full gap-4 flex-col md:flex-row">
             <FabricCanvas fabricCanvasRef={fabricCanvasRef} />
-            <ConfigurationSectionComponent fabricCanvasRef={fabricCanvasRef} />
+            <CanvasControlComponent fabricCanvasRef={fabricCanvasRef} />
           </div>
         </CanvasObjectsDataContext.Provider>
         </SelectedCanvasObjectIndexDataContext.Provider>
@@ -79,4 +77,4 @@ const DigitalDrawingToolComponent: React.FC = () => {
   );
 };
 
-export default DigitalDrawingToolComponent;
+export default MainControlComponent;
