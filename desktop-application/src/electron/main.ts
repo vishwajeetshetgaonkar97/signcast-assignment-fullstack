@@ -9,44 +9,46 @@ app.on('ready', () => {
   const mainWindow = new BrowserWindow({
     webPreferences: { 
       preload: getPreloadPath(),
+    
     },
   });
 
 
-  const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
+  // const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
+
+  
+
+//   const wss = new WebSocket("ws://localhost:3001");
+
+//   wss.onopen = () => {
+//     console.log("WebSocket connected");
+//   };
+//   wss.onmessage = (event: any ) => {
+//     try {
+//       const data = JSON.parse(event.data);
+//       console.log("Received data:", data);
 
 
+//       if (data.type === "updateAllCanvas") {
+//         console.log("Updating canvas objects for all:", data);
+//         ipcMain.emit('get-socket-response', data.canvases);
+// console.log("Updating canvas objects for all:", data);
+//       } else if (data.type === "notification") {
+//         console.log("Notification:", data.message);
+//       }
+//     } catch (error) {
+//       console.error("Error parsing WebSocket message:", error);
+//     }
+//   };
 
-  wss.onopen = () => {
-    console.log("WebSocket connected");
-    const data = {
-      name: "Master Device",
-      status: "online",
-    }
-  };
-  wss.onmessage = (event: any ) => {
-    console.log("Socket Response", event.data);
-    try {
-      const data = JSON.parse(event.data);
-      console.log("Received data:", data);
+  // ipcMain.handle('get-socket',()=>{
+  //   return wss
+  // })
 
-
-      if (data.type === "updateAllCanvas") {
-        console.log("Updating canvas objects for all:", data);
-        ipcMain.emit('get-socket-response', data.canvases);
-console.log("Updating canvas objects for all:", data);
-      } else if (data.type === "notification") {
-        console.log("Notification:", data.message);
-      }
-    } catch (error) {
-      console.error("Error parsing WebSocket message:", error);
-    }
-  };
-
-  wss.onclose = () => {
-    console.log("WebSocket disconnected");
+  // wss.onclose = () => {
+  //   console.log("WebSocket disconnected");
  
-  };
+  // };
 
 
 

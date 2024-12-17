@@ -8,4 +8,6 @@ contextBridge.exposeInMainWorld('electron', {
 
   getSocketResponse: async () => ipcRenderer.invoke('get-socket-response'),
 
+  getSocket: async () => ipcRenderer.invoke('get-socket'),
+
 });

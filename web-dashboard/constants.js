@@ -1,4 +1,4 @@
-export const IS_TEST = false;
+export const IS_TEST = true;
 
 const BASE_URL_TEST = 'http://localhost:3001';
 const BASE_URL_PROD = 'https://signcast-assignment-fullstack-production.up.railway.app';

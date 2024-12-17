@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as fabric from 'fabric';
+import { get } from 'http';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -16,8 +17,8 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [canvasObjects, setCanvasObjects] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+const [isConnected, setIsConnected] = useState<boolean>(false);
 
-  const socket = useRef<any>(null); 
 
   const getAllCanvases = async () => {
     try {
@@ -27,15 +28,47 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
       setAllCanvases(canvases);
       console.log('canvases', canvases);
       setCanvasObjects(canvases[selectedCanvasIndex].data);
+
+
+      const wss = new WebSocket("ws://localhost:3001");
+
+      wss.onopen = () => {
+        console.log("WebSocket connected");
+        setIsConnected(true);
+      };
+
+
+      wss.onmessage = (event: any) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("Received data:", data);
+
+          if (data.action === "updateAllCanvas") {
+            console.log("Updating canvas objects for all:", data);
+            setAllCanvases(data.canvases);
+          } else if (data.type === "notification") {
+            console.log("Notification:", data.message);
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
+      };
+
+      wss.onclose = () => {
+        console.log("WebSocket disconnected");
+        setIsConnected(false);
+      };
+
     } catch (error) {
       console.log(`Canvas get issue: ${error}`);
     }
   };
+
   useEffect(() => {
-    getAllCanvases(); 
+    getAllCanvases();
+
   }, []);
 
-  console.log('canvases value', allcanvases);
 
   const renderCanvasObjects = (canvasObjects, canvas) => {
     canvas.clear();
@@ -105,14 +138,14 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
               lockMovementX: !obj.isDraggable,
               lockMovementY: !obj.isDraggable,
               originX: 'center',
-              originY: 'center',  
+              originY: 'center',
             });
 
-         
+
             imgInstance.set({
               angle: obj.angle,
-              originX: 'center',  
-              originY: 'center', 
+              originX: 'center',
+              originY: 'center',
               left: obj.x,
               top: obj.y,
             });
@@ -130,11 +163,11 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         } else if (obj.type === 'slideshow') {
           console.log('slideshow', obj);
           const { images, x, y, width, height, isDraggable } = obj;
-        
+
           const imgElement = new Image();
           let currentIndex = 0;
           imgElement.src = images[currentIndex]; // Pre-load the first image
-        
+
           imgElement.onload = () => {
             const slideshowImage = new fabric.Image(imgElement, {
               left: x,
@@ -143,24 +176,24 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
               scaleY: height / imgElement.height,
               selectable: isDraggable,
             });
-        
+
             canvas.add(slideshowImage);
-        
+
             // Update the image every 2 seconds
             const updateImage = () => {
               currentIndex = (currentIndex + 1) % images.length;
               imgElement.src = images[currentIndex];
             };
-        
+
             setInterval(updateImage, 2000);
           };
-        
+
           imgElement.onerror = (e) => {
             console.error('Failed to load image:', e);
             alert('Image failed to load. Check the URL or try another one.');
           };
         }
-        
+
 
         if (obj.type !== 'image' && obj.type !== 'slideshow' && obj.type !== 'video') {
           canvasObject.id = obj.id;
@@ -240,9 +273,9 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     if (canvasRef.current) {
       fabricCanvasRef.current = new fabric.Canvas(canvasRef.current);
 
-     
+
       fabricCanvasRef.current.on('object:modified', (e) => {
-        const modifiedObject = e.target as CustomFabricObject; 
+        const modifiedObject = e.target as CustomFabricObject;
 
         console.log("Object modified:", modifiedObject);
         updateCanvasObject({
@@ -262,7 +295,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     window.addEventListener('resize', updateCanvasSize);
 
 
-  
+
 
 
 
@@ -273,7 +306,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         fabricCanvasRef.current = null;
       }
 
-  
+
     };
   }, []);
 
@@ -287,34 +320,34 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   }, [canvasObjects]);
 
 
-console.log('canvasObjects', canvasObjects);
+  console.log('canvasObjects', canvasObjects);
 
-const handleSelectedCanvas = (index: number) => {
-  setSelectedCanvasIndex(index);
-  fabricCanvasRef.current.clear();
-  setCanvasObjects(allcanvases[index].data);
-}
+  const handleSelectedCanvas = (index: number) => {
+    setSelectedCanvasIndex(index);
+    fabricCanvasRef.current.clear();
+    setCanvasObjects(allcanvases[index].data);
+  }
 
-const isIndexCanvasSelected = (index: number) => {
-  return selectedCanvasIndex === index;
-};
+  const isIndexCanvasSelected = (index: number) => {
+    return selectedCanvasIndex === index;
+  };
 
 
   return (
     <div ref={containerRef} className="h-full w-full">
       <div>
-      <canvas ref={canvasRef} className="border border-gray-300 h-full w-full" />
-      <div className='flex gap-2 mt-2'>
-        {allcanvases.map((canvas, index) => (
-          <div
-            key={index}
-            onClick={() => handleSelectedCanvas(index)}
-            className={`p-2 border border-gray-300 w-fit text-xs cursor-pointer hover:bg-gray-100 ${isIndexCanvasSelected(index) ? 'bg-gray-300' : ''}`}
-          >
-            {canvas.name}
-          </div>
-        ))}
-      </div>
+        <canvas ref={canvasRef} className="border border-gray-300 h-full w-full" />
+        <div className='flex gap-2 mt-2'>
+          {allcanvases.map((canvas, index) => (
+            <div
+              key={index}
+              onClick={() => handleSelectedCanvas(index)}
+              className={`p-2 border border-gray-300 w-fit text-xs cursor-pointer hover:bg-gray-100 ${isIndexCanvasSelected(index) ? 'bg-gray-300' : ''}`}
+            >
+              {canvas.name}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex flex-col gap-4 max-h-full overflow-y-auto border-gray-300">
         {canvasObjects.map((object, index) => (
@@ -323,7 +356,10 @@ const isIndexCanvasSelected = (index: number) => {
           </div>
         ))}
       </div>
-     
+      <div>
+        {isConnected ? "Connected" : "Not Connected"}
+      </div>
+
     </div>
   );
 };
