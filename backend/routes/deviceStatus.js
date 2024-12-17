@@ -8,15 +8,12 @@ function DeiceStatusRouter(database) {
   router.get("/", async (req, res) => {
     let data = await database.collections;
     let devicesOp = await database.collections.devices.find().toArray();
-    console.log("devices", devicesOp);
     res.json({ devicesOp });
   });
 
 
   router.post("/addDevice", async (req, res) => {
-    console.log("Received request:", req.body);
     let data = req.body;
-    console.log("Parsed data:", data);
     const ref = {
       name: data.name,
       isMonitoring: data.isMonitoring,
@@ -33,9 +30,7 @@ function DeiceStatusRouter(database) {
 
   router.post("/updateDevice/:deviceID", async (req, res) => {
     let data = req.body;
-    console.log("data", data);
     const deviceID = req.params.deviceID;
-    console.log("deviceID", deviceID);
 
     const updatedDevice = {
       name: data.name,
@@ -47,7 +42,6 @@ function DeiceStatusRouter(database) {
 
     try {
       let deviceMongoId = new mongodb.ObjectId(deviceID);
-      console.log("deviceID", deviceMongoId);
       const updatednewDevice = await database.collections.devices.updateOne({ _id: deviceMongoId }, { $set: updatedDevice });
 
       res.json({ message: "Device updated successfully", updatednewDevice });

@@ -13,7 +13,6 @@ function CanvasRouter(database,wss) {
 console.log("Wssss log Canvas Router file", wss)
 
   const notifyClients = async () => {
-    console.log("Notifying clients...");
     const canvases = await database.collections.canvases.find().toArray();
     console.log("canvases", canvases);
     wss.clients.forEach((client) => {
@@ -26,18 +25,14 @@ console.log("Wssss log Canvas Router file", wss)
   // Route for the homepage
   router.get("/", async (req, res) => {
     let data = await database.collections;
-    console.log("data", data);
     let users = await database.collections.users.find().toArray();
     let canvases = await database.collections.canvases.find().toArray();
-    console.log("canvases", canvases);
     res.json({ canvases });
   });
 
   // Route to add a new canvas
   router.post("/addCanvas", async (req, res) => {
-    console.log("Received request:", req.body);
     let data = req.body;
-    console.log("Parsed data:", data);
     const ref = {
       name: data.name,
       category: data.category,
@@ -58,7 +53,6 @@ console.log("Wssss log Canvas Router file", wss)
 
   router.post("/updateCanvas/:canvasID", async (req, res) => {
     let data = req.body;
-    console.log("data", data);
     const canvasID = req.params.canvasID;
     console.log("canvasID", canvasID);
 
@@ -71,7 +65,6 @@ console.log("Wssss log Canvas Router file", wss)
 
     try {
       let canvasMongoId = new mongodb.ObjectId(canvasID);
-      console.log("canvasID", canvasMongoId);
       const updatednewCanvas = await database.collections.canvases.updateOne({ _id: canvasMongoId }, { $set: updatedCanvas });
 
        await notifyClients();
@@ -106,8 +99,6 @@ console.log("Wssss log Canvas Router file", wss)
 
   router.post("/uploadImage", upload.single("image"), async (req, res) => {
     try {
-      console.log("Received request:", req.body);
-      console.log("Received file:", req.file);
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
       }
