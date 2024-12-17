@@ -4,6 +4,7 @@ import CanvasObjectsDataContext from '../../Contexts/CanvasObjectsDataContext';
 import AllCanvasesObjectsDataContext from '../../Contexts/AllCanvasesObjectsDataContext';
 import SelectedCanvasObjectIndexDataContext from '../../Contexts/SelectedCanvasObjectIndexDataContext';
 import addCanvas from '../../api/addCanvas';
+import MonitoringStateContext from '../../Contexts/MonitoringStateContext';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -15,6 +16,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
   const { selectedCanvasIndex, setSelectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext);
   const { canvasObjects, setCanvasObjects } = useContext(CanvasObjectsDataContext);
+  const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
@@ -94,6 +96,12 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   };
 
   const sendCanvasObjectData = (data: any) => {
+    if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+      websocketRef.current.send(JSON.stringify(data));
+    }
+  };
+
+  const sendDeviceMonitoringStatus = (data: any) => {
     if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
       websocketRef.current.send(JSON.stringify(data));
     }
@@ -221,10 +229,16 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     window.addEventListener('resize', updateCanvasSize);
 
     // Establish WebSocket connection
-    websocketRef.current = new WebSocket("ws://localhost:3000");
+    websocketRef.current = new WebSocket("ws://localhost:3001");
 
     websocketRef.current.onopen = () => {
       console.log("WebSocket connected");
+      const data = {
+        name: "Master Device",
+        status: "online",
+      }
+      sendDeviceMonitoringStatus(data)
+      setIsMonitoring(true)
     };
 
     websocketRef.current.onmessage = (event) => {
@@ -239,7 +253,9 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
           console.log("Updating canvas objects for all:", data);
           setAllCanvases(data.canvases);
           setCanvasObjects(data.canvases[selectedCanvasIndex].data);
-
+          if (!isMonitoring) {
+            setIsMonitoring(true)
+          }
           // setCanvasObjects(data.canvasObjects);
         } else if (data.type === "notification") {
           // Show a notification or log data
@@ -253,6 +269,12 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
     websocketRef.current.onclose = () => {
       console.log("WebSocket disconnected");
+      const data = {
+        name: "Master Device",
+        status: "offline",
+      }
+      sendDeviceMonitoringStatus(data)
+      setIsMonitoring(false)
     };
 
     websocketRef.current.onerror = (error) => {

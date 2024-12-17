@@ -4,7 +4,6 @@ import ConfigurationSectionComponent from "../ConfigurationSectionComponent/Conf
 import CanvasObjectsDataContext from "../../Contexts/CanvasObjectsDataContext";
 import * as fabric from "fabric";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
-import addCanvas from "../../api/addCanvas";
 import getCanvases from "../../api/getCanvases";
 import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesObjectsDataContext";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
@@ -16,6 +15,7 @@ const DigitalDrawingToolComponent: React.FC = () => {
   const [allcanvases, setAllCanvases] = useState<any[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [canvasObjects, setCanvasObjects] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const AllCanvasObjectsDataContextValue = useMemo(
     () => ({ allcanvases, setAllCanvases }),
@@ -32,7 +32,6 @@ const DigitalDrawingToolComponent: React.FC = () => {
     [canvasObjects, setCanvasObjects]
   );
 
-  const isLoading = false;
 
 
   const getAllCanvases = async () => {
@@ -44,28 +43,11 @@ const DigitalDrawingToolComponent: React.FC = () => {
       if(data.canvases.length > 0){
         setCanvasObjects(data.canvases[0].data);
       }
-
+      setIsLoading(false);
     } catch (error) {
       console.log(`canvas get issue ${error}`);
-    }
-  };
-
-
-  const handleAddCanvas = async () => {
-    console.log("Add Canvas");
-
-    try {
-      const postData = {
-        name: "test canvas",
-        category: 'cricket',
-        data: [{ test: 'test' }, { test: 'test' }],
-      };
-      const log = await addCanvas(postData);
-      console.log("log addition ", log);
-    } catch (error) {
-
-      console.log(`canvas get issue ${error}`);
-
+      setIsLoading(false);
+      alert('Error loading data');
     }
   };
 

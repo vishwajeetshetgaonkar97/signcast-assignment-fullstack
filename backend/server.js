@@ -13,7 +13,7 @@ const canvasesRouter = require("./routes/canvases.js");
 const deviceStatusRouter = require("./routes/deviceStatus.js");
 const cors = require("cors");
 const WebSocket = require("ws");
-const PORT = 3000;
+const PORT = 3001;
 
 // Initialize Express app
 const app = express();
@@ -64,7 +64,7 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
     // Construct the URL to access the image
     const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
 
-    console.log("Image uploaded successfully", imageUrl);
+    console.log("Image uploaded successfully");
 
     res.json({
       message: "Image uploaded successfully",
@@ -101,6 +101,7 @@ wss.on("connection", (ws) => {
 
     // Broadcast the message to all connected clients
     wss.clients.forEach((client) => {
+      console.log("client", client);
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       }
