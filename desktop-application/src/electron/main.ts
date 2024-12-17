@@ -15,7 +15,7 @@ app.on('ready', () => {
   // Handle request to get canvases from renderer
   ipcMain.handle('get-canvases', async () => {
     try {
-      const response = await fetch('https://signcast-assignment-fullstack-production.up.railway.app/canvases');
+      const response = await fetch('https://signcast-assignment-fullstack.vercel.app/canvases');
       const data = await response.json();
       console.log("Data from canvases:", data);
       return data.canvases; 
@@ -27,7 +27,7 @@ app.on('ready', () => {
 
   ipcMain.handle('get-devices', async () => {
     try {
-      const response = await fetch('https://signcast-assignment-fullstack-production.up.railway.app/devices/device/675f2e50e23a9c8e760a8839');
+      const response = await fetch('https://signcast-assignment-fullstack.vercel.app/devices/device/675f2e50e23a9c8e760a8839');
       console.log("Response", response);
       const data = await response.json();
       console.log("Device Data", data.deviceop);

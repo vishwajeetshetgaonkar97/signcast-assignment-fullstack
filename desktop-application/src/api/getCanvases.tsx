@@ -3,7 +3,7 @@ import fetch from 'electron-fetch'; // Or use require if needed
 const getCanvases = async () => {
   try {
     // Make an API request to fetch canvases data
-    const response = await fetch('https://signcast-assignment-fullstack-production.up.railway.app/canvases');
+    const response = await fetch('https://signcast-assignment-fullstack.vercel.app/canvases');
 
     // Check if the response is successful (status code 200-299)
     if (!response.ok) {
