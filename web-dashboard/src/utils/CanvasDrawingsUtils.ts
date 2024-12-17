@@ -286,11 +286,11 @@ const addTextToCanvas = ({
 
 
 const addSlideshowToCanvas = ({
-  images = ["https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734390815720.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734409324614.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734390815720.png"],
+  images = ["https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466424768.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466436597.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466443994.png"],
   x = 50,
   y = 50,
-  width = 200,
-  height = 200,
+  width = 890,
+  height = 500,
   interval = 5000,
   canvas,
   setCanvasObjects,
