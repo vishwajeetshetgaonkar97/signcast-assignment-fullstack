@@ -34,29 +34,29 @@ const ConfigurationSectionComponent: React.FC<CanvasProps> = ({ fabricCanvasRef 
 
       {/* Render canvasObjects content */}
       <div className="h-max px-4 py-3 space-y-0 border border-border-color">
-        <h4 className="font-semibold text-sm pb-1 opacity-80">Layers</h4>
+        <h4 className="font-semibold text-xs pb-2 opacity-80">Layers</h4>
         {canvasObjects.length > 0 ? (
           <ul className="space-y-2">
             {canvasObjects.map((object, index) => (
-              <li key={index} className="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
-                <span>{object.id || `Object ${index + 1}`}</span>
+              <li key={index} className="flex items-center justify-between p-2 bg-gray-100 shadow-sm">
+                <span className="text-xs " >{object.id || `Object ${index + 1}`}</span>
                 <div className="flex items-center space-x-2">
                   {/* Use icons instead of checkbox */}
                   <button
                     onClick={() => toggleVisibility(index)}
-                    className="text-lg text-gray-700"
+                    className="text-xs text-gray-700 hover:opacity-70"
                   >
                     {object.visible ? (
-                      <AiOutlineEye size={18} /> // Eye icon for visible
+                      <AiOutlineEye size={18} /> 
                     ) : (
-                      <AiOutlineEyeInvisible size={18} /> // Eye Invisible icon for hidden
+                      <AiOutlineEyeInvisible size={18} /> 
                     )}
                   </button>
                   <button
                     onClick={() => deleteObject(index)}
                     className="py-1 px-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
                   >
-                    <MdDeleteForever size={18} />
+                    <MdDeleteForever size={14} />
                   </button>
                 </div>
               </li>

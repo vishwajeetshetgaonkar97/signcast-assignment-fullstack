@@ -1,6 +1,6 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
 import * as fabric from 'fabric';
-import { addImageToCanvas, addLineToCanvas, addRectangleToCanvas } from "../../utils/CanvasDrawingsUtils";
+import { addImageToCanvas, addLineToCanvas, addRectangleToCanvas, addSlideshowToCanvas, addTextToCanvas, addVideoToCanvas } from "../../utils/CanvasDrawingsUtils";
 import CanvasObjectsDataContext from "../../Contexts/CanvasObjectsDataContext";
 import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesObjectsDataContext";
 import updateCanvas from "../../api/updateCanvas";
@@ -35,12 +35,12 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
     const file = e.target.files?.[0];
     if (file && fabricCanvasRef.current) {
       const reader = new FileReader();
-  
+
       reader.onload = async (event) => {
         const dataUrl = event.target?.result?.toString();
         if (dataUrl) {
           try {
-            const imageUrl = await uploadImage(dataUrl);  
+            const imageUrl = await uploadImage(dataUrl);
             console.log('Image URL:', imageUrl.imageUrl);
             addImageToCanvas({ url: imageUrl.imageUrl, canvas: fabricCanvasRef.current, canvasObjects, setCanvasObjects });
           } catch (error) {
@@ -48,11 +48,11 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
           }
         }
       };
-  
+
       reader.readAsDataURL(file);
     }
   };
-  
+
 
   const handleAddRectangle = () => {
     if (fabricCanvasRef.current) {
@@ -65,6 +65,15 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
       addLineToCanvas({ canvas: fabricCanvasRef.current, setCanvasObjects, canvasObjects });
     }
   };
+
+
+  const handleAddText = () => {
+    if (fabricCanvasRef.current) {
+      addTextToCanvas({ canvas: fabricCanvasRef.current, setCanvasObjects, canvasObjects });
+    }
+  };
+
+
 
   const handleSyncCanvas = async () => {
     console.log("canvasObjects", allcanvases);
@@ -79,7 +88,7 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
       console.log("updateCanvasPostBody", updateCanvasPostBody);
       const log = await updateCanvas(updateCanvasPostBody);
       console.log("log addition", log);
-      setIsSyncRequired(false); 
+      setIsSyncRequired(false);
     } catch (error) {
       console.log(`canvas sync issue ${error}`);
       alert('Error to sync canvas');
@@ -88,15 +97,24 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
 
   return (
     <div className="h-max px-4 py-3 space-y-0 border border-border-color">
-      <h4 className="font-semibold text-sm pb-1 opacity-80">Components</h4>
-      <div className="flex flex-col w-full pt-2 gap-2">
+      <div className="flex justify-between items-center pb-3">
+        <button
+          onClick={handleSyncCanvas}
+          disabled={!isSyncRequired}
+          className={`w-full py-2 px-4 text-xs border ${isSyncRequired ? 'bg-green-700 text-white' : 'bg-gray-300 text-gray-600'}`}
+        >
+          {isSyncRequired ? 'Sync Changes' : 'No Sync Required'}
+        </button>
+      </div>
+      <h4 className="font-semibold text-xs pb-1 opacity-80">Add Components</h4>
+      <div className="flex flex-wrap  w-full pt-2 gap-2">
         <button
           onClick={() => {
             if (fabricCanvasRef.current) {
               handleAddRectangle();
             }
           }}
-          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          className="bg-transparent w-[48%] hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
         >
           Add Rectangle
         </button>
@@ -107,9 +125,31 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
               handleAddLine();
             }
           }}
-          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          className="bg-transparent w-[48%]  hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
         >
           Add Line
+        </button>
+
+        <button
+          onClick={() => {
+            if (fabricCanvasRef.current) {
+              handleAddText();
+            }
+          }}
+          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+        >
+          Add Text
+        </button>
+
+        <button
+          onClick={() => {
+            if (fabricCanvasRef.current) {
+              addSlideshowToCanvas( { canvas: fabricCanvasRef.current, setCanvasObjects, canvasObjects });
+            }
+          }}
+          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+        >
+          Add Image SlideShow
         </button>
 
         <input
@@ -125,15 +165,8 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
           Add Image
         </button>
 
-        <div className="flex justify-between items-center pt-3">
-          <button
-            onClick={handleSyncCanvas}
-            disabled={!isSyncRequired}
-            className={`w-full py-2 px-4 text-xs border ${isSyncRequired ? 'bg-green-700 text-white' : 'bg-gray-300 text-gray-600'}`}
-          >
-            {isSyncRequired ? 'Sync Changes' : 'No Sync Required'}
-          </button>
-        </div>
+
+
       </div>
     </div>
   );

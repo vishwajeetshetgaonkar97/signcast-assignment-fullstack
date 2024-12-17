@@ -113,7 +113,8 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     canvasObjects.forEach(obj => {
       if (obj.visible) {
         let canvasObject;
-
+        console.log("obj", obj.type);
+        console.log("obj", obj);
         if (obj.type === 'rectangle') {
           console.log("inside rectangle ", obj);
           canvasObject = new fabric.Rect({
@@ -189,13 +190,54 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             // Add the image instance to the canvas
             canvas.add(imgInstance);
           };
+        } else if (obj.type === 'text') {
+          canvasObject = new fabric.Text(obj.text, {
+            left: obj.x,
+            top: obj.y,
+            fontSize: obj.fontSize,
+            fill: obj.fillColor,
+          })
+        } else if (obj.type === 'slideshow') {
+          console.log('slideshow', obj);
+          const { images, x, y, width, height, isDraggable } = obj;
+        
+          const imgElement = new Image();
+          let currentIndex = 0;
+          imgElement.src = images[currentIndex]; // Pre-load the first image
+        
+          imgElement.onload = () => {
+            const slideshowImage = new fabric.Image(imgElement, {
+              left: x,
+              top: y,
+              scaleX: width / imgElement.width,
+              scaleY: height / imgElement.height,
+              selectable: isDraggable,
+            });
+        
+            canvas.add(slideshowImage);
+        
+            // Update the image every 2 seconds
+            const updateImage = () => {
+              currentIndex = (currentIndex + 1) % images.length;
+              imgElement.src = images[currentIndex];
+            };
+        
+            setInterval(updateImage, 2000);
+          };
+        
+          imgElement.onerror = (e) => {
+            console.error('Failed to load image:', e);
+            alert('Image failed to load. Check the URL or try another one.');
+          };
         }
+        
 
-        // If it's not an image, we continue with the created canvasObject
-        if (obj.type !== 'image') {
+        if (obj.type !== 'image' && obj.type !== 'slideshow' && obj.type !== 'video') {
           canvasObject.id = obj.id;
           canvas.add(canvasObject);
         }
+
+
       }
     });
 
@@ -341,7 +383,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
           <div
             key={index}
             onClick={() => handleSelectedCanvas(index)}
-            className={`p-2 border border-gray-300 w-fit text-xs cursor-pointer ${isIndexCanvasSelected(index) ? 'bg-gray-200' : ''}`}
+            className={`p-2 border border-gray-300 w-fit text-xs cursor-pointer hover:bg-gray-100 ${isIndexCanvasSelected(index) ? 'bg-gray-300' : ''}`}
           >
             {canvas.name}
           </div>

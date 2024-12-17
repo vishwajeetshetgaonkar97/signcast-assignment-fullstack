@@ -45,6 +45,36 @@ interface ImageOptions {
   visible?: boolean;
 }
 
+interface TextOptions {
+  text?: string;
+  x?: number;
+  y?: number;
+  fontSize?: number;
+  fontFamily?: string;
+  fillColor?: string;
+  isDraggable?: boolean;
+  angle?: number;
+  canvas: fabric.Canvas;
+  setCanvasObjects: any;
+  canvasObjects?: any;
+  visible?: boolean;
+}
+
+interface SlideshowOptions {
+  images?: string[];
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  interval?: number;
+  canvas: fabric.Canvas;
+  setCanvasObjects: any;
+  canvasObjects?: any;
+  isDraggable?: boolean;
+  visible?: boolean;
+}
+
+
 const addRectangleToCanvas = ({
   x = 10,
   y = 10,
@@ -137,9 +167,9 @@ const addLineToCanvas = ({
       y1,
       x2,
       y2,
-      x:0,
-      y:0,
-      angle:0,
+      x: 0,
+      y: 0,
+      angle: 0,
       strokeColor,
       strokeWidth,
       isDraggable,
@@ -165,7 +195,7 @@ const addImageToCanvas = ({
   if (!canvas) return;
 
   const imgElement = new Image();
-  
+
   imgElement.onload = () => {
     // Create the fabric image instance after the image loads
     const imgInstance = new fabric.Image(imgElement, {
@@ -207,5 +237,126 @@ const addImageToCanvas = ({
 };
 
 
+const addTextToCanvas = ({
+  text = 'Demo Text',
+  x = 10,
+  y = 10,
+  fontSize = 20,
+  fontFamily = 'Poppins',
+  fillColor = 'black',
+  isDraggable = true,
+  angle = 0,
+  canvas,
+  setCanvasObjects,
+  visible = true,
+  canvasObjects = [],
+}: TextOptions) => {
+  const textObject = new fabric.Text(text, {
+    left: x,
+    top: y,
+    fontSize,
+    fontFamily,
+    fill: fillColor,
+    selectable: isDraggable,
+    lockMovementX: !isDraggable,
+    lockMovementY: !isDraggable,
+    angle,
+  });
 
-export { addRectangleToCanvas, addLineToCanvas, addImageToCanvas };
+  // Add an `id` to track objects
+  textObject.id = `text-${canvasObjects.length + 1}`;
+
+  canvas.add(textObject);
+  canvas.renderAll();
+
+  // Add to the state
+  setCanvasObjects((prevObjects) => [
+    ...prevObjects,
+    {
+      id: textObject.id,
+      type: 'text',
+      text,
+      x,
+      y,
+      fontSize,
+      fontFamily,
+      fillColor,
+      isDraggable,
+      angle,
+      visible,
+    },
+  ]);
+};
+
+
+const addSlideshowToCanvas = ({
+  images = ["http://localhost:3001/uploads/1734390815720.png", "http://localhost:3001/uploads/1734409324614.png", "http://localhost:3001/uploads/1734390815720.png"],
+  x = 50,
+  y = 50,
+  width = 200,
+  height = 200,
+  interval = 5000,
+  canvas,
+  setCanvasObjects,
+  canvasObjects,
+  isDraggable = true,
+  visible = true,
+}: SlideshowOptions) => {
+  if (!images || images.length === 0) return;
+
+  let currentIndex = 0;
+  const imgElement = new Image();
+
+  const slideshowImage = new fabric.Image(imgElement, {
+    left: x,
+    top: y,
+    scaleX: width / imgElement.width,
+    scaleY: height / imgElement.height,
+    selectable: isDraggable,
+    lockMovementX: !isDraggable,
+    lockMovementY: !isDraggable,
+  });
+
+
+  // Add to canvas and update state
+  canvas.add(slideshowImage);
+  canvas.renderAll();
+
+  setCanvasObjects((prevObjects) => [
+    ...prevObjects,
+    {
+      id: `slideshow-${canvasObjects.length + 1}`,
+      type: 'slideshow',
+      images,
+      x,
+      y,
+      width,
+      height,
+      isDraggable,
+      visible,
+    },
+  ]);
+
+  const updateImage = () => {
+    currentIndex = (currentIndex + 1) % images.length;
+    imgElement.src = images[currentIndex];
+    imgElement.onload = () => {
+      slideshowImage.set({
+        scaleX: width / imgElement.width,
+        scaleY: height / imgElement.height,
+      });
+      canvas.renderAll();
+    };
+  };
+
+  // Start slideshow interval
+  imgElement.src = images[currentIndex]; // Set the initial image
+  setInterval(updateImage, interval);
+};
+
+
+
+
+
+
+export { addRectangleToCanvas, addLineToCanvas, addImageToCanvas, addTextToCanvas, addSlideshowToCanvas };

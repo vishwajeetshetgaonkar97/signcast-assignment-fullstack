@@ -18,7 +18,7 @@ const PORT = 3001;
 // Initialize Express app
 const app = express();
 app.use(cors({
-  origin: "http://localhost:5173", // Replace with your frontend's URL
+  origin: "*",
 }));
 
 app.use(bodyParser());
@@ -62,7 +62,7 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
     const result = await database.collections.images.insertOne(imageMetadata);
 
     // Construct the URL to access the image
-    const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+    const imageUrl = `http://localhost:3001/uploads/${req.file.filename}`;
 
     console.log("Image uploaded successfully");
 
