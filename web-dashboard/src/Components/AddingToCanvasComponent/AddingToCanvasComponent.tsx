@@ -96,8 +96,8 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
   };
 
   return (
-    <div className="h-max px-4 py-3 space-y-0 border border-border-color">
-      <div className="flex justify-between items-center pb-3">
+    <div className="h-max  px-4 py-3 space-y-0 border border-border-color">
+      <div className="flex justify-between items-center pb-3 ">
         <button
           onClick={handleSyncCanvas}
           disabled={!isSyncRequired}
@@ -107,14 +107,14 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
         </button>
       </div>
       <h4 className="font-semibold text-xs pb-1 opacity-80">Add Components</h4>
-      <div className="flex flex-wrap  w-full pt-2 gap-2">
+      <div className="flex flex-wrap min-h-fit w-full pt-2 gap-2">
         <button
           onClick={() => {
             if (fabricCanvasRef.current) {
               handleAddRectangle();
             }
           }}
-          className="bg-transparent w-[48%] hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          className="bg-transparent w-full hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
         >
           Add Rectangle
         </button>
@@ -125,7 +125,7 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
               handleAddLine();
             }
           }}
-          className="bg-transparent w-[48%]  hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
+          className="bg-transparent w-full  hover:bg-blue-700 text-blue-700 text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent"
         >
           Add Line
         </button>

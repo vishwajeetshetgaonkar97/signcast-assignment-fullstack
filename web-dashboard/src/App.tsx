@@ -8,7 +8,7 @@ const App: React.FC = () => {
 const [isMonitoring, setIsMonitoring] = useState(false);
 
 const monitoringStateContextValue = useMemo(
-  () => ({ isMonitoring, setIsMonitoring}),
+  () => ({ isMonitoring, setIsMonitoring}), 
   [isMonitoring, setIsMonitoring]
 );
 const updateOnlineStatus = () => setIsMonitoring(navigator.onLine);

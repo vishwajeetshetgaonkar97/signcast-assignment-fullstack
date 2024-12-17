@@ -36,7 +36,7 @@ const ConfigurationSectionComponent: React.FC<CanvasProps> = ({ fabricCanvasRef 
       <div className="h-max px-4 py-3 space-y-0 border border-border-color">
         <h4 className="font-semibold text-xs pb-2 opacity-80">Layers</h4>
         {canvasObjects.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="h-max flex flex-col space-y-2">
             {canvasObjects.map((object, index) => (
               <li key={index} className="flex items-center justify-between p-2 bg-gray-100 shadow-sm">
                 <span className="text-xs " >{object.id || `Object ${index + 1}`}</span>

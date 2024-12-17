@@ -10,8 +10,6 @@ interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
 }
 
-
-
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
   const { selectedCanvasIndex, setSelectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext);
@@ -175,10 +173,10 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
               lockMovementX: !obj.isDraggable,
               lockMovementY: !obj.isDraggable,
               originX: 'center',
-              originY: 'center',  // Ensure rotation happens around the center
+              originY: 'center',  
             });
 
-            // Apply the angle transformation to the image
+         
             imgInstance.set({
               angle: obj.angle,
               originX: 'center',  // Center the rotation
