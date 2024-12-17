@@ -262,6 +262,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
     websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
 
+
     websocketRef.current.onopen = () => {
       console.log("WebSocket connected");
       const data = {

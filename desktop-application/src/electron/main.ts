@@ -3,6 +3,7 @@ import { isDev } from './util.js';
 import { getPreloadPath, getUIPath } from './pathResolver.js';
 import { createTray } from './tray.js';
 import { createMenu } from './menu.js';
+import {WebSocket} from "ws";
 
 app.on('ready', () => {
   const mainWindow = new BrowserWindow({
@@ -12,7 +13,43 @@ app.on('ready', () => {
   });
 
 
-  // Handle request to get canvases from renderer
+  const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
+
+
+
+  wss.onopen = () => {
+    console.log("WebSocket connected");
+    const data = {
+      name: "Master Device",
+      status: "online",
+    }
+  };
+  wss.onmessage = (event: any ) => {
+    console.log("Socket Response", event.data);
+    try {
+      const data = JSON.parse(event.data);
+      console.log("Received data:", data);
+
+
+      if (data.type === "updateAllCanvas") {
+        console.log("Updating canvas objects for all:", data);
+        ipcMain.emit('get-socket-response', data.canvases);
+console.log("Updating canvas objects for all:", data);
+      } else if (data.type === "notification") {
+        console.log("Notification:", data.message);
+      }
+    } catch (error) {
+      console.error("Error parsing WebSocket message:", error);
+    }
+  };
+
+  wss.onclose = () => {
+    console.log("WebSocket disconnected");
+ 
+  };
+
+
+
   ipcMain.handle('get-canvases', async () => {
     try {
       const response = await fetch('https://signcast-assignment-fullstack-production.up.railway.app/canvases');
@@ -38,7 +75,6 @@ app.on('ready', () => {
     }
   });
 
-  // Load the appropriate URL or file based on the environment
   if (isDev()) {
     mainWindow.loadURL('http://localhost:5123');
     mainWindow.webContents.openDevTools();

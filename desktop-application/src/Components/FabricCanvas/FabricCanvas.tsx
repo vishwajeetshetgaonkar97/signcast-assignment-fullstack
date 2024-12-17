@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as fabric from 'fabric';
-import getCanvases from '../../api/getCanvases';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -20,9 +19,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
   const socket = useRef<any>(null); 
 
-  
-
-  // Fetch canvases from main process using IPC
   const getAllCanvases = async () => {
     try {
       // Invoke the main process to get the canvases
@@ -40,7 +36,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   }, []);
 
   console.log('canvases value', allcanvases);
-
 
   const renderCanvasObjects = (canvasObjects, canvas) => {
     canvas.clear();

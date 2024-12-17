@@ -9,7 +9,7 @@ const cors = require("cors");
 const WebSocket = require("ws");
 
 const PORT = 3001;
-
+ 
 
 
 const app = express();
@@ -56,7 +56,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// file upload 
 app.post("/uploadImage", upload.single("image"), async (req, res) => {
   try {
     console.log("Received request:", req.body);
@@ -98,9 +97,6 @@ const server = app.listen(PORT, async () => {
 
 const wss = new WebSocket.Server({ server });
 
-console.log("Wssss log server file", wss)
-
-// Setup WebSocket server
 wss.on("connection", (ws) => {
   console.log("New WebSocket connection established");
 
@@ -121,7 +117,6 @@ wss.on("connection", (ws) => {
     console.log("WebSocket connection closed");
   });
 
-  ws.send("Welcome to the WebSocket server!");
 });
 
 app.get('/', (req, res) => {

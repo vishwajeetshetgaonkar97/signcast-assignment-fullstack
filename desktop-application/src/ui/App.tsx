@@ -23,7 +23,7 @@ function App() {
   );
 
   const updateOnlineStatus = () => setIsMonitoring(navigator.onLine);
-
+ 
   useEffect(() => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
