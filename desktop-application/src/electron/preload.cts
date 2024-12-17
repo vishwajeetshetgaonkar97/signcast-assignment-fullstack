@@ -3,9 +3,9 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {
   // Exposing the getCanvases function
-  getCanvases: () => ipcRenderer.invoke('get-canvases'),
+  getCanvases: async () => ipcRenderer.invoke('get-canvases'),
 
-  getDevices: () => ipcRenderer.invoke('get-devices'),
+  getDevices: async () => ipcRenderer.invoke('get-devices'),
 
 
 });

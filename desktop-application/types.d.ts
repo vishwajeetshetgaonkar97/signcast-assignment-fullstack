@@ -12,20 +12,7 @@ interface Window {
       callback: (view: View) => void
     ) => UnsubscribeFunction;
     sendFrameAction: (payload: FrameWindowAction) => void;
-  };
-}
-
-declare global {
-  interface Window {
-    electron: {
-      getCanvases: () => Promise<any[]>; // Define the return type appropriately
-    };
-  }
-}
-
-interface Window {
-  electron: {
-    getCanvases: () => Promise<any[]>; // Adjust the return type as needed
-    // Define other methods here if needed
+    getCanvases: () => Promise<any>;
+    getDevices: () => Promise<any>;
   };
 }

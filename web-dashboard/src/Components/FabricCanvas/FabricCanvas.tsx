@@ -9,6 +9,9 @@ import MonitoringStateContext from '../../Contexts/MonitoringStateContext';
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
 }
+interface CustomFabricObject extends fabric.Object {
+  id?: string;
+}
 
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const { allcanvases, setAllCanvases } = useContext(AllCanvasesObjectsDataContext);
@@ -244,7 +247,8 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
 
       fabricCanvasRef.current.on('object:modified', (e) => {
-        const modifiedObject = e.target;
+        const modifiedObject = e.target as CustomFabricObject;
+  
         console.log("Object modified:", modifiedObject);
         updateCanvasObject({
           id: modifiedObject?.id,

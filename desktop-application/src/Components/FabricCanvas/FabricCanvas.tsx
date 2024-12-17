@@ -5,6 +5,9 @@ import getCanvases from '../../api/getCanvases';
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
 }
+interface CustomFabricObject extends fabric.Object {
+  id?: string;
+}
 
 const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -113,8 +116,8 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
          
             imgInstance.set({
               angle: obj.angle,
-              originX: 'center',  // Center the rotation
-              originY: 'center',  // Center the rotation
+              originX: 'center',  
+              originY: 'center', 
               left: obj.x,
               top: obj.y,
             });
@@ -242,9 +245,10 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     if (canvasRef.current) {
       fabricCanvasRef.current = new fabric.Canvas(canvasRef.current);
 
-
+     
       fabricCanvasRef.current.on('object:modified', (e) => {
-        const modifiedObject = e.target;
+        const modifiedObject = e.target as CustomFabricObject; 
+
         console.log("Object modified:", modifiedObject);
         updateCanvasObject({
           id: modifiedObject?.id,

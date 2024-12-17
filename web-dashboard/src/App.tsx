@@ -28,7 +28,7 @@ useEffect(() => {
 
   return (
     <MonitoringStateContext.Provider value={monitoringStateContextValue}>
-    <div className={`${themeMode} bg-bg-color h-screen w-full text-text-color  px-4 py-2 font-poppins`}>
+    <div className={`${themeMode} bg-bg-color h-screen w-screen text-text-color  px-4 py-2 font-poppins`}>
       <TopBar themeMode={themeMode} setThemeMode={setThemeMode} />
       <main className="flex h-[95%] pb-2 align-center justify-center  pt-2 flex-col ">
         <DigitalDrawingToolComponent />
