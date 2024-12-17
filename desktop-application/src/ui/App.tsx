@@ -12,27 +12,13 @@ interface CanvasProps {
 function App() {
 
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
-  const [isMonitoring, setIsMonitoring] = useState(false);
   const [deviceInfo, setDeviceInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [screenId, setScreenId] = useState('');
-
-  const monitoringStateContextValue = useMemo(
-    () => ({ isMonitoring, setIsMonitoring }),
-    [isMonitoring, setIsMonitoring]
-  );
-
-  const updateOnlineStatus = () => setIsMonitoring(navigator.onLine);
- 
-  useEffect(() => {
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    return () => {
-      window.removeEventListener('online', updateOnlineStatus);
-      window.removeEventListener('offline', updateOnlineStatus);
-    };
-
-  }, []);
+  const [allcanvases, setAllCanvases] = useState<any[]>([]);
+  const [canvasObjects, setCanvasObjects] = useState<any[]>([]);
+  const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
 
   const getDeviceInfo = async () => {
     try {
@@ -49,8 +35,6 @@ function App() {
     getDeviceInfo();
   }, []);
 
-  console.log('Device info:', deviceInfo);
-
   const handleModalSubmit = () => {
     if (screenId) {
       if (deviceInfo && deviceInfo.pairingCode === screenId) {
@@ -63,15 +47,71 @@ function App() {
     alert('Please enter a screen ID');
   };
 
+  const getAllCanvases = async () => {
+    try {
+      // Invoke the main process to get the canvases
+      const canvases = await window.electron.getCanvases();
+      console.log('canvases', canvases);
+      setAllCanvases(canvases);
+      console.log('canvases', canvases);
+      setCanvasObjects(canvases[selectedCanvasIndex].data);
+
+
+      const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
+
+      wss.onopen = () => {
+        console.log("WebSocket connected");
+        setIsConnected(true);
+      };
+
+
+      wss.onmessage = (event: any) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("Received data:", data);
+
+          if (data.action === "updateAllCanvas") {
+            console.log("Updating canvas objects for all:", data);
+            setAllCanvases(data.canvases);
+          } else if (data.type === "notification") {
+            console.log("Notification:", data.message);
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
+      };
+
+      wss.onclose = () => {
+        console.log("WebSocket disconnected");
+        setIsConnected(false);
+      };
+
+    } catch (error) {
+      console.log(`Canvas get issue: ${error}`);
+    }
+  };
+
+  useEffect(() => {
+    getAllCanvases();
+
+  }, []);
+
   return (
-    <MonitoringStateContext.Provider value={monitoringStateContextValue}>
       <div className="h-screen w-full text-text-color  px-4 py-2 font-poppins">
-        <TopBar isMonitoring={isMonitoring} />
+        <TopBar isConnected={isConnected} />
         <main className="flex h-[95%] pb-2 align-center justify-center  pt-2 flex-col ">
-          <FabricCanvas fabricCanvasRef={fabricCanvasRef} />
+          <FabricCanvas 
+          fabricCanvasRef={fabricCanvasRef} 
+          allcanvases={allcanvases} 
+          setAllCanvases={setAllCanvases} 
+          canvasObjects={canvasObjects} 
+          setCanvasObjects={setCanvasObjects}
+          selectedCanvasIndex={selectedCanvasIndex}
+          setSelectedCanvasIndex={setSelectedCanvasIndex}
+          />
         </main>
         {isModalOpen && (
-          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-blue-800  z-50">
             <div className="bg-white rounded-lg p-6 w-1/3 text-center shadow-lg">
               <h2 className="text-xl font-semibold mb-4">Enter Screen ID</h2>
               <input
@@ -91,7 +131,6 @@ function App() {
           </div>
         )}
       </div>
-    </MonitoringStateContext.Provider>
   );
 }
 

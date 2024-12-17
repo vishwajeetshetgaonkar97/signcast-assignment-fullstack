@@ -4,19 +4,22 @@ import { get } from 'http';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
+  allcanvases: any[];
+  setAllCanvases: any;
+  canvasObjects: any[];
+  setCanvasObjects: any;
+  selectedCanvasIndex: number;
+  setSelectedCanvasIndex: any
 }
 interface CustomFabricObject extends fabric.Object {
   id?: string;
 }
 
-const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
+const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef ,allcanvases, setAllCanvases, canvasObjects, setCanvasObjects, selectedCanvasIndex, setSelectedCanvasIndex}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const [allcanvases, setAllCanvases] = useState<any[]>([]);
-  const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
-  const [canvasObjects, setCanvasObjects] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+
 const [isConnected, setIsConnected] = useState<boolean>(false);
 
 
