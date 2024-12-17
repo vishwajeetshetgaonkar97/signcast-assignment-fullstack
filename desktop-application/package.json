@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "autoprefixer": "^10.4.20",
+    "electron-fetch": "^1.9.1",
     "fabric": "^6.5.3",
     "os-utils": "^0.0.14",
     "react": "^18.3.1",

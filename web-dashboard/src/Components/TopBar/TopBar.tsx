@@ -11,7 +11,7 @@ const TopBar: React.FC<ThemeSelectionProps> = ({ themeMode, setThemeMode }) => {
 
   const { isMonitoring } = useContext(MonitoringStateContext);
 
-  // this logic can be upgraded to add more themes 
+  // this logic can be upgraded to add more themes  
   const toggleDMode = () => {
     // can try ocean mode commenting this line
     setThemeMode(themeMode === "light" ? "dark" : "light");
