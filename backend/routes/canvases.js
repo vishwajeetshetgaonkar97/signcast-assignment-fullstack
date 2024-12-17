@@ -43,8 +43,9 @@ function CanvasRouter(database,wss) {
       let canvases = await database.collections.canvases.insertOne(ref);
 
       await notifyClients();
+      const allcanvases = await database.collections.canvases.find().toArray();
       
-      res.json({ canvases });
+      res.json({ allcanvases });
     } catch (error) {
       console.error("Error inserting canvas:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -65,7 +66,6 @@ function CanvasRouter(database,wss) {
 
 
     try {
-      console.log("ref", updatedCanvas);
       let canvasMongoId = new mongodb.ObjectId(canvasID);
       console.log("canvasID", canvasMongoId);
       const updatednewCanvas = await database.collections.canvases.updateOne({ _id: canvasMongoId }, { $set: updatedCanvas });

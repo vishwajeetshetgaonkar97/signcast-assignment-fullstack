@@ -165,12 +165,10 @@ const AddingToCanvasComponent: React.FC<CanvasProps> = ({ fabricCanvasRef }) => 
           >
             Add Image
           </button>
-
-
-
         </div>
+        <h6 className=" pt-2 text-[9px] opacity-80 text-yellow-700">Note: Demo images/slideshow; limited functionality.</h6>
       </div>
-    </div>
+   </div>
   );
 };
 

@@ -1,5 +1,9 @@
 import * as fabric from 'fabric';
 
+interface CustomFabricObject extends fabric.Object {
+  id?: string;
+}
+
 interface RectangleOptions {
   x?: number;
   y?: number;
@@ -102,9 +106,9 @@ const addRectangleToCanvas = ({
     lockMovementX: !isDraggable,
     lockMovementY: !isDraggable,
     angle,
-  });
-
-  // Add an `id` to track objects
+  }) as CustomFabricObject;
+;
+  
   rectangle.id = `rect-${canvasObjects.length + 1}`;
 
   canvas.add(rectangle);
@@ -149,15 +153,13 @@ const addLineToCanvas = ({
     selectable: isDraggable,
     lockMovementX: !isDraggable,
     lockMovementY: !isDraggable,
-  });
+  }) as CustomFabricObject;
 
-  // Add an `id` to track objects
   line.id = `line-${canvasObjects.length + 1}`;
 
   canvas.add(line);
   canvas.renderAll();
 
-  // Add to the state
   setCanvasObjects((prevObjects) => [
     ...prevObjects,
     {
@@ -197,24 +199,21 @@ const addImageToCanvas = ({
   const imgElement = new Image();
 
   imgElement.onload = () => {
-    // Create the fabric image instance after the image loads
+
     const imgInstance = new fabric.Image(imgElement, {
       left: x,
       top: y,
-      scaleX: width / imgElement.width, // Scale the image according to the provided width
-      scaleY: height / imgElement.height, // Scale the image according to the provided height
+      scaleX: width / imgElement.width, 
+      scaleY: height / imgElement.height, 
       angle: angle,
       selectable: isDraggable,
-    });
+    }) as CustomFabricObject;
 
-    // Assign a unique ID to the image for tracking purposes
     imgInstance.id = `image-${canvasObjects.length + 1}`;
 
-    // Add the image instance to the canvas
     canvas.add(imgInstance);
     canvas.renderAll();
 
-    // Update the canvas objects state with the new image
     setCanvasObjects((prevObjects) => [
       ...prevObjects,
       {
@@ -232,7 +231,6 @@ const addImageToCanvas = ({
     ]);
   };
 
-  // Set the image source to trigger the image loading process
   imgElement.src = url;
 };
 
@@ -261,15 +259,13 @@ const addTextToCanvas = ({
     lockMovementX: !isDraggable,
     lockMovementY: !isDraggable,
     angle,
-  });
+  }) as CustomFabricObject;
 
-  // Add an `id` to track objects
   textObject.id = `text-${canvasObjects.length + 1}`;
 
   canvas.add(textObject);
   canvas.renderAll();
 
-  // Add to the state
   setCanvasObjects((prevObjects) => [
     ...prevObjects,
     {
@@ -318,7 +314,6 @@ const addSlideshowToCanvas = ({
   });
 
 
-  // Add to canvas and update state
   canvas.add(slideshowImage);
   canvas.renderAll();
 
@@ -349,12 +344,9 @@ const addSlideshowToCanvas = ({
     };
   };
 
-  // Start slideshow interval
-  imgElement.src = images[currentIndex]; // Set the initial image
+  imgElement.src = images[currentIndex];
   setInterval(updateImage, interval);
 };
-
-
 
 
 

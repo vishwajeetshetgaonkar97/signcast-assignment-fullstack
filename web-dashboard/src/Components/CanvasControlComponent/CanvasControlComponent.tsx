@@ -17,7 +17,7 @@ const ConfigurationSectionComponent: React.FC<CanvasProps> = ({ fabricCanvasRef 
       <AddingToCanvasComponent fabricCanvasRef={fabricCanvasRef} />
       <RenderCanvasElementsComponent />
 
-      <div className="flex">
+      <div className="flex  flex-col gap-1">
         <button
           onClick={() => downloadCanvasAsPdf(fabricCanvasRef.current)}
           className="w-full py-2 text-xs bg-blue-700 text-blue-50 border border-border-color focus:outline-none hover:bg-blue-600 flex items-center justify-between gap-2"
@@ -27,7 +27,10 @@ const ConfigurationSectionComponent: React.FC<CanvasProps> = ({ fabricCanvasRef 
             <AiOutlineDownload size={18} />
           </div>
         </button>
+        <h6 className=" text-[9px] opacity-80 text-yellow-700">Note: Might not work with slideshow.</h6>
+    
       </div>
+     
     </div>
   );
 };

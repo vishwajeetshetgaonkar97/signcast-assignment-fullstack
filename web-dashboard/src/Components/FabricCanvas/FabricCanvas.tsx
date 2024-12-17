@@ -5,6 +5,7 @@ import AllCanvasesObjectsDataContext from '../../Contexts/AllCanvasesObjectsData
 import SelectedCanvasObjectIndexDataContext from '../../Contexts/SelectedCanvasObjectIndexDataContext';
 import addCanvas from '../../api/addCanvas';
 import MonitoringStateContext from '../../Contexts/MonitoringStateContext';
+import getCanvases from '../../api/getCanvases';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -32,12 +33,10 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     return selectedCanvasIndex === index;
   };
 
-  console.log("canvas local array", canvasObjects);
 
   const updateCanvasSize = () => {
     if (containerRef.current && fabricCanvasRef.current) {
       const containerWidth = containerRef.current.offsetWidth;
-
 
       const newHeight = (containerWidth * 9) / 16;
 
@@ -51,10 +50,9 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
       const scaleX = containerWidth / prevWidth;
       const scaleY = newHeight / prevHeight;
 
-
       //  this code is to enable explicit 1920x1080 canvas size i have commented it for demonstration purpose 
 
-      //   const canvasWidth = 1920;
+      // const canvasWidth = 1920;
       // const canvasHeight = 1080;
 
       // const canvas = fabricCanvasRef.current;
@@ -126,7 +124,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             angle: obj.angle,
           });
         } else if (obj.type === 'line') {
-          // Adjust the line positions based on the angle
+       
           const x1 = obj.x1 + obj.x;
           const y1 = obj.y1 + obj.y;
           const x2 = obj.x2 + obj.x;
@@ -134,7 +132,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
 
           const angle = obj.angle;
 
-          // Calculate the new start and end positions based on the angle
           const radian = fabric.util.degreesToRadians(angle);
           const centerX = (x1 + x2) / 2;
           const centerY = (y1 + y2) / 2;
@@ -159,7 +156,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
           imgElement.src = obj.url;
 
           imgElement.onload = () => {
-            // Create the fabric image instance
+
             const imgInstance = new fabric.Image(imgElement, {
               left: obj.x,
               top: obj.y,
@@ -176,13 +173,12 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
          
             imgInstance.set({
               angle: obj.angle,
-              originX: 'center',  // Center the rotation
-              originY: 'center',  // Center the rotation
+              originX: 'center',  
+              originY: 'center',  
               left: obj.x,
               top: obj.y,
             });
 
-            // Add the image instance to the canvas
             canvas.add(imgInstance);
           };
         } else if (obj.type === 'text') {
@@ -198,7 +194,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         
           const imgElement = new Image();
           let currentIndex = 0;
-          imgElement.src = images[currentIndex]; // Pre-load the first image
+          imgElement.src = images[currentIndex]; 
         
           imgElement.onload = () => {
             const slideshowImage = new fabric.Image(imgElement, {
@@ -210,14 +206,12 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
             });
         
             canvas.add(slideshowImage);
-        
-            // Update the image every 2 seconds
             const updateImage = () => {
               currentIndex = (currentIndex + 1) % images.length;
               imgElement.src = images[currentIndex];
             };
         
-            setInterval(updateImage, 2000);
+            setInterval(updateImage, 4000);
           };
         
           imgElement.onerror = (e) => {
@@ -266,7 +260,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize);
 
-    // Establish WebSocket connection
     websocketRef.current = new WebSocket("ws://localhost:3001");
 
     websocketRef.current.onopen = () => {
@@ -285,18 +278,14 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         console.log("Received data:", data);
 
 
-        // Example: Handle received data
         if (data.type === "updateAllCanvas") {
-          // Update canvas objects with the received data
           console.log("Updating canvas objects for all:", data);
           setAllCanvases(data.canvases);
           setCanvasObjects(data.canvases[selectedCanvasIndex].data);
           if (!isMonitoring) {
             setIsMonitoring(true)
           }
-          // setCanvasObjects(data.canvasObjects);
         } else if (data.type === "notification") {
-          // Show a notification or log data
           console.log("Notification:", data.message);
         }
       } catch (error) {
@@ -326,7 +315,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
         fabricCanvasRef.current = null;
       }
 
-      // Close WebSocket connection
       if (websocketRef.current) {
         websocketRef.current.close();
       }
@@ -351,8 +339,9 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
           category: newCanvasCategory,
           data: [],
         };
-        const log = await addCanvas(postData);
-        console.log("log addition ", log);
+        await addCanvas(postData);
+       const data = await getCanvases();
+       setAllCanvases(data.canvases);
         setIsModalOpen(false);
         return
       }
@@ -430,8 +419,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef }) => {
           </div>
         )}
       </div>
-
-
     </div>
   );
 };
