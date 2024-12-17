@@ -10,67 +10,20 @@ interface CanvasProps {
   setCanvasObjects: any;
   selectedCanvasIndex: number;
   setSelectedCanvasIndex: any
+  syncCanvas: any
 }
 interface CustomFabricObject extends fabric.Object {
   id?: string;
 }
 
-const FabricCanvas: React.FC<CanvasProps> = ({ fabricCanvasRef ,allcanvases, setAllCanvases, canvasObjects, setCanvasObjects, selectedCanvasIndex, setSelectedCanvasIndex}) => {
+const FabricCanvas: React.FC<CanvasProps> = ({ 
+  fabricCanvasRef, allcanvases, setAllCanvases, 
+  canvasObjects, setCanvasObjects, 
+  selectedCanvasIndex, setSelectedCanvasIndex,
+  syncCanvas,
+ }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-
-const [isConnected, setIsConnected] = useState<boolean>(false);
-
-
-  const getAllCanvases = async () => {
-    try {
-      // Invoke the main process to get the canvases
-      const canvases = await window.electron.getCanvases();
-      console.log('canvases', canvases);
-      setAllCanvases(canvases);
-      console.log('canvases', canvases);
-      setCanvasObjects(canvases[selectedCanvasIndex].data);
-
-
-      const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
-
-      wss.onopen = () => {
-        console.log("WebSocket connected");
-        setIsConnected(true);
-      };
-
-
-      wss.onmessage = (event: any) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log("Received data:", data);
-
-          if (data.action === "updateAllCanvas") {
-            console.log("Updating canvas objects for all:", data);
-            setAllCanvases(data.canvases);
-          } else if (data.type === "notification") {
-            console.log("Notification:", data.message);
-          }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
-      };
-
-      wss.onclose = () => {
-        console.log("WebSocket disconnected");
-        setIsConnected(false);
-      };
-
-    } catch (error) {
-      console.log(`Canvas get issue: ${error}`);
-    }
-  };
-
-  useEffect(() => {
-    getAllCanvases();
-
-  }, []);
 
 
   const renderCanvasObjects = (canvasObjects, canvas) => {
@@ -181,8 +134,6 @@ const [isConnected, setIsConnected] = useState<boolean>(false);
             });
 
             canvas.add(slideshowImage);
-
-            // Update the image every 2 seconds
             const updateImage = () => {
               currentIndex = (currentIndex + 1) % images.length;
               imgElement.src = images[currentIndex];
@@ -196,14 +147,10 @@ const [isConnected, setIsConnected] = useState<boolean>(false);
             alert('Image failed to load. Check the URL or try another one.');
           };
         }
-
-
         if (obj.type !== 'image' && obj.type !== 'slideshow' && obj.type !== 'video') {
           canvasObject.id = obj.id;
           canvas.add(canvasObject);
         }
-
-
       }
     });
 
@@ -315,15 +262,10 @@ const [isConnected, setIsConnected] = useState<boolean>(false);
 
 
   useEffect(() => {
-    console.log('canvasObjects rendering our]ttttt');
     if (fabricCanvasRef.current) {
-      console.log('canvasObjects rendering', canvasObjects);
       renderCanvasObjects(canvasObjects, fabricCanvasRef.current);
     }
   }, [canvasObjects]);
-
-
-  console.log('canvasObjects', canvasObjects);
 
   const handleSelectedCanvas = (index: number) => {
     setSelectedCanvasIndex(index);
@@ -340,6 +282,9 @@ const [isConnected, setIsConnected] = useState<boolean>(false);
     <div ref={containerRef} className="h-full w-full">
       <div>
         <canvas ref={canvasRef} className="border border-gray-300 h-full w-full" />
+
+      </div>
+      
         <div className='flex gap-2 mt-2'>
           {allcanvases.map((canvas, index) => (
             <div
@@ -350,19 +295,18 @@ const [isConnected, setIsConnected] = useState<boolean>(false);
               {canvas.name}
             </div>
           ))}
-        </div>
-      </div>
-      <div className="flex flex-col gap-4 max-h-full overflow-y-auto border-gray-300">
-        {canvasObjects.map((object, index) => (
-          <div key={index}>
-            <p>{object.id}</p>
+          <div className="p-2 border border-gray-300 w-fit text-xs text-white cursor-pointer bg-green-500" onClick={syncCanvas}>
+            Sync Data
           </div>
-        ))}
-      </div>
-      <div>
-        {isConnected ? "Connected" : "Not Connected"}
-      </div>
+        </div>
 
+        <div className="flex flex-col gap-2 mt-2 max-h-full overflow-y-auto border-gray-300">
+          {canvasObjects.map((object, index) => (
+            <div key={index} className="flex items-center text-xs justify-between p-2 bg-gray-100 shadow-sm">
+              <p>{object.id}</p>
+            </div>
+          ))}
+        </div>
     </div>
   );
 };

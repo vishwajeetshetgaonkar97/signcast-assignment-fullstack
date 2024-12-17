@@ -4,6 +4,7 @@ import './App.css';
 import TopBar from '../Components/TopBar/TopBar';
 import FabricCanvas from '../Components/FabricCanvas/FabricCanvas';
 import MonitoringStateContext from '../Contexts/MonitoringStateContext';
+import { get } from 'http';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -31,9 +32,6 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    getDeviceInfo();
-  }, []);
 
   const handleModalSubmit = () => {
     if (screenId) {
@@ -56,11 +54,24 @@ function App() {
       console.log('canvases', canvases);
       setCanvasObjects(canvases[selectedCanvasIndex].data);
 
+    } catch (error) {
+      console.log(`Canvas get issue: ${error}`);
+    }
+  };
 
+  const setupWebSocket = async () => {
+    try {
+      
       const wss = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
 
       wss.onopen = () => {
         console.log("WebSocket connected");
+
+        // to set auto sync 
+        if(!isConnected ){
+          getAllCanvases();
+        }
+
         setIsConnected(true);
       };
 
@@ -73,6 +84,7 @@ function App() {
           if (data.action === "updateAllCanvas") {
             console.log("Updating canvas objects for all:", data);
             setAllCanvases(data.canvases);
+            setCanvasObjects(data.canvases[selectedCanvasIndex].data);
           } else if (data.type === "notification") {
             console.log("Notification:", data.message);
           }
@@ -92,8 +104,9 @@ function App() {
   };
 
   useEffect(() => {
+    getDeviceInfo();
     getAllCanvases();
-
+    setupWebSocket();
   }, []);
 
   return (
@@ -108,6 +121,7 @@ function App() {
           setCanvasObjects={setCanvasObjects}
           selectedCanvasIndex={selectedCanvasIndex}
           setSelectedCanvasIndex={setSelectedCanvasIndex}
+          syncCanvas={getAllCanvases}
           />
         </main>
         {isModalOpen && (
