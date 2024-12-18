@@ -20,7 +20,13 @@ function App() {
   const [canvasObjects, setCanvasObjects] = useState<any[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [isAutoSync, setIsAutoSync] = useState<boolean>(true);
+  const isAutoSyncRef = useRef(isAutoSync); 
+
   const [isConnected, setIsConnected] = useState<boolean>(false);
+
+  useEffect(() => {
+    isAutoSyncRef.current = isAutoSync;
+  }, [isAutoSync]);
 
   const getDeviceInfo = async () => {
     try {
@@ -48,15 +54,11 @@ function App() {
 
   const getAllCanvases = async () => {
     try {
-      // Invoke the main process to get the canvases
       const canvases = await window.electron.getCanvases();
-      console.log('canvases', canvases);
-
-      if(isAutoSync){
+      console.log('canvases rendering main', canvases);
         setAllCanvases(canvases);
-        console.log('canvases', canvases);
         setCanvasObjects(canvases[selectedCanvasIndex].data);
-      }
+      
 
 
     } catch (error) {
@@ -83,12 +85,15 @@ function App() {
       wss.onmessage = (event: any) => {
         try {
           const data = JSON.parse(event.data);
-          console.log("Received data:", data);
 
           if (data.action === "updateAllCanvas") {
-            console.log("Updating canvas objects for all:", data);
-            setAllCanvases(data.canvases);
-            setCanvasObjects(data.canvases[selectedCanvasIndex].data);
+           
+            if(isAutoSyncRef.current){
+              console.log("isAutoSync inside socket", isAutoSync);
+              console.log("Updating canvas objects for all:", data);
+              setAllCanvases(data.canvases);
+              setCanvasObjects(data.canvases[selectedCanvasIndex].data);
+            }
           } else if (data.type === "notification") {
             console.log("Notification:", data.message);
           }

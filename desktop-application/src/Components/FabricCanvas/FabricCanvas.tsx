@@ -35,10 +35,7 @@ const FabricCanvas: React.FC<CanvasProps> = ({
     canvasObjects.forEach(obj => {
       if (obj.visible) {
         let canvasObject;
-        console.log("obj", obj.type);
-        console.log("obj", obj);
         if (obj.type === 'rectangle') {
-          console.log("inside rectangle ", obj);
           canvasObject = new fabric.Rect({
             left: obj.x,
             top: obj.y,
@@ -53,15 +50,13 @@ const FabricCanvas: React.FC<CanvasProps> = ({
             angle: obj.angle,
           });
         } else if (obj.type === 'line') {
-          // Adjust the line positions based on the angle
+
           const x1 = obj.x1 + obj.x;
           const y1 = obj.y1 + obj.y;
           const x2 = obj.x2 + obj.x;
           const y2 = obj.y2 + obj.y;
 
           const angle = obj.angle;
-
-          // Calculate the new start and end positions based on the angle
           const radian = fabric.util.degreesToRadians(angle);
           const centerX = (x1 + x2) / 2;
           const centerY = (y1 + y2) / 2;
@@ -81,12 +76,10 @@ const FabricCanvas: React.FC<CanvasProps> = ({
             angle: angle,
           });
         } else if (obj.type === 'image') {
-          console.log('image moving value', obj);
           const imgElement = new Image();
           imgElement.src = obj.url;
 
           imgElement.onload = () => {
-            // Create the fabric image instance
             const imgInstance = new fabric.Image(imgElement, {
               left: obj.x,
               top: obj.y,
@@ -108,8 +101,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({
               left: obj.x,
               top: obj.y,
             });
-
-            // Add the image instance to the canvas
             canvas.add(imgInstance);
           };
         } else if (obj.type === 'text') {
@@ -120,7 +111,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({
             fill: obj.fillColor,
           })
         } else if (obj.type === 'slideshow') {
-          console.log('slideshow', obj);
           const { images, x, y, width, height, isDraggable } = obj;
 
           const imgElement = new Image();
@@ -207,14 +197,12 @@ const FabricCanvas: React.FC<CanvasProps> = ({
   };
 
   const updateCanvasObject = (updatedObject: any) => {
-    console.log("function", updatedObject);
+
     setCanvasObjects((prevObjects) =>
       prevObjects.map((obj) => {
         if (obj.id === updatedObject.id) {
           return { ...obj, ...updatedObject }
         }
-
-
         return obj
       }
 
@@ -247,11 +235,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize);
 
-
-
-
-
-
     return () => {
       window.removeEventListener('resize', updateCanvasSize);
       if (fabricCanvasRef.current) {
@@ -280,7 +263,6 @@ const FabricCanvas: React.FC<CanvasProps> = ({
     return selectedCanvasIndex === index;
   };
 
-
   return (
     <div ref={containerRef} className="h-full w-full">
       <div>
@@ -305,16 +287,19 @@ const FabricCanvas: React.FC<CanvasProps> = ({
           ManualSync Data
         </div>
 
-        <label className="inline-flex items-center cursor-pointer">
+        {/* <label className="inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
             checked={isAutoSync}
-            onChange={(e) => setIsAutoSync(e.target.checked)} 
+            onChange={(e) => {
+              console.log("sync event", e.target.checked);
+              setIsAutoSync((prev) => !prev); 
+            }}
             className="sr-only peer"
           />
           <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-Yellow-300 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
           <span className="ms-3 text-sm font-xs text-black">Auto Sync </span>
-        </label>
+        </label> */}
       </div>
       
 
