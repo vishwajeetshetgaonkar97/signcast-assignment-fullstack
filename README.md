@@ -25,7 +25,7 @@ WebSocket integration enables real-time synchronization with the dashboard.
 
 ## Setup Instructions
 
-### Display Application
+### Desktop Application
 
 Navigate to the desktop application folder:
 > cd /desktop-application  
