@@ -1,4 +1,4 @@
-SignCast Full Stack Application
+# SignCast Full Stack Application
 
 SignCast is a digital signage application built using the MERN stack, WebSockets, and Electron for real-time canvas creation, updates, and display synchronization.
 
