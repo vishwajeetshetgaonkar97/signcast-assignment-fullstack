@@ -31,24 +31,24 @@ Navigate to the desktop application folder:
 > cd /desktop-application  
 
 Install dependencies:
-npm install  
+> npm install  
 
 Run the application in development mode:
-npm run dev  
+> npm run dev  
 
 Use the screen key 1234 to sync displays with the dashboard.
 
 
-Dashboard
+## Dashboard
 
 Navigate to the dashboard folder:
-cd /dashboard  
+> cd /dashboard  
 
 Install dependencies:
-npm install  
+> npm install  
 
 Start the development server:
-npm run dev  
+> npm run dev  
 
 
 WebSocket Implementation Details
