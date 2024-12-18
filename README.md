@@ -14,7 +14,6 @@ SignCast is developed using the following technologies:
 
 ### Frontend Dashboard:
 Built with React.js (TypeScript) and TailwindCSS using Vite for optimized builds.
-Backend:
 
 ### Backend 
 Node.js + Express.js with WebSocket implementation for real-time communication.
