@@ -51,7 +51,7 @@ Start the development server:
 > npm run dev  
 
 
-# WebSocket Implementation Details
+## WebSocket Implementation Details
 
 ### Data Flow:
 - Canvas Events: WebSocket messages are triggered on canvas creation and updates.
@@ -68,7 +68,7 @@ Offline support for the Electron application is not implemented yet. The plan in
 - Using WebSocket events in conjunction with network detection to fetch the latest data when reconnected.
 - Implementing a caching mechanism to store and sync data seamlessly
 
-# Known Limitations
+## Known Limitations
 - Electron Application:
 - Build for production not yet implemented.
 - Lacks offline support and caching mechanisms.
@@ -77,14 +77,14 @@ Offline support for the Electron application is not implemented yet. The plan in
 - Security: Screen key (1234) and client validation need improvements.
 - Password hashing and encrypted communication are not yet implemented.
 
-Future Improvements
-Enhance the UI/UX for both the dashboard and Electron application.
-Build the Electron application for production with offline mode enabled.
-Optimize canvas rendering logic to cater to various user applications.
-Improve security by:
-Using hashed passwords.
-Validating WebSocket clients more rigorously.
-Securing the screen ID mechanism.
-Add advanced features such as:
-Video playback capabilities.
-Live streaming support.
+## Future Improvements
+- Enhance the UI/UX for both the dashboard and Electron application.
+- Build the Electron application for production with offline mode enabled.
+- Optimize canvas rendering logic to cater to various user applications.
+- Improve security by:
+- Using hashed passwords.
+- Validating WebSocket clients more rigorously.
+- Securing the screen ID mechanism.
+- Add advanced features such as:
+- Video playback capabilities.
+- Live streaming support.
