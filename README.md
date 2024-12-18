@@ -39,7 +39,7 @@ Run the application in development mode:
 Use the screen key 1234 to sync displays with the dashboard.
 
 
-## Dashboard
+## Front-End Dashboard
 
 Navigate to the dashboard folder:
 > cd /dashboard  
@@ -49,6 +49,17 @@ Install dependencies:
 
 Start the development server:
 > npm run dev  
+
+## Backend
+
+Navigate to the dashboard folder:
+> cd /backend  
+
+Install dependencies:
+> npm install  
+
+Start the development server:
+> node server.js
 
 
 ## WebSocket Implementation Details
