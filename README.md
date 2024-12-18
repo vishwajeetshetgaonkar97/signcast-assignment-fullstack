@@ -61,7 +61,7 @@ Start the development server:
 ### Real-Time Communication:
 - WebSocket events are managed via a backend server, ensuring a continuous connection between the dashboard and the display application.
 
-# Offline Functionality
+## Offline Functionality
 Offline support for the Electron application is not implemented yet. The plan includes:
 
 - Saving data locally for offline use.
