@@ -51,11 +51,12 @@ Start the development server:
 > npm run dev  
 
 
-WebSocket Implementation Details
-Data Flow:
-Canvas Events: WebSocket messages are triggered on canvas creation and updates.
-Dashboard: Listens for real-time updates and processes canvas data for display.
-Electron Application: Subscribes to WebSocket updates to ensure synchronized display.
+#WebSocket Implementation Details
+
+## Data Flow:
+- Canvas Events: WebSocket messages are triggered on canvas creation and updates.
+- Dashboard: Listens for real-time updates and processes canvas data for display.
+- Electron Application: Subscribes to WebSocket updates to ensure synchronized display.
 
 Real-Time Communication:
 WebSocket events are managed via a backend server, ensuring a continuous connection between the dashboard and the display application.
