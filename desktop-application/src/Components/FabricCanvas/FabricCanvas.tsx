@@ -11,17 +11,20 @@ interface CanvasProps {
   selectedCanvasIndex: number;
   setSelectedCanvasIndex: any
   syncCanvas: any
+  isAutoSync: boolean;
+  setIsAutoSync: any
 }
 interface CustomFabricObject extends fabric.Object {
   id?: string;
 }
 
-const FabricCanvas: React.FC<CanvasProps> = ({ 
-  fabricCanvasRef, allcanvases, setAllCanvases, 
-  canvasObjects, setCanvasObjects, 
+const FabricCanvas: React.FC<CanvasProps> = ({
+  fabricCanvasRef, allcanvases, setAllCanvases,
+  canvasObjects, setCanvasObjects,
   selectedCanvasIndex, setSelectedCanvasIndex,
   syncCanvas,
- }) => {
+  isAutoSync, setIsAutoSync
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -284,29 +287,44 @@ const FabricCanvas: React.FC<CanvasProps> = ({
         <canvas ref={canvasRef} className="border border-gray-300 h-full w-full" />
 
       </div>
-      
-        <div className='flex gap-2 mt-2'>
-          {allcanvases.map((canvas, index) => (
-            <div
-              key={index}
-              onClick={() => handleSelectedCanvas(index)}
-              className={`p-2 border border-gray-300 w-fit text-xs cursor-pointer hover:bg-gray-100 ${isIndexCanvasSelected(index) ? 'bg-gray-300' : ''}`}
-            >
-              {canvas.name}
-            </div>
-          ))}
-          <div className="p-2 border border-gray-300 w-fit text-xs text-white cursor-pointer bg-green-500" onClick={syncCanvas}>
-            Sync Data
+
+      <div className='flex gap-2 mt-2'>
+        {allcanvases.map((canvas, index) => (
+          <div
+            key={index}
+            onClick={() => handleSelectedCanvas(index)}
+            className={`p-2 border border-gray-300 w-fit text-xs cursor-pointer hover:bg-gray-100 ${isIndexCanvasSelected(index) ? 'bg-gray-300' : ''}`}
+          >
+            {canvas.name}
           </div>
+        ))}
+
+      
+
+        <div className="p-2 border border-gray-300 w-fit text-xs text-white cursor-pointer bg-green-500" onClick={syncCanvas}>
+          ManualSync Data
         </div>
 
-        <div className="flex flex-col gap-2 mt-2 max-h-full overflow-y-auto border-gray-300">
-          {canvasObjects.map((object, index) => (
-            <div key={index} className="flex items-center text-xs justify-between p-2 bg-gray-100 shadow-sm">
-              <p>{object.id}</p>
-            </div>
-          ))}
-        </div>
+        <label className="inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isAutoSync}
+            onChange={(e) => setIsAutoSync(e.target.checked)} 
+            className="sr-only peer"
+          />
+          <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-Yellow-300 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+          <span className="ms-3 text-sm font-xs text-black">Auto Sync </span>
+        </label>
+      </div>
+      
+
+      <div className="flex flex-col gap-2 mt-2 max-h-full overflow-y-auto border-gray-300">
+        {canvasObjects.map((object, index) => (
+          <div key={index} className="flex items-center text-xs justify-between p-2 bg-gray-100 shadow-sm">
+            <p>{object.id}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

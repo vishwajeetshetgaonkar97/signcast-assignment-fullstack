@@ -19,6 +19,7 @@ function App() {
   const [allcanvases, setAllCanvases] = useState<any[]>([]);
   const [canvasObjects, setCanvasObjects] = useState<any[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
+  const [isAutoSync, setIsAutoSync] = useState<boolean>(true);
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
   const getDeviceInfo = async () => {
@@ -50,9 +51,13 @@ function App() {
       // Invoke the main process to get the canvases
       const canvases = await window.electron.getCanvases();
       console.log('canvases', canvases);
-      setAllCanvases(canvases);
-      console.log('canvases', canvases);
-      setCanvasObjects(canvases[selectedCanvasIndex].data);
+
+      if(isAutoSync){
+        setAllCanvases(canvases);
+        console.log('canvases', canvases);
+        setCanvasObjects(canvases[selectedCanvasIndex].data);
+      }
+
 
     } catch (error) {
       console.log(`Canvas get issue: ${error}`);
@@ -71,7 +76,6 @@ function App() {
         if(!isConnected ){
           getAllCanvases();
         }
-
         setIsConnected(true);
       };
 
@@ -122,6 +126,8 @@ function App() {
           selectedCanvasIndex={selectedCanvasIndex}
           setSelectedCanvasIndex={setSelectedCanvasIndex}
           syncCanvas={getAllCanvases}
+          isAutoSync={isAutoSync}
+          setIsAutoSync={setIsAutoSync}
           />
         </main>
         {isModalOpen && (
