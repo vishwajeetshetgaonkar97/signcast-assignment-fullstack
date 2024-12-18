@@ -69,8 +69,7 @@ Offline support for the Electron application is not implemented yet. The plan in
 - Implementing a caching mechanism to store and sync data seamlessly
 
 ## Known Limitations
-- Electron Application:
-- Build for production not yet implemented.
+- Electron Application: Build for production not yet implemented.
 - Lacks offline support and caching mechanisms.
 - Slideshow Feature: Contains a known bug that needs resolution.
 - UI/UX: Demo UI is basic and requires enhancements.
