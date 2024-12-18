@@ -9,24 +9,23 @@ Demo Video Link
 https://youtu.be/N4J2S27Xxts
 
 
-### Project Architecture Overview
+## Project Architecture Overview
 SignCast is developed using the following technologies:
 
-Frontend Dashboard:
-
+### Frontend Dashboard:
 Built with React.js (TypeScript) and TailwindCSS using Vite for optimized builds.
 Backend:
 
-Node.js + Express.js with WebSocket implementation for real-time communication.
+### Node.js + Express.js with WebSocket implementation for real-time communication.
 Deployed on Railway.app.
-Desktop Application:
 
+### Desktop Application:
 Electron application powered by React.js (TypeScript) and TailwindCSS.
 WebSocket integration enables real-time synchronization with the dashboard.
 
-Setup Instructions
+## Setup Instructions
 
-Display Application
+### Display Application
 
 Navigate to the desktop application folder
 
