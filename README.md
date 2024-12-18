@@ -27,10 +27,8 @@ WebSocket integration enables real-time synchronization with the dashboard.
 
 ### Display Application
 
-Navigate to the desktop application folder
-
 Navigate to the desktop application folder:
-cd /desktop-application  
+> cd /desktop-application  
 
 Install dependencies:
 npm install  
