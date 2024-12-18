@@ -9,7 +9,7 @@ Demo Video Link
 https://youtu.be/N4J2S27Xxts
 
 
-Project Architecture Overview
+### Project Architecture Overview
 SignCast is developed using the following technologies:
 
 Frontend Dashboard:
