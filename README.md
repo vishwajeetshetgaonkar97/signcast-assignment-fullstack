@@ -58,27 +58,24 @@ Start the development server:
 - Dashboard: Listens for real-time updates and processes canvas data for display.
 - Electron Application: Subscribes to WebSocket updates to ensure synchronized display.
 
-Real-Time Communication:
-WebSocket events are managed via a backend server, ensuring a continuous connection between the dashboard and the display application.
+## Real-Time Communication:
+- WebSocket events are managed via a backend server, ensuring a continuous connection between the dashboard and the display application.
 
-Offline Functionality
+# Offline Functionality
 Offline support for the Electron application is not implemented yet. The plan includes:
 
-Saving data locally for offline use.
-Using WebSocket events in conjunction with network detection to fetch the latest data when reconnected.
-Implementing a caching mechanism to store and sync data seamlessly
+- Saving data locally for offline use.
+- Using WebSocket events in conjunction with network detection to fetch the latest data when reconnected.
+- Implementing a caching mechanism to store and sync data seamlessly
 
-Known Limitations
-Electron Application:
-Build for production not yet implemented.
-Lacks offline support and caching mechanisms.
-Slideshow Feature:
-Contains a known bug that needs resolution.
-UI/UX:
-Demo UI is basic and requires enhancements.
-Security:
-Screen key (1234) and client validation need improvements.
-Password hashing and encrypted communication are not yet implemented.
+# Known Limitations
+- Electron Application:
+- Build for production not yet implemented.
+- Lacks offline support and caching mechanisms.
+- Slideshow Feature: Contains a known bug that needs resolution.
+- UI/UX: Demo UI is basic and requires enhancements.
+- Security: Screen key (1234) and client validation need improvements.
+- Password hashing and encrypted communication are not yet implemented.
 
 Future Improvements
 Enhance the UI/UX for both the dashboard and Electron application.
