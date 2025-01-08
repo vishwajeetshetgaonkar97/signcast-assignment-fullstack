@@ -11,6 +11,10 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
   const [height, setHeight] = useState<string>("");
   const [diameter, setDiameter] = useState<string>("");
   const [color, setColor] = useState<string>("");
+  const [textContent, setTextContent] = useState<string>("");
+const [fontSize, setFontSize] = useState<string>("");
+const [angle, setAngle] = useState<string>("");
+
 
   useEffect(() => {
     if (canvas) {
@@ -23,14 +27,40 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
           setWidth(Math.round(rect.width! * rect.scaleX!).toString());
           setHeight(Math.round(rect.height! * rect.scaleY!).toString());
           console.log("rect fill", rect.fill);
+          setAngle(Math.round(object.angle).toString());
           setColor(rect.fill as string);
           setDiameter("");
         } else if (object.type === "circle") {
           const circle = object as fabric.Circle;
           setDiameter(Math.round(circle.radius! * 2 * circle.scaleX!).toString());
           setColor(circle.fill as string);
+          setAngle(Math.round(object.angle).toString());
           setWidth("");
           setHeight("");
+        }else if (object.type === "triangle") {
+          const triangle = object as fabric.Triangle;
+          setWidth(Math.round(triangle.width! * triangle.scaleX!).toString());
+          setHeight(Math.round(triangle.height! * triangle.scaleY!).toString());
+          setAngle(Math.round(object.angle).toString());
+          setColor(triangle.fill as string);
+          setDiameter("");
+        } else if (object.type === "text") {
+          const text = object as fabric.Text;
+          setTextContent(text.text || "");
+          setFontSize(Math.round(text.fontSize!).toString());
+          setColor(text.fill as string);
+          setAngle(Math.round(object.angle).toString());
+          setWidth("");
+          setHeight("");
+          setDiameter("");
+        } else {
+          setWidth("");
+          setHeight("");
+          setColor("");
+          setDiameter("");
+          setTextContent("");
+          setFontSize("");
+          setAngle("");
         }
       };
 
@@ -99,10 +129,24 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
       canvas?.renderAll();
     }
   };
+
+  const handleAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/,/g, "");
+    const intValue = parseInt(value, 10);
+    setAngle(value);
+  
+    if (selectedObject && intValue >= 0 && intValue <= 360) {
+      selectedObject.set("angle", intValue);
+      canvas?.renderAll();
+    }
+  };
+
+  
+
   if (!selectedObject || !canvas || !selectedObject.type || (!width && !height && !diameter)) return null;
   return (
     <div className="flex flex-col  w-min  absolute top-12 right-2  bg-bg-color py-2 px-3 rounded shadow">
-      <h6 className="text-xs opacity-80 font-semibold pb-2">Appearance</h6>
+      <h6 className="text-xs opacity-80 font-semibold pb-2 min-w-[150px]">Appearance</h6>
       {width && <div className="flex flex-col ">
         <label className="text-xs opacity-80">Width</label>
         <input
@@ -119,10 +163,21 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
       {diameter && <div>
         <label className="text-xs opacity-80">Diameter</label>
         <input
-          className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full text-xs border rounded-md p-1  focus:outline-none focus:ring-2 focus:ring-blue-500"
 
           type="text" value={diameter} onChange={handleDiameterChange} />
       </div>}
+      {angle && (
+  <div>
+    <label className="text-xs opacity-80">Angle</label>
+    <input
+      className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      type="text"
+      value={angle}
+      onChange={handleAngleChange}
+    />
+  </div>
+)}
       {color && <div>
         <label className="text-xs opacity-80">Color</label>
 
