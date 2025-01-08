@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import TopBar from "./Components/TopBar/TopBar";
 import MainControlComponent from "./Components/MainControlComponent/MainControlComponent";
 import MonitoringStateContext from "./Contexts/MonitoringStateContext";
+import CanvasParentComponent from "./Components/CanvasParentComponent/CanvasParentComponent";
 
 const App: React.FC = () => {
   const [themeMode, setThemeMode] = useState("light");
@@ -26,10 +27,10 @@ useEffect(() => {
 
   return (
     <MonitoringStateContext.Provider value={monitoringStateContextValue}>
-    <div className={`${themeMode} bg-bg-color h-screen w-screen text-text-color  px-4 py-2 font-poppins`}>
+    <div className={`${themeMode} bg-bg-color h-screen w-screen text-text-color font-poppins`}>
       <TopBar themeMode={themeMode} setThemeMode={setThemeMode} />
-      <main className="flex h-[95%] pb-2 align-center justify-center  pt-2 flex-col ">
-        <MainControlComponent />
+      <main className="flex h-[95%] w-full align-center justify-center  pt-2 flex-col bg-gray-100 border border-gray-100 overflow-hidden">
+        <CanvasParentComponent/>
       </main>
     </div>
     </MonitoringStateContext.Provider>

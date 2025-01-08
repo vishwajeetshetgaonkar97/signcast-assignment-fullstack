@@ -20,8 +20,8 @@ const TopBar: React.FC<ThemeSelectionProps> = ({ themeMode, setThemeMode }) => {
   };
 
   return (
-    <div className="flex w-full h-min justify-between  items-center dark:text-neutral-100">
-      <img className="h-9" src="/logo.png" alt="Logo" />
+    <div className="flex w-full h-[5%] justify-between  items-center dark:text-neutral-100 px-4 py-2">
+      <img className="h-7" src="/logo.png" alt="Logo" />
       <div className="text-sm flex gap-2 flex-row items-center ">
         <div >
           {isMonitoring ? (
