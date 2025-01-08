@@ -47,12 +47,12 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
         } else if (object.type === "text") {
           const text = object as fabric.Text;
           setTextContent(text.text || "");
-        setFontSize(Math.round(text.fontSize!).toString());
-        setColor(text.fill as string);
-        setAngle(Math.round(object.angle).toString());
-        setWidth("");
-        setHeight("");
-        setDiameter("");
+          setFontSize(Math.round(text.fontSize!).toString());
+          setColor(text.fill as string);
+          setAngle(Math.round(object.angle).toString());
+          setWidth("");
+          setHeight("");
+          setDiameter("");
         } else {
           setWidth("");
           setHeight("");
@@ -80,7 +80,7 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
         const object = event.target as fabric.Object;
         if (object.type === "text") {
           const text = object as fabric.Text;
-          const adjustedFontSize = Math.round(text.fontSize! * text.scaleX!); 
+          const adjustedFontSize = Math.round(text.fontSize! * text.scaleX!);
           setFontSize(adjustedFontSize.toString());
         }
       });
@@ -89,8 +89,8 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
         canvas.off("selection:created");
         canvas.off("selection:updated");
         canvas.off("selection:cleared");
-  canvas.off("object:modified");
-      canvas.off("object:scaling");
+        canvas.off("object:modified");
+        canvas.off("object:scaling");
       };
     }
   }, [canvas]);
@@ -173,7 +173,8 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
   };
 
 
-  // if ((!width && !height && !diameter)) return null;
+  if (!selectedObject || !color) return null;
+  console.log("selectedObject", selectedObject);
   return (
     <div className="flex flex-col  w-min  absolute top-12 right-2  bg-bg-color py-2 px-3 rounded shadow">
       <h6 className="text-xs opacity-80 font-semibold pb-2 min-w-[150px]">Appearance</h6>
@@ -217,28 +218,28 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
           type="color" value={color} onChange={handleColorChange} />
       </div>}
 
-{selectedObject?.type === "text" && (
-  <>
-    <div>
-      <label className="text-xs opacity-80">Text Content</label>
-      <input
-        className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        type="text"
-        value={textContent}
-        onChange={handleTextChange}
-      />
-    </div>
-    <div>
-      <label className="text-xs opacity-80">Font Size</label>
-      <input
-        className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        type="number"
-        value={fontSize}
-        onChange={handleFontSizeChange}
-      />
-    </div>
-  </>
-)}
+      {selectedObject?.type === "text" && (
+        <>
+          <div>
+            <label className="text-xs opacity-80">Text Content</label>
+            <input
+              className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+              value={textContent}
+              onChange={handleTextChange}
+            />
+          </div>
+          <div>
+            <label className="text-xs opacity-80">Font Size</label>
+            <input
+              className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="number"
+              value={fontSize}
+              onChange={handleFontSizeChange}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
