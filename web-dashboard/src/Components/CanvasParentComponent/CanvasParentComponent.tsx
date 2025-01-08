@@ -3,7 +3,8 @@ import { Canvas, Rect, Circle, Text, Line, Triangle } from "fabric";
 import * as fabric from "fabric";
 import { FaRegSquare } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa";
-import { FaSlash, FaFont, FaPlay } from "react-icons/fa"; // FaPlay for triangle, FaFont for text
+import { RxText } from "react-icons/rx";
+import { LuTriangle } from "react-icons/lu";
 import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
 
 const CanvasParentComponent = () => {
@@ -81,8 +82,8 @@ const CanvasParentComponent = () => {
       <div className="flex flex-row w-min gap-3 absolute z-10 top-12 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
         <FaRegSquare className="cursor-pointer hover:text-violet-700" onClick={addRectangle} size={20} />
         <FaRegCircle className="cursor-pointer hover:text-fuchsia-500" onClick={addCircle} size={20} />
-        <FaFont className="cursor-pointer hover:text-blue-500" onClick={addText} size={20} />
-        <FaPlay className="cursor-pointer hover:text-green-500" onClick={addTriangle} size={20} />
+        <LuTriangle className="cursor-pointer hover:text-green-500" onClick={addTriangle} size={20} />
+        <RxText className="cursor-pointer hover:text-blue-500" onClick={addText} size={20} />
       </div>
       <canvas id="canvas" ref={canvasRef} />
       <DesignEditComponent canvas={canvas} />
