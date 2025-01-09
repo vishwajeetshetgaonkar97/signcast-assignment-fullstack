@@ -8,6 +8,7 @@ import { LuTriangle } from "react-icons/lu";
 import { FiZoomIn } from "react-icons/fi";
 import { FiZoomOut } from "react-icons/fi";
 import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
+import LayersComponent from "../LayersComponent/LayersComponent";
 
 const CanvasParentComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -129,8 +130,9 @@ const CanvasParentComponent = () => {
 
       <DesignEditComponent canvas={canvas} />
       <div className="flex flex-row items-center justify-center">
-      <button onClick={getCanvasObjects}>Get Canvas Objects</button>
-    </div>
+        <button onClick={getCanvasObjects}>Get Canvas Objects</button>
+      </div>
+      <LayersComponent canvas={canvas} />
     </div>
   );
 };
