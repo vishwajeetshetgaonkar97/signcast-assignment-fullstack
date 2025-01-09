@@ -174,7 +174,7 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
 
   if (!selectedObject || !color) return null;
   return (
-    <div className="flex flex-col  w-min  absolute top-12 right-2  bg-bg-color py-2 px-3 rounded shadow">
+    <div className="flex flex-col  w-min  absolute top-12 mt-1/2 right-2 bg-bg-color py-2 px-3 rounded shadow">
       <h6 className="text-xs opacity-80 font-semibold pb-2 mb-2 min-w-[150px] border-b border-border-color">Appearance</h6>
       {width && <div className="flex flex-col ">
         <label className="text-xs opacity-80">Width</label>

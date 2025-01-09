@@ -13,6 +13,7 @@ import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
 import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../utils/CanvasDrawingsUtils";
+import updateDeviceStatus from "../../api/updateDeviceStatus";
 
 interface allcanvases {
   name: string;
@@ -66,7 +67,8 @@ const getAllCanvases = async () => {
             id: object.id,
             zIndex: object.zIndex,
             scaleX: object.scaleX,
-            scaleY: object.scaleY
+            scaleY: object.scaleY,
+            visible: object.visible,
           });
         } else if (object.type === "circle") {
           addCircle({
@@ -80,7 +82,8 @@ const getAllCanvases = async () => {
             id: object.id,
             zIndex: object.zIndex,
             scaleX: object.scaleX,
-            scaleY: object.scaleY
+            scaleY: object.scaleY,
+            visible: object.visible,
           });
         } else if (object.type === "triangle") {
           addTriangle({
@@ -95,7 +98,8 @@ const getAllCanvases = async () => {
             id: object.id,
             zIndex: object.zIndex,
             scaleX: object.scaleX,
-            scaleY: object.scaleY
+            scaleY: object.scaleY,
+            visible: object.visible,
           });
         } else if (object.type === "text") {
           addText({
@@ -109,7 +113,8 @@ const getAllCanvases = async () => {
             id: object.id,
             zIndex: object.zIndex,
             scaleX: object.scaleX,
-            scaleY: object.scaleY
+            scaleY: object.scaleY,
+            visible: object.visible,
           });
         } else if (object.type === "image") {
           addImage({
@@ -121,7 +126,9 @@ const getAllCanvases = async () => {
             scaleY: object.scaleY,
             angle: object.angle,
             id: object.id,
-            zIndex: object.zIndex
+            zIndex: object.zIndex,
+            selectable: object.selectable,
+            visible: object.visible,
           })
         }
       });
@@ -153,12 +160,9 @@ const getAllCanvases = async () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-      // getAllCanvases();
 
       // socket connection 
-
       // websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
-
       websocketRef.current = new WebSocket("ws://localhost:3003");
 
       websocketRef.current.onopen = () => {
@@ -167,7 +171,7 @@ const getAllCanvases = async () => {
           name: "Master Device",
           status: "online",
         }
-        // sendDeviceMonitoringStatus(data)
+        updateDeviceStatus(data)
         // setIsMonitoring(true)
       };
 
@@ -257,6 +261,8 @@ const getAllCanvases = async () => {
     [selectedCanvasIndex, setSelectedCanvasIndex]
   );
 
+  const isSyncRequired = allcanvases.length > 0 && allcanvases[selectedCanvasIndex].data !== canvas?.getObjects();
+
   const handleSyncCanvas = async () => {
     try {
       const currentObjects = getCanvasObjects();
@@ -278,6 +284,7 @@ const getAllCanvases = async () => {
             angle: object.angle,
             zIndex: object.zIndex,
             imageUrl: object.imageUrl || "",
+            visible: object.visible, 
           };
         }),
       };
@@ -334,8 +341,8 @@ const getAllCanvases = async () => {
               <AddToCanvasModal handleAddCanvas={handleAddCanvas} setIsModalOpen={setIsModalOpen} />
             )}
 
-            <div className="flex flex-row items-center justify-center absolute z-10 bottom-15 right-2 " onClick={handleSyncCanvas}>
-              <button>Sync</button>
+            <div className="flex flex-row items-center justify-center absolute z-10 top-12  right-2 " onClick={handleSyncCanvas}>
+              <button  className={`bg-blue-600 text-xs  text-white px-4 py-2 rounded`}>Apply</button>
             </div>
 
 

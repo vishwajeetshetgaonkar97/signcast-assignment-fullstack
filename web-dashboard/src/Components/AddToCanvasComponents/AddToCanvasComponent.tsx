@@ -1,6 +1,5 @@
 import React from 'react';
-import { Canvas, Text } from "fabric";
-import * as fabric from "fabric";
+import { Canvas } from "fabric";
 import { FaRegSquare } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa";
 import { RxText } from "react-icons/rx";
@@ -14,10 +13,6 @@ interface AddToCanvasProps {
 }
 
 const AddToCanvasComponent: React.FC<AddToCanvasProps> = ({ canvas }) => {
-
-
-
-
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -43,7 +38,6 @@ const AddToCanvasComponent: React.FC<AddToCanvasProps> = ({ canvas }) => {
             reader.readAsDataURL(file);
         }
     };
-
     return (
         <div className="flex flex-row w-min gap-3 absolute z-10 top-12 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
             <FaRegSquare className="cursor-pointer hover:text-violet-700"

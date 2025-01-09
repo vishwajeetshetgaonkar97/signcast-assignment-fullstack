@@ -22,6 +22,7 @@ interface RectangleOptions {
   zIndex?: number;
   scaleX?: number;
   scaleY?: number;
+  visible?: boolean;
 }
 
 interface CircleOptions {
@@ -36,6 +37,7 @@ interface CircleOptions {
   zIndex?: number;
   scaleX?: number;
   scaleY?: number;
+  visible?: boolean;
 }
 
 interface TriangleOptions {
@@ -51,6 +53,7 @@ interface TriangleOptions {
   zIndex?: number;
   scaleX?: number;
   scaleY?: number;
+  visible?: boolean;
 }
 
 interface TextOptions {
@@ -66,6 +69,7 @@ interface TextOptions {
   zIndex?: number;
   scaleX?: number;
   scaleY?: number;
+  visible?: boolean;
 }
 
 interface ImageOptions {
@@ -82,6 +86,7 @@ interface ImageOptions {
   zIndex?: number;
   scaleX?: number;
   scaleY?: number;
+  visible?: boolean;
 }
 
 const addRectangle = ({
@@ -97,6 +102,7 @@ const addRectangle = ({
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
+  visible = true,
 }: RectangleOptions) => {
   if (canvas) {
     const rect = new Rect({
@@ -108,7 +114,8 @@ const addRectangle = ({
       angle,
       selectable,
       scaleX,
-      scaleY
+      scaleY,
+      visible,
     }) as CustomFabricObject;
     rect.id = id;
     rect.zIndex = zIndex;
@@ -129,6 +136,7 @@ const addCircle = ({
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
+  visible = true
 }: CircleOptions) => {
   if (canvas) {
     const circle = new Circle({
@@ -139,7 +147,8 @@ const addCircle = ({
       angle,
       selectable,
       scaleX,
-      scaleY
+      scaleY,
+      visible
     }) as CustomFabricObject;
     circle.id = id;
     circle.zIndex = zIndex;
@@ -161,6 +170,7 @@ const addTriangle = ({
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
+  visible = true,
 }: TriangleOptions) => {
   if (canvas) {
     const triangle = new Triangle({
@@ -172,7 +182,8 @@ const addTriangle = ({
       angle,
       selectable,
       scaleX,
-      scaleY
+      scaleY,
+      visible
     }) as CustomFabricObject;
     triangle.id = id;
     triangle.zIndex = zIndex;
@@ -194,6 +205,7 @@ const addText = ({
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
+  visible = true,
 }: TextOptions) => {
   if (canvas) {
     const fabricText = new Text(text, {
@@ -204,7 +216,8 @@ const addText = ({
       angle,
       selectable,
       scaleX,
-      scaleY
+      scaleY,
+      visible
     }) as CustomFabricObject;
     fabricText.id = id;
     fabricText.zIndex = zIndex;
@@ -223,6 +236,7 @@ const addImage = ({
   angle = 0,
   id = "image-1",
   zIndex = 1,
+  visible = true,
 }: ImageOptions) => {
   const imgObj = new Image();
   imgObj.src = imageUrl;
@@ -234,6 +248,7 @@ const addImage = ({
       scaleX,
       scaleY,
       angle,
+      visible
     }) as CustomFabricObject;
     fabricImage.id = id;
     fabricImage.zIndex = zIndex;
