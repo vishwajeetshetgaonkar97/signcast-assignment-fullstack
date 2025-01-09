@@ -26,7 +26,6 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
           const rect = object as fabric.Rect;
           setWidth(Math.round(rect.width! * rect.scaleX!).toString());
           setHeight(Math.round(rect.height! * rect.scaleY!).toString());
-          console.log("rect fill", rect.fill);
           setAngle(Math.round(object.angle).toString());
           setColor(rect.fill as string);
           setDiameter("");
@@ -174,27 +173,26 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
 
 
   if (!selectedObject || !color) return null;
-  console.log("selectedObject", selectedObject);
   return (
     <div className="flex flex-col  w-min  absolute top-12 right-2  bg-bg-color py-2 px-3 rounded shadow">
-      <h6 className="text-xs opacity-80 font-semibold pb-2 min-w-[150px]">Appearance</h6>
+      <h6 className="text-xs opacity-80 font-semibold pb-2 mb-2 min-w-[150px] border-b border-border-color">Appearance</h6>
       {width && <div className="flex flex-col ">
         <label className="text-xs opacity-80">Width</label>
         <input
-          className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full text-xs  border border-border-color bg-bg-color  rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="text" value={width} onChange={handleWidthChange} />
       </div>}
       {height && <div>
         <label className="text-xs opacity-80">Height</label>
         <input
-          className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full text-xs border border-border-color bg-bg-color rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="text"
           value={height} onChange={handleHeightChange} />
       </div>}
       {diameter && <div>
         <label className="text-xs opacity-80">Diameter</label>
         <input
-          className="w-full text-xs border rounded-md p-1  focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full text-xs border border-border-color bg-bg-color rounded-md p-1  focus:outline-none focus:ring-2 focus:ring-blue-500"
 
           type="text" value={diameter} onChange={handleDiameterChange} />
       </div>}
@@ -202,7 +200,7 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
         <div>
           <label className="text-xs opacity-80">Angle</label>
           <input
-            className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border border-border-color bg-bg-color rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="text"
             value={angle}
             onChange={handleAngleChange}
@@ -223,7 +221,7 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
           <div>
             <label className="text-xs opacity-80">Text Content</label>
             <input
-              className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs border border-border-color bg-bg-color rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               value={textContent}
               onChange={handleTextChange}
@@ -232,7 +230,7 @@ const DesignEditComponent: React.FC<DesignEditComponentProps> = ({ canvas }) => 
           <div>
             <label className="text-xs opacity-80">Font Size</label>
             <input
-              className="w-full text-xs border rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs border border-border-color bg-bg-color rounded-md p-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="number"
               value={fontSize}
               onChange={handleFontSizeChange}

@@ -87,6 +87,15 @@ const CanvasParentComponent = () => {
   const zoomOut = () => {
     setScale((prevScale) => prevScale / 1.1);
   };
+  const getCanvasObjects = () => {
+    if (canvas) {
+      const objects = canvas.getObjects(); // Get all objects on the canvas
+      console.log(objects); // Log or use these objects as needed
+      objects.forEach((object) => {
+        console.log(object.type); // Log the type of each object
+      });
+    }
+  };
 
   return (
     <div className={"flex items-center justify-center "}  >
@@ -102,9 +111,9 @@ const CanvasParentComponent = () => {
         <FiZoomIn className="cursor-pointer hover:text-fuchsia-700 mt-1" onClick={zoomIn} size={18} />
         <FiZoomOut className="cursor-pointer hover:text-rose-500 mt-1" onClick={zoomOut} size={18} />
 
-        <div className="flex flex-row items-center group transition duration-300 ease-in-out">
+        <div className="flex flex-row items-center group transition duration-300 ease-in-out pr-2">
           <input
-            className="text-xs w-12 border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-xs w-12 border border-border-color bg-bg-color rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="number"
             value={scale * 100}
             onChange={(e) => setScale(parseFloat(e.target.value) / 100)}
@@ -119,6 +128,9 @@ const CanvasParentComponent = () => {
       </div>
 
       <DesignEditComponent canvas={canvas} />
+      <div className="flex flex-row items-center justify-center">
+      <button onClick={getCanvasObjects}>Get Canvas Objects</button>
+    </div>
     </div>
   );
 };
