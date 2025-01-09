@@ -7,19 +7,20 @@ import { RxText } from "react-icons/rx";
 import { LuTriangle } from "react-icons/lu";
 import { FiZoomIn } from "react-icons/fi";
 import { FiZoomOut } from "react-icons/fi";
+import { MdOutlineImage } from "react-icons/md";
 import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
 import LayersComponent from "../LayersComponent/LayersComponent";
 
 const CanvasParentComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
-  const [scale, setScale] = useState(0.8);
+  const [scale, setScale] = useState(0.5);
 
   useEffect(() => {
     if (canvasRef.current) {
       const initCanvas = new Canvas(canvasRef.current, {
-        width: 1280,
-        height: 720,
+        width: 1920,
+        height: 1080,
       });
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
@@ -88,6 +89,7 @@ const CanvasParentComponent = () => {
   const zoomOut = () => {
     setScale((prevScale) => prevScale / 1.1);
   };
+
   const getCanvasObjects = () => {
     if (canvas) {
       const objects = canvas.getObjects(); // Get all objects on the canvas
@@ -98,14 +100,49 @@ const CanvasParentComponent = () => {
     }
   };
 
+  const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && canvas) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imgObj = new Image();
+        imgObj.src = event.target?.result as string;
+        imgObj.onload = () => {
+          const fabricImage = new fabric.Image(imgObj);
+          fabricImage.set({
+            left: 100,
+            top: 100,
+            scaleX: 0.5,
+            scaleY: 0.5,
+          });
+          canvas.add(fabricImage);
+        };
+      };
+      reader.readAsDataURL(file); // Read the file as a Data URL
+    }
+  };
+
   return (
     <div className={"flex items-center justify-center "}  >
-      <div className="flex flex-row w-min gap-3 absolute z-10 top-12 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
-        <FaRegSquare className="cursor-pointer hover:text-violet-700" onClick={addRectangle} size={20} />
-        <FaRegCircle className="cursor-pointer hover:text-fuchsia-500" onClick={addCircle} size={20} />
-        <LuTriangle className="cursor-pointer hover:text-green-500" onClick={addTriangle} size={20} />
-        <RxText className="cursor-pointer hover:text-blue-500" onClick={addText} size={20} />
-      </div>
+   <div className="flex flex-row w-min gap-3 absolute z-10 top-12 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
+  <FaRegSquare className="cursor-pointer hover:text-violet-700" onClick={addRectangle} size={20} />
+  <FaRegCircle className="cursor-pointer hover:text-fuchsia-500" onClick={addCircle} size={20} />
+  <LuTriangle className="cursor-pointer hover:text-green-500" onClick={addTriangle} size={20} />
+  <RxText className="cursor-pointer hover:text-blue-500" onClick={addText} size={20} />
+
+  <label htmlFor="fileUpload" className="cursor-pointer hover:text-rose-500">
+    <MdOutlineImage size={20} />
+  </label>
+
+  <input
+    id="fileUpload"
+    type="file"
+    accept="image/*"
+    style={{ display: "none" }}
+    onChange={uploadImage}
+  />
+</div>
+
 
       <div className="flex flex-row align-center justify-center w-min gap-2 absolute z-10 bottom-2 right-2 bg-bg-color py-2 px-3 rounded shadow">
 
@@ -127,6 +164,7 @@ const CanvasParentComponent = () => {
       <div className={"flex items-center justify-center "} style={{ transform: `scale(${scale})` }}>
         <canvas id="canvas" ref={canvasRef} />
       </div>
+
 
       <DesignEditComponent canvas={canvas} />
       <div className="flex flex-row items-center justify-center">
