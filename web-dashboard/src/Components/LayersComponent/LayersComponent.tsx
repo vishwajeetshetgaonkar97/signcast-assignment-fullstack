@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas, FabricObject } from 'fabric';
-import { FaAngleUp } from "react-icons/fa";
-import { FaAngleDown } from "react-icons/fa";
+import { FaAngleUp, FaAngleDown, FaEye, FaEyeSlash, FaTrash } from "react-icons/fa";
+import { RxCross2 } from "react-icons/rx";
 
 interface CustomFabricObject extends FabricObject {
     id?: string;
@@ -23,9 +23,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
         }
     };
 
-
     const moveSelectedLayer = (direction: 'up' | 'down') => {
-
         if (!selectedLayer) return;
 
         const allObjects = canvas.getObjects() as CustomFabricObject[];
@@ -49,7 +47,6 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
             canvas.clear();
             canvas.add(...allObjects);
 
-
             allObjects.forEach((obj, index) => {
                 obj.set('zIndex', index);
                 obj.zIndex = index;
@@ -59,21 +56,37 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
             canvas.setActiveObject(selectedObject);
             canvas.renderAll();
 
-            updateLayers()
+            updateLayers();
         }
     };
 
     const handleObjectSelection = (e) => {
         const selectedObject = e.selected ? e.selected[0] : null;
-
         setSelectedLayer(selectedObject || null);
     }
 
-    const selectlayerInCanvas = (layerId: string) => {
+    const selectLayerInCanvas = (layerId: string) => {
         const selectedLayer = layers.find(layer => layer.id === layerId);
         if (selectedLayer) {
             canvas.setActiveObject(selectedLayer);
             canvas.renderAll();
+        }
+    };
+
+    const toggleLayerVisibility = (layerId: string) => {
+        const selectedLayer = layers.find(layer => layer.id === layerId);
+        if (selectedLayer) {
+            selectedLayer.set('visible', !selectedLayer.visible);
+            canvas.renderAll();
+            updateLayers();
+        }
+    };
+
+    const deleteLayer = (layerId: string) => {
+        const selectedLayer = layers.find(layer => layer.id === layerId);
+        if (selectedLayer) {
+            canvas.remove(selectedLayer);
+            updateLayers();
         }
     };
 
@@ -85,15 +98,11 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
             obj.zIndex = index;
         });
 
-
-
         setLayers([...objects].reverse());
     };
 
-
     useEffect(() => {
         if (canvas) {
-
             updateLayers();
 
             canvas.on('object:added', updateLayers);
@@ -116,27 +125,50 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
         }
     }, [canvas]);
 
+    if (!canvas || layers.length === 0) {
+        return null;
+    }
 
     return (
-        <div className="flex flex-col  w-fit min-w-[150px]  absolute top-12 left-2  bg-bg-color py-2 px-2 rounded shadow" >
+        <div className="flex flex-col w-fit min-w-[150px] absolute top-12 left-2 bg-bg-color py-2 px-2 rounded shadow">
             <div className="flex justify-between items-center pb-2 mb-2 border-b border-border-color">
-                <h6 className="text-xs opacity-80 font-semibold  min-w-[150px] ">Layers</h6>
-                <div className="flex gap-1">
-                    <FaAngleUp onClick={() => moveSelectedLayer('up')} className="text-xs opacity-80 hover:opacity-100 cursor-pointer" />
-                    <FaAngleDown onClick={() => moveSelectedLayer('down')} className="text-xs opacity-80 hover:opacity-100 cursor-pointer" />
+                <h6 className="text-xs opacity-80 font-semibold min-w-[150px]">Layers</h6>
+                <div className="flex items-center gap-1">
+                    <FaAngleUp size={14} onClick={() => moveSelectedLayer('up')} className="text-xs opacity-80 hover:opacity-100 cursor-pointer hover:text-green-600" />
+                    <FaAngleDown size={14} onClick={() => moveSelectedLayer('down')} className="text-xs opacity-80 hover:opacity-100 cursor-pointer hover:text-yellow-600" />
                 </div>
             </div>
 
             <ul>
-                {layers.map((layer, index) => {
-                    console.log("layer", layer.id === selectedLayer?.id);
-                    return (
-                        <li key={layer.id} onClick={() => selectlayerInCanvas(layer.id)} className={`flex text-xs items-center w-full bg-bg-color hover:bg-card-color py-1 px-2 cursor-pointer rounded gap-2 ${layer.id === selectedLayer?.id ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}>
+                {layers.map((layer) => (
+                    <li
+                        key={layer.id}
+                        onClick={() => selectLayerInCanvas(layer.id)}
+                        className={`flex text-xs items-center w-full bg-bg-color hover:bg-card-color py-1 px-2 cursor-pointer rounded gap-2 ${layer.id === selectedLayer?.id ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}
+                    >
+                        {layer.type} {layer.zIndex}
 
-                            {layer.type} {layer.zIndex}
-                        </li>
-                    )
-                })}
+                        <div className="flex items-center gap-1 ml-auto">
+                            {layer.visible ?
+                                <FaEye
+                                    onClick={() => toggleLayerVisibility(layer.id)}
+                                    className={`text-xs cursor-pointer  text-gray-400 hover:text-gray-600 '}`}
+                                /> :
+
+                                <FaEyeSlash
+                                    onClick={() => toggleLayerVisibility(layer.id)}
+                                    className={`text-xs cursor-pointer  text-gray-400 hover:text-gray-600 '}`}
+                                />
+                            }
+
+                            <RxCross2
+                                size={14}
+                                onClick={() => deleteLayer(layer.id)}
+                                className="text-xs  cursor-pointer hover:text-red-500"
+                            />
+                        </div>
+                    </li>
+                ))}
             </ul>
         </div>
     );
