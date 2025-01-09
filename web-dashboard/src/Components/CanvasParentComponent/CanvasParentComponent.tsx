@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import { Canvas } from "fabric";
+import { Canvas , FabricObject} from "fabric";
 import * as fabric from "fabric";
 import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
 import LayersComponent from "../LayersComponent/LayersComponent";
@@ -12,11 +12,19 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
+import { addCircle, addRectangle, addTriangle } from "../../utils/CanvasDrawingsUtils";
 
 interface allcanvases {
   name: string;
   category: string;
   data: [];
+}
+
+
+interface CustomFabricObject extends FabricObject {
+    id?: string;
+    zIndex?: number;
+    radius?: number;
 }
 
 const CanvasParentComponent: React.FC = () => {
@@ -29,37 +37,84 @@ const CanvasParentComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
 
+const getAllCanvases = async () => {
+  try {
+    const data = await getCanvases();
+    console.log("Fetched canvases:", data.canvases);
+    setAllCanvases(data.canvases);
 
-  const getAllCanvases = async () => {
-    try {
-      const data = await getCanvases();
-      console.log('canvases', data.canvases);
-      setAllCanvases(data.canvases);
+    // Assuming the first canvas is the one we need
+    const objects = data.canvases[0].data as CustomFabricObject[];
+    console.log("Fetched objects:", objects);
 
-      const objects = data.canvases[0].data
+    if (canvas) {
+      console.log("Canvas exists, adding objects", objects);
 
-      console.log("objects on call", objects)
+      objects.forEach((object) => {
+        if (object.type === "rect") {
+          addRectangle({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            width: object.width,
+            height: object.height,
+            fill: typeof object.fill === "string" ? object.fill : "#FF0000", 
+            angle: object.angle,
+            selectable: object.selectable,
+            id: object.id,
+            zIndex: object.zIndex,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY
+          });
+        } else if (object.type === "circle") {
+          addCircle({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            radius: object.radius,
+            fill: typeof object.fill === "string" ? object.fill : "#0000FF", 
+            angle: object.angle,
+            selectable: object.selectable,
+            id: object.id,
+            zIndex: object.zIndex,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY
+          });
+        } else if (object.type === "triangle") {
+          addTriangle({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            width: object.width,
+            height: object.height,
+            fill: typeof object.fill === "string" ? object.fill : "#00FF00", 
+            angle: object.angle,
+            selectable: object.selectable,
+            id: object.id,
+            zIndex: object.zIndex,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY
+          });
+        }
+      });
 
+      canvas.renderAll();
 
-      if (canvas) {
-        canvas.add(...objects);
-        canvas.renderAll();
-      } else {
-        console.log("no canvas, creating a new one");
-        const newCanvas = new fabric.Canvas(canvasRef.current, {
-          width: 1920,
-          height: 1080,
+      // Correct usage of enlivenObjects
+      fabric.util.enlivenObjects(objects, (enlivenedObjects) => {
+        enlivenedObjects.forEach((object) => {
+          canvas.add(object);
         });
-        newCanvas.backgroundColor = "#fff";
-        newCanvas.add(...objects);
-        newCanvas.renderAll();
-        setCanvas(newCanvas);
-      }
-
-    } catch (error) {
-      console.log(`canvas get issue ${error}`);
+        canvas.renderAll();
+      });
     }
-  };
+  } catch (error) {
+    console.log(`Canvas fetch issue: ${error}`);
+  }
+};
+
+  
+  
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -70,7 +125,7 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-      getAllCanvases();
+      // getAllCanvases();
 
       // socket connection 
 
@@ -175,28 +230,48 @@ const CanvasParentComponent: React.FC = () => {
   );
 
   const handleSyncCanvas = async () => {
-
     try {
-      const currenObjects = canvas.getObjects()
+      const currentObjects = getCanvasObjects();
       const updateCanvasPostBody = {
         canvasId: allcanvases[selectedCanvasIndex]._id,
         name: allcanvases[selectedCanvasIndex].name,
         category: allcanvases[selectedCanvasIndex].category,
-        data: currenObjects,
+        data: currentObjects.map(object => {
+          return {
+            type: object.type,
+            left: object.left,
+            top: object.top,
+            width: object.width,
+            height: object.height,
+            fill: object.fill,
+            id: object.id,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY,
+            angle: object.angle,
+            zIndex: object.zIndex,
+          };
+        }),
       };
-      console.log("body posted", updateCanvasPostBody)
+  
+      // Send data to the backend to update the canvas
       const log = await updateCanvas(updateCanvasPostBody);
-      console.log("log addition", log);
-      // setIsSyncRequired(false);
+      console.log("Canvas synced successfully", log);
     } catch (error) {
-      console.log(`canvas sync issue ${error}`);
-      alert('Error to sync canvas');
+      console.log(`Canvas sync issue: ${error}`);
+      alert('Error syncing canvas');
     }
   };
+  
 
 
   console.log("allcanvases", allcanvases);
   console.log("canvas", canvas)
+
+  useEffect(() => {
+    if (canvas && allcanvases.length <= 0) {
+      getAllCanvases();
+    }
+  },[canvas])
 
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>

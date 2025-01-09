@@ -1,354 +1,154 @@
 import * as fabric from 'fabric';
+import { Canvas, Rect, Circle, Text, Triangle } from "fabric";
 
 interface CustomFabricObject extends fabric.Object {
   id?: string;
+  zIndex?: number;
 }
 
 interface RectangleOptions {
-  x?: number;
-  y?: number;
+  canvas: fabric.Canvas;
+  top?: number;
+  left?: number;
   width?: number;
   height?: number;
-  fillColor?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
-  isDraggable?: boolean;
-  canvas: fabric.Canvas;
-  setCanvasObjects: any;
+  fill?: string;
   angle?: number;
-  visible?: boolean;
-  canvasObjects?: any;
+  selectable?: boolean;
+  id?: string;
+  zIndex?: number;
+  scaleX?: number;
+  scaleY?: number;
 }
 
-interface LineOptions {
-  x1?: number;
-  y1?: number;
-  x2?: number;
-  y2?: number;
-  strokeColor?: string;
-  strokeWidth?: number;
-  isDraggable?: boolean;
+interface CircleOptions {
   canvas: fabric.Canvas;
-  setCanvasObjects: any;
-  visible?: boolean;
-  canvasObjects?: any;
+  top?: number;
+  left?: number;
+  radius?: number;
+  fill?: string;
+  angle?: number;
+  selectable?: boolean;
+  id?: string;
+  zIndex?: number;
+  scaleX?: number;
+  scaleY?: number;
 }
 
-
-interface ImageOptions {
-  url: string;
-  x?: number;
-  y?: number;
+interface TriangleOptions {
+  canvas: fabric.Canvas;
+  top?: number;
+  left?: number;
   width?: number;
   height?: number;
+  fill?: string;
   angle?: number;
-  isDraggable?: boolean;
-  canvas: fabric.Canvas;
-  setCanvasObjects: any;
-  canvasObjects?: any;
-  visible?: boolean;
+  selectable?: boolean;
+  id?: string;
+  zIndex?: number;
+  scaleX?: number;
+  scaleY?: number;
 }
 
-interface TextOptions {
-  text?: string;
-  x?: number;
-  y?: number;
-  fontSize?: number;
-  fontFamily?: string;
-  fillColor?: string;
-  isDraggable?: boolean;
-  angle?: number;
-  canvas: fabric.Canvas;
-  setCanvasObjects: any;
-  canvasObjects?: any;
-  visible?: boolean;
-}
-
-interface SlideshowOptions {
-  images?: string[];
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  interval?: number;
-  canvas: fabric.Canvas;
-  setCanvasObjects: any;
-  canvasObjects?: any;
-  isDraggable?: boolean;
-  visible?: boolean;
-}
-
-
-const addRectangleToCanvas = ({
-  x = 10,
-  y = 10,
+const addRectangle = ({
+  canvas,
+  top = 100,
+  left = 50,
   width = 100,
-  height = 50,
-  fillColor = 'transparent',
-  strokeColor = 'black',
-  strokeWidth = 2,
-  isDraggable = true,
-  canvas,
+  height = 60,
+  fill = "#FF0000",
   angle = 0,
-  setCanvasObjects,
-  visible = true,
-  canvasObjects = [],
+  selectable = true,
+  id = "rectangle-1",
+  zIndex = 1,
+  scaleX = 1,
+  scaleY = 1,
 }: RectangleOptions) => {
-  const rectangle = new fabric.Rect({
-    left: x,
-    top: y,
-    width,
-    height,
-    fill: fillColor,
-    stroke: strokeColor,
-    strokeWidth,
-    selectable: isDraggable,
-    lockMovementX: !isDraggable,
-    lockMovementY: !isDraggable,
-    angle,
-  }) as CustomFabricObject;
-;
-  
-  rectangle.id = `rect-${canvasObjects.length + 1}`;
-
-  canvas.add(rectangle);
-  canvas.renderAll();
-
-  // Add to the state
-  setCanvasObjects((prevObjects) => [
-    ...prevObjects,
-    {
-      id: rectangle.id,
-      type: 'rectangle',
-      x,
-      y,
+  if (canvas) {
+    const rect = new Rect({
+      top,
+      left,
       width,
       height,
-      fillColor,
-      strokeColor,
-      strokeWidth,
-      isDraggable,
+      fill,
       angle,
-      visible,
-    },
-  ]);
-};
-
-const addLineToCanvas = ({
-  x1 = 10,
-  y1 = 10,
-  x2 = 100,
-  y2 = 100,
-  strokeColor = 'black',
-  strokeWidth = 2,
-  isDraggable = true,
-  canvas,
-  setCanvasObjects,
-  visible = true,
-  canvasObjects = [],
-}: LineOptions) => {
-  const line = new fabric.Line([x1, y1, x2, y2], {
-    stroke: strokeColor,
-    strokeWidth,
-    selectable: isDraggable,
-    lockMovementX: !isDraggable,
-    lockMovementY: !isDraggable,
-  }) as CustomFabricObject;
-
-  line.id = `line-${canvasObjects.length + 1}`;
-
-  canvas.add(line);
-  canvas.renderAll();
-
-  setCanvasObjects((prevObjects) => [
-    ...prevObjects,
-    {
-      id: line.id,
-      type: 'line',
-      x1,
-      y1,
-      x2,
-      y2,
-      x: 0,
-      y: 0,
-      angle: 0,
-      strokeColor,
-      strokeWidth,
-      isDraggable,
-      visible,
-    },
-  ]);
-};
-
-
-const addImageToCanvas = ({
-  url,
-  x = 0,
-  y = 0,
-  width,
-  height,
-  angle = 0,
-  isDraggable = true,
-  canvas,
-  canvasObjects,
-  setCanvasObjects,
-  visible = true,
-}: ImageOptions) => {
-  if (!canvas) return;
-
-  const imgElement = new Image();
-
-  imgElement.onload = () => {
-
-    const imgInstance = new fabric.Image(imgElement, {
-      left: x,
-      top: y,
-      scaleX: width / imgElement.width, 
-      scaleY: height / imgElement.height, 
-      angle: angle,
-      selectable: isDraggable,
+      selectable,
+      scaleX,
+      scaleY
     }) as CustomFabricObject;
+    rect.id = id;
+    rect.zIndex = zIndex;
 
-    imgInstance.id = `image-${canvasObjects.length + 1}`;
-
-    canvas.add(imgInstance);
-    canvas.renderAll();
-
-    setCanvasObjects((prevObjects) => [
-      ...prevObjects,
-      {
-        id: imgInstance.id,
-        type: 'image',
-        url,
-        x,
-        y,
-        width,
-        height,
-        angle,
-        isDraggable,
-        visible,
-      },
-    ]);
-  };
-
-  imgElement.src = url;
+    canvas.add(rect);
+  }
 };
 
 
-const addTextToCanvas = ({
-  text = 'Demo Text',
-  x = 10,
-  y = 10,
-  fontSize = 20,
-  fontFamily = 'Poppins',
-  fillColor = 'black',
-  isDraggable = true,
+
+const addCircle = ({
+  canvas,
+  top = 100,
+  left = 50,
+  radius = 50,
+  fill = "#0000FF",
   angle = 0,
-  canvas,
-  setCanvasObjects,
-  visible = true,
-  canvasObjects = [],
-}: TextOptions) => {
-  const textObject = new fabric.Text(text, {
-    left: x,
-    top: y,
-    fontSize,
-    fontFamily,
-    fill: fillColor,
-    selectable: isDraggable,
-    lockMovementX: !isDraggable,
-    lockMovementY: !isDraggable,
-    angle,
-  }) as CustomFabricObject;
-
-  textObject.id = `text-${canvasObjects.length + 1}`;
-
-  canvas.add(textObject);
-  canvas.renderAll();
-
-  setCanvasObjects((prevObjects) => [
-    ...prevObjects,
-    {
-      id: textObject.id,
-      type: 'text',
-      text,
-      x,
-      y,
-      fontSize,
-      fontFamily,
-      fillColor,
-      isDraggable,
+  selectable = true,
+  id = "circle-1",
+  zIndex = 1,
+  scaleX = 1,
+  scaleY = 1,
+}: CircleOptions) => {
+  if (canvas) {
+    const circle = new fabric.Circle({
+      top,
+      left,
+      radius,
+      fill,
       angle,
-      visible,
-    },
-  ]);
+      selectable,
+      scaleX,
+      scaleY
+    }) as CustomFabricObject;
+    circle.id = id;
+    circle.zIndex = zIndex;
+
+    canvas.add(circle);
+  }
 };
 
-
-const addSlideshowToCanvas = ({
-  images = ["https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466424768.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466436597.png", "https://signcast-assignment-fullstack-production.up.railway.app/uploads/1734466443994.png"],
-  x = 50,
-  y = 50,
-  width = 890,
-  height = 500,
-  interval = 5000,
+const addTriangle = ({
   canvas,
-  setCanvasObjects,
-  canvasObjects,
-  isDraggable = true,
-  visible = true,
-}: SlideshowOptions) => {
-  if (!images || images.length === 0) return;
-
-  let currentIndex = 0;
-  const imgElement = new Image();
-
-  const slideshowImage = new fabric.Image(imgElement, {
-    left: x,
-    top: y,
-    scaleX: width / imgElement.width,
-    scaleY: height / imgElement.height,
-    selectable: isDraggable,
-    lockMovementX: !isDraggable,
-    lockMovementY: !isDraggable,
-  });
-
-
-  canvas.add(slideshowImage);
-  canvas.renderAll();
-
-  setCanvasObjects((prevObjects) => [
-    ...prevObjects,
-    {
-      id: `slideshow-${canvasObjects.length + 1}`,
-      type: 'slideshow',
-      images,
-      x,
-      y,
+  top = 100,
+  left = 50,
+  width = 80,
+  height = 80,
+  fill = "#00FF00",
+  angle = 0,
+  selectable = true,
+  id = "triangle-1",
+  zIndex = 1,
+  scaleX = 1,
+  scaleY = 1,
+}: TriangleOptions) => {
+  if (canvas) {
+    const triangle = new fabric.Triangle({
+      top,
+      left,
       width,
       height,
-      isDraggable,
-      visible,
-    },
-  ]);
+      fill,
+      angle,
+      selectable,
+      scaleX,
+      scaleY
+    }) as CustomFabricObject;
+    triangle.id = id;
+    triangle.zIndex = zIndex;
 
-  const updateImage = () => {
-    currentIndex = (currentIndex + 1) % images.length;
-    imgElement.src = images[currentIndex];
-    imgElement.onload = () => {
-      slideshowImage.set({
-        scaleX: width / imgElement.width,
-        scaleY: height / imgElement.height,
-      });
-      canvas.renderAll();
-    };
-  };
-
-  imgElement.src = images[currentIndex];
-  setInterval(updateImage, interval);
+    canvas.add(triangle);
+  }
 };
 
+export { addRectangle, addCircle, addTriangle };
 
-
-
-export { addRectangleToCanvas, addLineToCanvas, addImageToCanvas, addTextToCanvas, addSlideshowToCanvas };
+    
