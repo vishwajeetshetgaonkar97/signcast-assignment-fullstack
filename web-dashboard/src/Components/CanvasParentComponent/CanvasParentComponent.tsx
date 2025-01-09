@@ -14,6 +14,7 @@ import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
 import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../utils/CanvasDrawingsUtils";
 import updateDeviceStatus from "../../api/updateDeviceStatus";
+import { ToastContainer, toast } from 'react-toastify';
 
 interface allcanvases {
   name: string;
@@ -43,11 +44,11 @@ const CanvasParentComponent: React.FC = () => {
 
   const renderCanvasObjects = (objects) => {
     console.log("2234t", objects);
-console.log("canvas", canvas);
+    console.log("canvas", canvas);
 
     if (canvas) {
       canvas.clear();
-canvas.backgroundColor = "#fff";
+      canvas.backgroundColor = "#fff";
       console.log("Canvas exists, adding objects", objects);
       objects.forEach((object) => {
         if (object.type === "rect") {
@@ -262,11 +263,8 @@ canvas.backgroundColor = "#fff";
 
   const handleScreenChange = (index: number) => {
     if (canvas) {
-
-
       canvas.clear();
       canvas.backgroundColor = "#fff";
-
       renderCanvasObjects(allcanvases[index].data);
       setSelectedCanvasIndex(index);
       canvas.renderAll();
@@ -284,6 +282,31 @@ canvas.backgroundColor = "#fff";
     [selectedCanvasIndex, setSelectedCanvasIndex]
   );
 
+
+  const notifySuccess = () =>
+    toast.success("Canvas synced successfully!", {
+      position: "bottom-left",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      className: "bg-green-600 bg-opacity-60 text-sm h-[40px]  text-white rounded shadow-lg",
+    });
+  
+  // Error notification
+  const notifyError = () =>
+    toast.error("Error syncing canvas. Please try again.", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      className: "bg-red-500 text-white font-semibold rounded-lg shadow-lg",
+    });
 
   const handleSyncCanvas = async () => {
     try {
@@ -315,16 +338,12 @@ canvas.backgroundColor = "#fff";
       const log = await updateCanvas(updateCanvasPostBody);
 
       console.log("Canvas synced successfully", log);
+    notifySuccess();
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
-      alert('Error syncing canvas');
+      notifyError();
     }
   };
-
-
-
-  console.log("allcanvases", allcanvases);
-  console.log("canvas", canvas)
 
   useEffect(() => {
     if (canvas && allcanvases.length <= 0) {
@@ -344,6 +363,7 @@ canvas.backgroundColor = "#fff";
       <SelectedCanvasObjectIndexDataContext.Provider value={selectedCanvasIndexContextValue}>
 
         <>
+        <ToastContainer />
           <div className={"flex items-center justify-center "}  >
 
             <div className={"flex items-center justify-center "} style={{ transform: `scale(${scale})` }}>
@@ -375,7 +395,6 @@ canvas.backgroundColor = "#fff";
             <div className="flex flex-row items-center justify-center absolute z-10 top-12  right-2 " onClick={handleSyncCanvas}>
               <button className={`bg-blue-600 text-xs  text-white px-4 py-2 rounded`}>Apply</button>
             </div>
-
 
           </div>
         </>
