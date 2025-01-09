@@ -334,7 +334,6 @@ canvas.backgroundColor = "#fff";
 
   useEffect(() => {
     if (canvas && allcanvases.length > 0) {
-      console.log("in here me", allcanvases);
       renderCanvasObjects(allcanvases[selectedCanvasIndex].data);
     }
   }, [allcanvases])
