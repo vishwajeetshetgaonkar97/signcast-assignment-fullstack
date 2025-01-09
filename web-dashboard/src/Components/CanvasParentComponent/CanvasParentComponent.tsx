@@ -8,28 +8,33 @@ import { LuTriangle } from "react-icons/lu";
 import { FiZoomIn } from "react-icons/fi";
 import { FiZoomOut } from "react-icons/fi";
 import { MdOutlineImage } from "react-icons/md";
+import { GrAdd } from "react-icons/gr";
 import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
 import LayersComponent from "../LayersComponent/LayersComponent";
+import addCanvas from "../../api/addCanvas";
+import getCanvases from "../../api/getCanvases";
 
 const CanvasParentComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [scale, setScale] = useState(0.5);
-  const [allcanvases, setAllCanvases] = useState<any[]>([  {
-    name: "screen 1",
-    category: "general",
-    data: [],
-  },{
-    name: "screen 2",
-    category: "general",
-    data: [],
-  },]);
+  const [allcanvases, setAllCanvases] = useState<any[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newCanvasName, setNewCanvasName] = useState('');
   const [newCanvasCategory, setNewCanvasCategory] = useState('');
 
+
+  const getAllCanvases = async () => {
+    try {
+      const data = await getCanvases();
+      console.log('canvases', data.canvases);
+      setAllCanvases(data.canvases);
+    } catch (error) {
+      console.log(`canvas get issue ${error}`);
+    }
+  };
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -40,6 +45,7 @@ const CanvasParentComponent = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
+      getAllCanvases();
 
       return () => {
         initCanvas.dispose();
@@ -114,7 +120,7 @@ const CanvasParentComponent = () => {
       });
       return objects;
     }
-return [];
+    return [];
   };
 
   const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,10 +154,11 @@ return [];
           category: newCanvasCategory,
           data: [],
         };
-        // await addCanvas(postData);
-      //  const data = await getCanvases();
-      //  setAllCanvases(data.canvases);
-      setAllCanvases((prev) => [...prev, postData]);
+        await addCanvas(postData);
+        const data = await getCanvases();
+        console.log("dataaa canvass", data);
+        //  setAllCanvases(data.canvases);
+        setAllCanvases((prev) => [...prev, postData]);
         setIsModalOpen(false);
         return
       }
@@ -167,7 +174,7 @@ return [];
   const handleScreenChange = (index: number) => {
     if (canvas) {
       const currentObjects = canvas.getObjects();
-  
+
       setAllCanvases((prev) =>
         prev.map((canvasData, idx) =>
           idx === selectedCanvasIndex
@@ -175,9 +182,9 @@ return [];
             : canvasData
         )
       );
-      
+
       const selectedCanvasData = allcanvases[index].data;
- 
+
       const canvasBgColor = canvas.backgroundColor;
 
       canvas.clear();
@@ -187,7 +194,7 @@ return [];
       canvas.renderAll();
     }
   };
-  
+
   console.log("allcanvases", allcanvases);
 
   return (
@@ -239,57 +246,60 @@ return [];
       </div>
       <LayersComponent canvas={canvas} />
 
-      <div className="flex flex-row w-min gap-3 absolute z-10 bottom-2 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
+      <div className="flex flex-row w-fit align-center justify-center gap-1 absolute z-10 bottom-2 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
         {
           allcanvases.map((canvas, index) => (
-            <div key={index} onClick={() => handleScreenChange(index)} className={`cursor-pointer hover:text-violet-700 ${index === selectedCanvasIndex ? 'text-violet-700' : ''}`}>
+            <div key={index}
+              onClick={() => handleScreenChange(index)}
+              className={`cursor-pointer text-xs p-2 w-min min-w-[80px] hover:bg-card-color rounded ${index === selectedCanvasIndex ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}>
               {canvas.name}
             </div>
           ))
-        
+
         }
-          <div onClick={() => setIsModalOpen(true)}>
-         Add Canvas
+        <div className="cursor-pointer text-xs w-min hover:text-violet-700 p-2 bg-card-color rounded px-3" onClick={() => setIsModalOpen(true)}>
+          <GrAdd />
         </div>
       </div>
+
       {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 shadow-lg">
-              <h2 className="text-lg font-semibold mb-4">Add New Canvas</h2>
-              <input
-                type="text"
-                placeholder="Canvas Name"
-                value={newCanvasName}
-                onChange={(e) => setNewCanvasName(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border "
-              />
-              <select
-                value={newCanvasCategory}
-                onChange={(e) => setNewCanvasCategory(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border "
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 shadow-lg">
+            <h2 className="text-lg font-semibold mb-4">Add New Canvas</h2>
+            <input
+              type="text"
+              placeholder="Canvas Name"
+              value={newCanvasName}
+              onChange={(e) => setNewCanvasName(e.target.value)}
+              className="w-full mb-4 px-3 py-2 border "
+            />
+            <select
+              value={newCanvasCategory}
+              onChange={(e) => setNewCanvasCategory(e.target.value)}
+              className="w-full mb-4 px-3 py-2 border "
+            >
+              <option value="">Select Category</option>
+              <option value="General">General</option>
+              <option value="Special">Special</option>
+              <option value="Preffered">Preffered</option>
+            </select>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
               >
-                <option value="">Select Category</option>
-                <option value="General">General</option>
-                <option value="Special">Special</option>
-                <option value="Preffered">Preffered</option>
-              </select>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddCanvas}
-                  className="bg-blue-700 text-white px-4 py-2 hover:bg-blue-600"
-                >
-                  Add Canvas
-                </button>
-              </div>
+                Cancel
+              </button>
+              <button
+                onClick={handleAddCanvas}
+                className="bg-blue-700 text-white px-4 py-2 hover:bg-blue-600"
+              >
+                Add Canvas
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
     </div>
   );

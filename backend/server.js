@@ -8,7 +8,7 @@ const deviceStatusRouter = require("./routes/deviceStatus.js");
 const cors = require("cors");
 const WebSocket = require("ws");
 
-const PORT = 3001;
+const PORT = 3002;
  
 
 
