@@ -8,7 +8,7 @@ const deviceStatusRouter = require("./routes/deviceStatus.js");
 const cors = require("cors");
 const WebSocket = require("ws");
 
-const PORT = 3002;
+const PORT = 3003;
  
 
 
@@ -73,7 +73,8 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
 
     const result = await database.collections.images.insertOne(imageMetadata);
 
-    const imageUrl = `https://signcast-assignment-fullstack-production.up.railway.app/uploads/${req.file.filename}`;
+    // const imageUrl = `https://signcast-assignment-fullstack-production.up.railway.app/uploads/${req.file.filename}`;
+    const imageUrl = `http://localhost:3003/uploads/${req.file.filename}`;
 
     console.log("Image uploaded successfully");
 

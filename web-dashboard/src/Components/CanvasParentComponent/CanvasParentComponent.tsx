@@ -13,6 +13,7 @@ import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
 import LayersComponent from "../LayersComponent/LayersComponent";
 import addCanvas from "../../api/addCanvas";
 import getCanvases from "../../api/getCanvases";
+import uploadImage from "../../api/uploadImage";
 
 const CanvasParentComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -123,27 +124,47 @@ const CanvasParentComponent = () => {
     return [];
   };
 
-  const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && canvas) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const imgObj = new Image();
-        imgObj.src = event.target?.result as string;
-        imgObj.onload = () => {
-          const fabricImage = new fabric.Image(imgObj);
-          fabricImage.set({
-            left: 100,
-            top: 100,
-            scaleX: 0.5,
-            scaleY: 0.5,
-          });
-          canvas.add(fabricImage);
-        };
+      reader.onload = async (event) => {
+        const dataUrl = event.target?.result?.toString();
+        if (dataUrl) {
+          try {
+            // Upload the image to the backend
+            const imageUrl = await uploadImage(dataUrl);
+    
+            console.log('Image URL:', imageUrl);
+    
+            // Once the image is uploaded, add it to the canvas
+            const imgObj = new Image();
+            imgObj.src = imageUrl.imageUrl;
+            imgObj.onload = () => {
+              const fabricImage = new fabric.Image(imgObj);
+              fabricImage.set({
+                left: 100,
+                top: 100,
+                scaleX: 0.5,
+                scaleY: 0.5,
+              });
+    
+              // Ensure canvas is available before adding the image
+              if (canvas) {
+                canvas.add(fabricImage);
+                canvas.renderAll();
+              }
+            };
+          } catch (error) {
+            console.error('Error uploading image:', error);
+          }
+        }
       };
+  
       reader.readAsDataURL(file);
     }
   };
+  
 
   const handleAddCanvas = async () => {
     try {
@@ -157,8 +178,7 @@ const CanvasParentComponent = () => {
         await addCanvas(postData);
         const data = await getCanvases();
         console.log("dataaa canvass", data);
-        //  setAllCanvases(data.canvases);
-        setAllCanvases((prev) => [...prev, postData]);
+         setAllCanvases(data.canvases);
         setIsModalOpen(false);
         return
       }
@@ -214,7 +234,7 @@ const CanvasParentComponent = () => {
           type="file"
           accept="image/*"
           style={{ display: "none" }}
-          onChange={uploadImage}
+          onChange={handleImageUpload}
         />
       </div>
 
