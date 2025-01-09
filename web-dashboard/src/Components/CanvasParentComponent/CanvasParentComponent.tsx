@@ -15,6 +15,21 @@ const CanvasParentComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [scale, setScale] = useState(0.5);
+  const [allcanvases, setAllCanvases] = useState<any[]>([  {
+    name: "screen 1",
+    category: "general",
+    data: [],
+  },{
+    name: "screen 2",
+    category: "general",
+    data: [],
+  },]);
+  const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newCanvasName, setNewCanvasName] = useState('');
+  const [newCanvasCategory, setNewCanvasCategory] = useState('');
+
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -92,12 +107,14 @@ const CanvasParentComponent = () => {
 
   const getCanvasObjects = () => {
     if (canvas) {
-      const objects = canvas.getObjects(); // Get all objects on the canvas
-      console.log(objects); // Log or use these objects as needed
+      const objects = canvas.getObjects();
+      console.log(objects);
       objects.forEach((object) => {
-        console.log(object.type); // Log the type of each object
+        console.log(object.type);
       });
+      return objects;
     }
+return [];
   };
 
   const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,31 +135,81 @@ const CanvasParentComponent = () => {
           canvas.add(fabricImage);
         };
       };
-      reader.readAsDataURL(file); // Read the file as a Data URL
+      reader.readAsDataURL(file);
     }
   };
 
+  const handleAddCanvas = async () => {
+    try {
+      if (newCanvasName.trim() && newCanvasCategory) {
+
+        const postData = {
+          name: newCanvasName,
+          category: newCanvasCategory,
+          data: [],
+        };
+        // await addCanvas(postData);
+      //  const data = await getCanvases();
+      //  setAllCanvases(data.canvases);
+      setAllCanvases((prev) => [...prev, postData]);
+        setIsModalOpen(false);
+        return
+      }
+
+      alert('Please provide both a name and a category for the canvas.');
+    } catch (error) {
+      console.log(`canvas get issue ${error}`);
+      alert('Error');
+      setIsModalOpen(false);
+    }
+  }
+
+  const handleScreenChange = (index: number) => {
+    if (canvas) {
+      const currentObjects = canvas.getObjects();
+  
+      setAllCanvases((prev) =>
+        prev.map((canvasData, idx) =>
+          idx === selectedCanvasIndex
+            ? { ...canvasData, data: currentObjects }
+            : canvasData
+        )
+      );
+      
+      const selectedCanvasData = allcanvases[index].data;
+ 
+      const canvasBgColor = canvas.backgroundColor;
+
+      canvas.clear();
+      canvas.add(...selectedCanvasData);
+      canvas.backgroundColor = canvasBgColor;
+      setSelectedCanvasIndex(index);
+      canvas.renderAll();
+    }
+  };
+  
+  console.log("allcanvases", allcanvases);
+
   return (
     <div className={"flex items-center justify-center "}  >
-   <div className="flex flex-row w-min gap-3 absolute z-10 top-12 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
-  <FaRegSquare className="cursor-pointer hover:text-violet-700" onClick={addRectangle} size={20} />
-  <FaRegCircle className="cursor-pointer hover:text-fuchsia-500" onClick={addCircle} size={20} />
-  <LuTriangle className="cursor-pointer hover:text-green-500" onClick={addTriangle} size={20} />
-  <RxText className="cursor-pointer hover:text-blue-500" onClick={addText} size={20} />
+      <div className="flex flex-row w-min gap-3 absolute z-10 top-12 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
+        <FaRegSquare className="cursor-pointer hover:text-violet-700" onClick={addRectangle} size={20} />
+        <FaRegCircle className="cursor-pointer hover:text-fuchsia-500" onClick={addCircle} size={20} />
+        <LuTriangle className="cursor-pointer hover:text-green-500" onClick={addTriangle} size={20} />
+        <RxText className="cursor-pointer hover:text-blue-500" onClick={addText} size={20} />
 
-  <label htmlFor="fileUpload" className="cursor-pointer hover:text-rose-500">
-    <MdOutlineImage size={20} />
-  </label>
+        <label htmlFor="fileUpload" className="cursor-pointer hover:text-rose-500">
+          <MdOutlineImage size={20} />
+        </label>
 
-  <input
-    id="fileUpload"
-    type="file"
-    accept="image/*"
-    style={{ display: "none" }}
-    onChange={uploadImage}
-  />
-</div>
-
+        <input
+          id="fileUpload"
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={uploadImage}
+        />
+      </div>
 
       <div className="flex flex-row align-center justify-center w-min gap-2 absolute z-10 bottom-2 right-2 bg-bg-color py-2 px-3 rounded shadow">
 
@@ -167,10 +234,63 @@ const CanvasParentComponent = () => {
 
 
       <DesignEditComponent canvas={canvas} />
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
         <button onClick={getCanvasObjects}>Get Canvas Objects</button>
       </div>
       <LayersComponent canvas={canvas} />
+
+      <div className="flex flex-row w-min gap-3 absolute z-10 bottom-2 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
+        {
+          allcanvases.map((canvas, index) => (
+            <div key={index} onClick={() => handleScreenChange(index)} className={`cursor-pointer hover:text-violet-700 ${index === selectedCanvasIndex ? 'text-violet-700' : ''}`}>
+              {canvas.name}
+            </div>
+          ))
+        
+        }
+          <div onClick={() => setIsModalOpen(true)}>
+         Add Canvas
+        </div>
+      </div>
+      {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 shadow-lg">
+              <h2 className="text-lg font-semibold mb-4">Add New Canvas</h2>
+              <input
+                type="text"
+                placeholder="Canvas Name"
+                value={newCanvasName}
+                onChange={(e) => setNewCanvasName(e.target.value)}
+                className="w-full mb-4 px-3 py-2 border "
+              />
+              <select
+                value={newCanvasCategory}
+                onChange={(e) => setNewCanvasCategory(e.target.value)}
+                className="w-full mb-4 px-3 py-2 border "
+              >
+                <option value="">Select Category</option>
+                <option value="General">General</option>
+                <option value="Special">Special</option>
+                <option value="Preffered">Preffered</option>
+              </select>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddCanvas}
+                  className="bg-blue-700 text-white px-4 py-2 hover:bg-blue-600"
+                >
+                  Add Canvas
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
     </div>
   );
 };

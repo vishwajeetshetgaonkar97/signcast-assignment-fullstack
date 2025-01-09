@@ -14,7 +14,7 @@ async function setup() {
     client = await new mongodb.MongoClient('mongodb+srv://vishwajeetshetgaonkar999:MMDD209@cluster.cnzoamb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster').connect();
 
     // Database setup
-    database = await client.db('signcastdatabase');
+    database = await client.db('signcastdatabasev2');
 
     
     // listCollections functions, lists all the functions. It has 2 parameters. First, a filter which we have left blank here. Second, we want just the names so we set the value for nameOnly to true.
