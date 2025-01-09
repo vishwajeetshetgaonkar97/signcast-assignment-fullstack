@@ -10,18 +10,22 @@ import CanvasZoomInOutComponent from "../CanvasZoomInOutComponent/CanvasZoomInOu
 import CanvasScreensComponent from "../CanvasScreensComponent/CanvasScreensComponent";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
+import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 
+interface allcanvases {
+  name: string;
+  category: string;
+  data: [];
+}
 
 const CanvasParentComponent: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [scale, setScale] = useState(0.5);
-  const [allcanvases, setAllCanvases] = useState<any[]>([]);
+  const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newCanvasName, setNewCanvasName] = useState('');
-  const [newCanvasCategory, setNewCanvasCategory] = useState('');
 
 
   const getAllCanvases = async () => {
@@ -68,24 +72,19 @@ const CanvasParentComponent: React.FC = () => {
 
 
 
-  const handleAddCanvas = async () => {
+  const handleAddCanvas = async (postData) => {
     try {
-      if (newCanvasName.trim() && newCanvasCategory) {
+     
 
-        const postData = {
-          name: newCanvasName,
-          category: newCanvasCategory,
-          data: [],
-        };
+   
         await addCanvas(postData);
         const data = await getCanvases();
         console.log("dataaa canvass", data);
         setAllCanvases(data.canvases);
         setIsModalOpen(false);
-        return
-      }
+    
 
-      alert('Please provide both a name and a category for the canvas.');
+     
     } catch (error) {
       console.log(`canvas get issue ${error}`);
       alert('Error');
@@ -137,42 +136,7 @@ const CanvasParentComponent: React.FC = () => {
 
 
             {isModalOpen && (
-              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                <div className="bg-white p-6 shadow-lg">
-                  <h2 className="text-lg font-semibold mb-4">Add New Canvas</h2>
-                  <input
-                    type="text"
-                    placeholder="Canvas Name"
-                    value={newCanvasName}
-                    onChange={(e) => setNewCanvasName(e.target.value)}
-                    className="w-full mb-4 px-3 py-2 border "
-                  />
-                  <select
-                    value={newCanvasCategory}
-                    onChange={(e) => setNewCanvasCategory(e.target.value)}
-                    className="w-full mb-4 px-3 py-2 border "
-                  >
-                    <option value="">Select Category</option>
-                    <option value="General">General</option>
-                    <option value="Special">Special</option>
-                    <option value="Preffered">Preffered</option>
-                  </select>
-                  <div className="flex justify-end gap-4">
-                    <button
-                      onClick={() => setIsModalOpen(false)}
-                      className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleAddCanvas}
-                      className="bg-blue-700 text-white px-4 py-2 hover:bg-blue-600"
-                    >
-                      Add Canvas
-                    </button>
-                  </div>
-                </div>
-              </div>
+             <AddToCanvasModal handleAddCanvas={handleAddCanvas} setIsModalOpen={setIsModalOpen}/>
             )}
 
           </div>

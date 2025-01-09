@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas, FabricObject } from 'fabric';
-import { FaAngleUp, FaAngleDown, FaEye, FaEyeSlash, FaTrash } from "react-icons/fa";
+import { FaAngleUp, FaAngleDown, FaEye, FaEyeSlash } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 
 interface CustomFabricObject extends FabricObject {
