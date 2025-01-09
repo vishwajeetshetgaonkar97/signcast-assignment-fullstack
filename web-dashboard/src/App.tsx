@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import TopBar from "./Components/TopBar/TopBar";
-import MainControlComponent from "./Components/MainControlComponent/MainControlComponent";
 import MonitoringStateContext from "./Contexts/MonitoringStateContext";
 import CanvasParentComponent from "./Components/CanvasParentComponent/CanvasParentComponent";
 
