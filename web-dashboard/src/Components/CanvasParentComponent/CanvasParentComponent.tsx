@@ -12,7 +12,7 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
-import { addCircle, addRectangle, addTriangle } from "../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../utils/CanvasDrawingsUtils";
 
 interface allcanvases {
   name: string;
@@ -25,6 +25,8 @@ interface CustomFabricObject extends FabricObject {
     id?: string;
     zIndex?: number;
     radius?: number;
+    fontSize?: number;
+    imageUrl?: string;
 }
 
 const CanvasParentComponent: React.FC = () => {
@@ -95,6 +97,32 @@ const getAllCanvases = async () => {
             scaleX: object.scaleX,
             scaleY: object.scaleY
           });
+        } else if (object.type === "text") {
+          addText({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            fontSize: object.fontSize,
+            fill: typeof object.fill === "string" ? object.fill : "#000000", 
+            angle: object.angle,
+            selectable: object.selectable,
+            id: object.id,
+            zIndex: object.zIndex,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY
+          });
+        } else if (object.type === "image") {
+          addImage({
+            canvas: canvas,
+            imageUrl: object.imageUrl,
+            top: object.top,
+            left: object.left,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY,
+            angle: object.angle,
+            id: object.id,
+            zIndex: object.zIndex
+          })
         }
       });
 
@@ -249,6 +277,7 @@ const getAllCanvases = async () => {
             scaleY: object.scaleY,
             angle: object.angle,
             zIndex: object.zIndex,
+            imageUrl: object.imageUrl || "",
           };
         }),
       };

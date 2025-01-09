@@ -4,6 +4,9 @@ import { Canvas, Rect, Circle, Text, Triangle } from "fabric";
 interface CustomFabricObject extends fabric.Object {
   id?: string;
   zIndex?: number;
+  radius?: number;
+  fontSize?: number;
+  imageUrl?: string;
 }
 
 interface RectangleOptions {
@@ -50,6 +53,37 @@ interface TriangleOptions {
   scaleY?: number;
 }
 
+interface TextOptions {
+  canvas: fabric.Canvas;
+  text?: string;
+  top?: number;
+  left?: number;
+  fontSize?: number;
+  fill?: string;
+  angle?: number;
+  selectable?: boolean;
+  id?: string;
+  zIndex?: number;
+  scaleX?: number;
+  scaleY?: number;
+}
+
+interface ImageOptions {
+  canvas: fabric.Canvas;
+  imageUrl: string;
+  text?: string;
+  top?: number;
+  left?: number;
+  fontSize?: number;
+  fill?: string;
+  angle?: number;
+  selectable?: boolean;
+  id?: string;
+  zIndex?: number;
+  scaleX?: number;
+  scaleY?: number;
+}
+
 const addRectangle = ({
   canvas,
   top = 100,
@@ -83,8 +117,6 @@ const addRectangle = ({
   }
 };
 
-
-
 const addCircle = ({
   canvas,
   top = 100,
@@ -99,7 +131,7 @@ const addCircle = ({
   scaleY = 1,
 }: CircleOptions) => {
   if (canvas) {
-    const circle = new fabric.Circle({
+    const circle = new Circle({
       top,
       left,
       radius,
@@ -131,7 +163,7 @@ const addTriangle = ({
   scaleY = 1,
 }: TriangleOptions) => {
   if (canvas) {
-    const triangle = new fabric.Triangle({
+    const triangle = new Triangle({
       top,
       left,
       width,
@@ -149,6 +181,72 @@ const addTriangle = ({
   }
 };
 
-export { addRectangle, addCircle, addTriangle };
+const addText = ({
+  canvas,
+  text = "Hello!" ,
+  top = 100,
+  left = 50,
+  fontSize = 24,
+  fill = "#000000",
+  angle = 0,
+  selectable = true,
+  id = "text-1",
+  zIndex = 1,
+  scaleX = 1,
+  scaleY = 1,
+}: TextOptions) => {
+  if (canvas) {
+    const fabricText = new Text(text, {
+      top,
+      left,
+      fontSize,
+      fill,
+      angle,
+      selectable,
+      scaleX,
+      scaleY
+    }) as CustomFabricObject;
+    fabricText.id = id;
+    fabricText.zIndex = zIndex;
+
+    canvas.add(fabricText);
+  }
+};
+
+const addImage = ({
+  canvas,
+  imageUrl,
+  top = 100,
+  left = 50,
+  scaleX = 1,
+  scaleY = 1,
+  angle = 0,
+  id = "image-1",
+  zIndex = 1,
+}: ImageOptions) => {
+  const imgObj = new Image();
+  imgObj.src = imageUrl;
+
+  imgObj.onload = () => {
+    const fabricImage = new fabric.Image(imgObj, {
+      top,
+      left,
+      scaleX,
+      scaleY,
+      angle,
+    }) as CustomFabricObject;
+    fabricImage.id = id;
+    fabricImage.zIndex = zIndex;
+    fabricImage.imageUrl = imageUrl;
+
+    if (canvas) {
+      canvas.add(fabricImage);
+      canvas.renderAll();
+    }
+  };
+};
+
+
+export { addRectangle, addCircle, addTriangle, addText, addImage };
 
     
