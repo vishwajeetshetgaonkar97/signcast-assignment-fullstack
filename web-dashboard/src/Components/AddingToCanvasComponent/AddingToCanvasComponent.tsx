@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState, useEffect } from "react";
 import * as fabric from 'fabric';
 import { addImageToCanvas, addLineToCanvas, addRectangleToCanvas, addSlideshowToCanvas, addTextToCanvas } from "../../utils/CanvasDrawingsUtils";
 import CanvasObjectsDataContext from "../../Contexts/CanvasObjectsDataContext";
-import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesObjectsDataContext";
+import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesDataContext";
 import updateCanvas from "../../api/updateCanvas";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
 import uploadImage from "../../api/uploadImage";

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useContext, useState } from 'react';
 import * as fabric from 'fabric';
 import CanvasObjectsDataContext from '../../Contexts/CanvasObjectsDataContext';
-import AllCanvasesObjectsDataContext from '../../Contexts/AllCanvasesObjectsDataContext';
+import AllCanvasesObjectsDataContext from '../../Contexts/AllCanvasesDataContext';
 import SelectedCanvasObjectIndexDataContext from '../../Contexts/SelectedCanvasObjectIndexDataContext';
 import addCanvas from '../../api/addCanvas';
 import MonitoringStateContext from '../../Contexts/MonitoringStateContext';

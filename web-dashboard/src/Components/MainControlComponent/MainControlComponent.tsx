@@ -5,7 +5,7 @@ import CanvasObjectsDataContext from "../../Contexts/CanvasObjectsDataContext";
 import * as fabric from "fabric";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import getCanvases from "../../api/getCanvases";
-import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesObjectsDataContext";
+import AllCanvasesObjectsDataContext from "../../Contexts/AllCanvasesDataContext";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
 
 const MainControlComponent: React.FC = () => {

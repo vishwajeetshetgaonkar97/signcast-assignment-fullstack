@@ -139,7 +139,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
                 </div>
             </div>
 
-            <ul>
+            <ul className='flex flex-col gap-1 max-h-[88vh] overflow-y-auto'>
                 {layers.map((layer) => (
                     <li
                         key={layer.id}
