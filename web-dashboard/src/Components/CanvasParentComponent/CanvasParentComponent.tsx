@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import { Canvas , FabricObject} from "fabric";
+import { Canvas, FabricObject } from "fabric";
 import * as fabric from "fabric";
 import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
 import LayersComponent from "../LayersComponent/LayersComponent";
@@ -23,11 +23,11 @@ interface allcanvases {
 
 
 interface CustomFabricObject extends FabricObject {
-    id?: string;
-    zIndex?: number;
-    radius?: number;
-    fontSize?: number;
-    imageUrl?: string;
+  id?: string;
+  zIndex?: number;
+  radius?: number;
+  fontSize?: number;
+  imageUrl?: string;
 }
 
 const CanvasParentComponent: React.FC = () => {
@@ -40,19 +40,15 @@ const CanvasParentComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
 
-const getAllCanvases = async () => {
-  try {
-    const data = await getCanvases();
-    console.log("Fetched canvases:", data.canvases);
-    setAllCanvases(data.canvases);
 
-    // Assuming the first canvas is the one we need
-    const objects = data.canvases[0].data as CustomFabricObject[];
-    console.log("Fetched objects:", objects);
+  const renderCanvasObjects = (objects) => {
+    console.log("2234t", objects);
+console.log("canvas", canvas);
 
     if (canvas) {
+      canvas.clear();
+canvas.backgroundColor = "#fff";
       console.log("Canvas exists, adding objects", objects);
-
       objects.forEach((object) => {
         if (object.type === "rect") {
           addRectangle({
@@ -61,7 +57,7 @@ const getAllCanvases = async () => {
             left: object.left,
             width: object.width,
             height: object.height,
-            fill: typeof object.fill === "string" ? object.fill : "#FF0000", 
+            fill: typeof object.fill === "string" ? object.fill : "#FF0000",
             angle: object.angle,
             selectable: object.selectable,
             id: object.id,
@@ -76,7 +72,7 @@ const getAllCanvases = async () => {
             top: object.top,
             left: object.left,
             radius: object.radius,
-            fill: typeof object.fill === "string" ? object.fill : "#0000FF", 
+            fill: typeof object.fill === "string" ? object.fill : "#0000FF",
             angle: object.angle,
             selectable: object.selectable,
             id: object.id,
@@ -92,7 +88,7 @@ const getAllCanvases = async () => {
             left: object.left,
             width: object.width,
             height: object.height,
-            fill: typeof object.fill === "string" ? object.fill : "#00FF00", 
+            fill: typeof object.fill === "string" ? object.fill : "#00FF00",
             angle: object.angle,
             selectable: object.selectable,
             id: object.id,
@@ -107,7 +103,7 @@ const getAllCanvases = async () => {
             top: object.top,
             left: object.left,
             fontSize: object.fontSize,
-            fill: typeof object.fill === "string" ? object.fill : "#000000", 
+            fill: typeof object.fill === "string" ? object.fill : "#000000",
             angle: object.angle,
             selectable: object.selectable,
             id: object.id,
@@ -143,13 +139,28 @@ const getAllCanvases = async () => {
         canvas.renderAll();
       });
     }
-  } catch (error) {
-    console.log(`Canvas fetch issue: ${error}`);
-  }
-};
+  };
 
-  
-  
+
+
+  const getAllCanvases = async () => {
+    try {
+      const data = await getCanvases();
+      console.log("Fetched canvases:", data.canvases);
+      setAllCanvases(data.canvases);
+
+      // Assuming the first canvas is the one we need
+      const objects = data.canvases[0].data as CustomFabricObject[];
+      console.log("Fetched objects:", objects);
+
+      renderCanvasObjects(objects);
+    } catch (error) {
+      console.log(`Canvas fetch issue: ${error}`);
+    }
+  };
+
+
+
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -179,15 +190,14 @@ const getAllCanvases = async () => {
         try {
           const data = JSON.parse(event.data);
           console.log("Received data:", data);
+          console.log("data action", data.action);
 
-
-          if (data.type === "updateAllCanvas") {
-            console.log("Updating canvas objects for all:", data);
+          if (data.action === "updateAllCanvas") {
             setAllCanvases(data.canvases);
-            // setCanvasObjects(data.canvases[selectedCanvasIndex].data);
-            // if (!isMonitoring) {
-            //   setIsMonitoring(true)
-            // }
+            // renderCanvasObjects(data.canvases[selectedCanvasIndex].data);
+
+
+
           } else if (data.type === "notification") {
             console.log("Notification:", data.message);
           }
@@ -250,6 +260,19 @@ const getAllCanvases = async () => {
     }
   }
 
+  const handleScreenChange = (index: number) => {
+    if (canvas) {
+
+
+      canvas.clear();
+      canvas.backgroundColor = "#fff";
+
+      renderCanvasObjects(allcanvases[index].data);
+      setSelectedCanvasIndex(index);
+      canvas.renderAll();
+    }
+  };
+
   const allCanvasDataContextValue = useMemo(
     () => ({ allcanvases, setAllCanvases }),
     [allcanvases, setAllCanvases]
@@ -261,7 +284,6 @@ const getAllCanvases = async () => {
     [selectedCanvasIndex, setSelectedCanvasIndex]
   );
 
-  const isSyncRequired = allcanvases.length > 0 && allcanvases[selectedCanvasIndex].data !== canvas?.getObjects();
 
   const handleSyncCanvas = async () => {
     try {
@@ -284,20 +306,21 @@ const getAllCanvases = async () => {
             angle: object.angle,
             zIndex: object.zIndex,
             imageUrl: object.imageUrl || "",
-            visible: object.visible, 
+            visible: object.visible,
           };
         }),
       };
-  
+
       // Send data to the backend to update the canvas
       const log = await updateCanvas(updateCanvasPostBody);
+
       console.log("Canvas synced successfully", log);
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
       alert('Error syncing canvas');
     }
   };
-  
+
 
 
   console.log("allcanvases", allcanvases);
@@ -307,7 +330,15 @@ const getAllCanvases = async () => {
     if (canvas && allcanvases.length <= 0) {
       getAllCanvases();
     }
-  },[canvas])
+  }, [canvas])
+
+  useEffect(() => {
+    if (canvas && allcanvases.length > 0) {
+      console.log("in here me", allcanvases);
+      renderCanvasObjects(allcanvases[selectedCanvasIndex].data);
+    }
+  }, [allcanvases])
+
 
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>
@@ -328,6 +359,7 @@ const getAllCanvases = async () => {
 
             <CanvasScreensComponent canvas={canvas}
               setIsModalOpen={setIsModalOpen}
+              handleScreenChange={handleScreenChange}
             />
 
 
@@ -342,7 +374,7 @@ const getAllCanvases = async () => {
             )}
 
             <div className="flex flex-row items-center justify-center absolute z-10 top-12  right-2 " onClick={handleSyncCanvas}>
-              <button  className={`bg-blue-600 text-xs  text-white px-4 py-2 rounded`}>Apply</button>
+              <button className={`bg-blue-600 text-xs  text-white px-4 py-2 rounded`}>Apply</button>
             </div>
 
 

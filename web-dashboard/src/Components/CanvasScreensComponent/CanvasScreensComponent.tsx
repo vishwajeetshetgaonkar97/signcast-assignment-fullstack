@@ -7,39 +7,18 @@ import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 interface CanvasScreensComponentProps {
     canvas: Canvas;
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    handleScreenChange: (index: number) => void;
 }
 
 const CanvasScreensComponent: React.FC<CanvasScreensComponentProps> = ({
-    canvas,
     setIsModalOpen,
+    handleScreenChange,
 }) => {
 
     const { allcanvases, setAllCanvases } = useContext(AllCanvasesDataContext)
     const { selectedCanvasIndex, setSelectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext)
 
-    const handleScreenChange = (index: number) => {
-        if (canvas) {
-            const currentObjects = canvas.getObjects();
-
-            setAllCanvases((prev) =>
-                prev.map((canvasData, idx) =>
-                    idx === selectedCanvasIndex
-                        ? { ...canvasData, data: currentObjects }
-                        : canvasData
-                )
-            );
-
-            const selectedCanvasData = allcanvases[index].data;
-
-            const canvasBgColor = canvas.backgroundColor;
-
-            canvas.clear();
-            canvas.add(...selectedCanvasData);
-            canvas.backgroundColor = canvasBgColor;
-            setSelectedCanvasIndex(index);
-            canvas.renderAll();
-        }
-    };
+ 
 
     return (
         <div className="flex flex-row w-fit align-center justify-center gap-1 absolute z-10 bottom-2 left-1/2 transform -translate-x-1/2 bg-bg-color py-2 px-3 rounded shadow">
