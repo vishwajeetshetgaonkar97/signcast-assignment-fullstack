@@ -75,13 +75,10 @@ const CanvasParentComponent: React.FC = () => {
 
 
   const renderCanvasObjects = (objects) => {
-    console.log("2234t", objects);
-    console.log("canvas", canvas);
 
     if (canvas) {
       canvas.clear();
       canvas.backgroundColor = "#fff";
-      console.log("Canvas exists, adding objects", objects);
       objects.forEach((object) => {
         if (object.type === "rect") {
           addRectangle({
@@ -340,11 +337,11 @@ const CanvasParentComponent: React.FC = () => {
             width: object.width,
             height: object.height,
             fill: object.fill,
-            id: object.id ?? "",
+            id: object.id ,
             scaleX: object.scaleX,
             scaleY: object.scaleY,
             angle: object.angle,
-            zIndex: object.zIndex || 1,
+            zIndex: object.zIndex,
             imageUrl: object.imageUrl || "",
             visible: object.visible,
             text: object.text || "",

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Canvas, FabricObject } from 'fabric';
 import { FaAngleUp, FaAngleDown, FaEye, FaEyeSlash } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
+import AllCanvasesDataContext from '../../Contexts/AllCanvasesDataContext';
 
 interface CustomFabricObject extends FabricObject {
     id?: string;
@@ -15,6 +16,7 @@ interface LayersListProps {
 const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
     const [layers, setLayers] = useState<CustomFabricObject[]>([]);
     const [selectedLayer, setSelectedLayer] = useState<CustomFabricObject | null>(null);
+    const {allcanvases} = useContext(AllCanvasesDataContext);
 
     const addIdToObject = (object: CustomFabricObject) => {
         if (!object.id) {
@@ -72,7 +74,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
             canvas.renderAll();
         }
     };
-
+ 
     const toggleLayerVisibility = (layerId: string) => {
         const selectedLayer = layers.find(layer => layer.id === layerId);
         if (selectedLayer) {
@@ -92,13 +94,23 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
 
     const updateLayers = () => {
         const objects = canvas.getObjects() as CustomFabricObject[];
-        objects.forEach((obj, index) => {
-            addIdToObject(obj);
+        console.log("update layer object",objects);
+        // removes dublicasted objects 
+        const filteredObjects = objects.filter((obj, index, self) => {
+            return self.findIndex(o => o.id === obj.id) === index;
+          });
+        console.log(filteredObjects);
+        filteredObjects.forEach((obj, index) => {
+            // addIdToObject(obj);
+            console.log(obj.type);
+            console.log(obj.zIndex);
+            console.log(index);
+            console.log(obj.id);
             obj.set('zIndex', index);
             obj.zIndex = index;
         });
 
-        setLayers([...objects].reverse());
+        setLayers([...filteredObjects].reverse());
     };
 
     useEffect(() => {

@@ -1,5 +1,5 @@
 import * as fabric from 'fabric';
-import {  Rect, Circle, Text, Triangle } from "fabric";
+import {  Rect, Circle, Text, Triangle , FabricImage} from "fabric";
 
 interface CustomFabricObject extends fabric.Object {
   id?: string;
@@ -99,7 +99,7 @@ const addRectangle = ({
   fill = "#FF0000",
   angle = 0,
   selectable = true,
-  id = "rectangle-1",
+  id = `rect-${new Date().getTime()}`,
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
@@ -133,7 +133,7 @@ const addCircle = ({
   fill = "#0000FF",
   angle = 0,
   selectable = true,
-  id = "circle-1",
+  id = `circle-${new Date().getTime()}`,
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
@@ -167,7 +167,7 @@ const addTriangle = ({
   fill = "#00FF00",
   angle = 0,
   selectable = true,
-  id = "triangle-1",
+  id = `triangle-${new Date().getTime()}`,
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
@@ -202,7 +202,7 @@ const addText = ({
   fill = "#000000",
   angle = 0,
   selectable = true,
-  id = "text-1",
+  id = `text-${new Date().getTime()}`,
   zIndex = 1,
   scaleX = 1,
   scaleY = 1,
@@ -236,7 +236,7 @@ const addImage = ({
   scaleX = 1,
   scaleY = 1,
   angle = 0,
-  id = "image-1",
+  id = `image-${new Date().getTime()}`,
   zIndex = 1,
   visible = true,
 }: ImageOptions) => {
@@ -244,13 +244,13 @@ const addImage = ({
   imgObj.src = imageUrl;
 
   imgObj.onload = () => {
-    const fabricImage = new fabric.Image(imgObj, {
+    const fabricImage = new FabricImage(imgObj, {
       top,
       left,
       scaleX,
       scaleY,
       angle,
-      visible
+      visible,
     }) as CustomFabricObject;
     fabricImage.id = id;
     fabricImage.zIndex = zIndex;
