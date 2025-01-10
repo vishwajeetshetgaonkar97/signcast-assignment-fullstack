@@ -32,6 +32,7 @@ interface CustomFabricObject extends FabricObject {
   radius?: number;
   fontSize?: number;
   imageUrl?: string;
+  text?: string;
 }
 
 const CanvasParentComponent: React.FC = () => {
@@ -143,6 +144,7 @@ const CanvasParentComponent: React.FC = () => {
             scaleX: object.scaleX,
             scaleY: object.scaleY,
             visible: object.visible,
+            text: object.text
           });
         } else if (object.type === "image") {
           addImage({
@@ -345,6 +347,7 @@ const CanvasParentComponent: React.FC = () => {
             zIndex: object.zIndex || 1,
             imageUrl: object.imageUrl || "",
             visible: object.visible,
+            text: object.text || "",
           };
         }),
       };
@@ -354,7 +357,6 @@ const CanvasParentComponent: React.FC = () => {
 
       console.log("Canvas synced successfully", log);
       notifySuccess("Canvas synced successfully");
-      notifyError("Error to sync canvas");
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
       notifyError("Error to sync canvas");
@@ -406,7 +408,7 @@ const CanvasParentComponent: React.FC = () => {
             <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>
             </div>
-            
+
             {isModalOpen && (
               <AddToCanvasModal handleAddCanvas={handleAddCanvas} setIsModalOpen={setIsModalOpen} />
             )}

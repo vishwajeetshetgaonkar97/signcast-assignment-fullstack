@@ -7,6 +7,7 @@ interface CustomFabricObject extends fabric.Object {
   radius?: number;
   fontSize?: number;
   imageUrl?: string;
+  text?: string;
 }
 
 interface RectangleOptions {
@@ -221,6 +222,7 @@ const addText = ({
     }) as CustomFabricObject;
     fabricText.id = id;
     fabricText.zIndex = zIndex;
+    fabricText.text = text;
 
     canvas.add(fabricText);
   }
