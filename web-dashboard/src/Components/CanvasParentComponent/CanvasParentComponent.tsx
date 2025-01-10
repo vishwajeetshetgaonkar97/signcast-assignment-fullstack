@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect, useMemo, useContext } from "react";
 import { Canvas, FabricObject } from "fabric";
 import * as fabric from "fabric";
 import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
@@ -13,8 +13,9 @@ import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
 import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../utils/CanvasDrawingsUtils";
-import updateDeviceStatus from "../../api/updateDeviceStatus";
 import { ToastContainer, toast } from 'react-toastify';
+import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
+import { BASE_WEB_SOCKET_URL } from '../../../constants';
 
 interface allcanvases {
   _id?: string;
@@ -38,6 +39,8 @@ const CanvasParentComponent: React.FC = () => {
   const [scale, setScale] = useState(0.5);
   const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
+
+  const {setIsMonitoring } = useContext(MonitoringStateContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
@@ -161,72 +164,79 @@ const CanvasParentComponent: React.FC = () => {
   };
 
 
-
-
-  useEffect(() => {
-    if (canvasRef.current) {
-      const initCanvas = new Canvas(canvasRef.current, {
-        width: 1920,
-        height: 1080,
-      });
-      initCanvas.backgroundColor = "#fff";
-      initCanvas.renderAll();
-      setCanvas(initCanvas);
-
-      // socket connection 
-      // websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production.up.railway.app/");
-      websocketRef.current = new WebSocket("ws://localhost:3003");
-
-      websocketRef.current.onopen = () => {
-        console.log("WebSocket connected");
-        const data = {
-          name: "Master Device",
-          status: "online",
-        }
-        updateDeviceStatus(data)
-        // setIsMonitoring(true)
-      };
-
-      websocketRef.current.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log("Received data:", data);
-          console.log("data action", data.action);
-
-          if (data.action === "updateAllCanvas") {
-            setAllCanvases(data.canvases);
-            // renderCanvasObjects(data.canvases[selectedCanvasIndex].data);
-
-
-
-          } else if (data.type === "notification") {
-            console.log("Notification:", data.message);
+    useEffect(() => {
+      if (canvasRef.current) {
+        // Initialize canvas
+        const initCanvas = new Canvas(canvasRef.current, {
+          width: 1920,
+          height: 1080,
+        });
+        initCanvas.backgroundColor = "#fff";
+        initCanvas.renderAll();
+        setCanvas(initCanvas);
+    
+        // Reconnection constants
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        const retryDelay = 5000;
+    
+        const connectWebSocket = () => {
+          websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
+    
+          websocketRef.current.onopen = () => {
+            console.log("WebSocket connected");
+            reconnectAttempts = 0; // Reset attempts on successful connection
+            setIsMonitoring(true);
+          };
+    
+          websocketRef.current.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              console.log("Received data:", data);
+    
+              if (data.action === "updateAllCanvas") {
+                setAllCanvases(data.canvases);
+              } else if (data.type === "notification") {
+                console.log("Notification:", data.message);
+              }
+            } catch (error) {
+              console.error("Error parsing WebSocket message:", error);
+            }
+          };
+    
+          websocketRef.current.onclose = () => {
+            console.log("WebSocket disconnected");
+            setIsMonitoring(false);
+            attemptReconnect();
+          };
+    
+          websocketRef.current.onerror = (error) => {
+            console.error("WebSocket error:", error);
+          };
+        };
+    
+        const attemptReconnect = () => {
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts += 1;
+            const delay = retryDelay * reconnectAttempts;
+            console.log(`Reconnecting in ${delay} ms...`);
+            setTimeout(connectWebSocket, delay);
+          } else {
+            console.error("Max reconnect attempts reached. Stopping further attempts.");
           }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
-      };
-
-
-      websocketRef.current.onclose = () => {
-        console.log("WebSocket disconnected");
-        // const data = {
-        //   name: "Master Device",
-        //   status: "offline",
-        // }
-        // sendDeviceMonitoringStatus(data)
-        // setIsMonitoring(false)
-      };
-
-      websocketRef.current.onerror = (error) => {
-        console.error("WebSocket error:", error);
+        };
+    
+        // Initial WebSocket connection
+        connectWebSocket();
+    
+        // Cleanup on unmount
+        return () => {
+          initCanvas.dispose();
+          websocketRef.current?.close();
+        };
       }
-
-      return () => {
-        initCanvas.dispose();
-      };
-    }
-  }, []);
+    }, []);
+    
 
 
 

@@ -1,4 +1,4 @@
-import { BASE_URL } from '../../constants';
+import { BASE_URL } from '../../constants.tsx';
 
 const getCanvases = async () => {
   const response = await fetch(`${BASE_URL}/canvases`);

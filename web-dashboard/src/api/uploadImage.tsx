@@ -1,4 +1,4 @@
-import { BASE_URL } from '../../constants';
+import { BASE_URL } from '../../constants.tsx';
 
 const base64ToFile = (base64: string, fileName: string) => {
   const arr = base64.split(",");

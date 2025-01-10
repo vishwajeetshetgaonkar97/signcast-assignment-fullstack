@@ -1,4 +1,4 @@
-import { BASE_URL } from '../../constants';
+import { BASE_URL } from '../../constants.tsx';
 
 const getImagepath = async (filename) => {
   const response = await fetch(`${BASE_URL}/images/${filename}`);
