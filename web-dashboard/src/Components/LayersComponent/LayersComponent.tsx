@@ -96,19 +96,16 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
 
     const updateLayers = () => {
         const objects = canvas.getObjects() as CustomFabricObject[];
-        console.log("update layer object",objects);
+   
         // removes dublicasted objects 
         const filteredObjects = objects.filter((obj, index, self) => {
             return self.findIndex(o => o.id === obj.id) === index;
           });
         console.log(filteredObjects);
+        filteredObjects.sort((a, b) => a.zIndex - b.zIndex);
         filteredObjects.forEach((obj, index) => {
             // addIdToObject(obj);
-            console.log(obj.type);
-            console.log(obj.zIndex);
-            console.log(index);
-            console.log(obj.id);
-            obj.set('zIndex', index);
+     
             obj.zIndex = index;
         });
 

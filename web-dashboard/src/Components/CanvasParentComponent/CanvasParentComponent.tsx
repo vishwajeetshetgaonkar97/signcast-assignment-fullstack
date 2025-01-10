@@ -164,12 +164,6 @@ const CanvasParentComponent: React.FC = () => {
 
       canvas.renderAll();
 
-      // fabric.util.enlivenObjects(objects, (enlivenedObjects) => {
-      //   enlivenedObjects.forEach((object) => {
-      //     canvas.add(object);
-      //   });
-      //   canvas.renderAll();
-      // });
     }
   };
 
@@ -272,10 +266,11 @@ const CanvasParentComponent: React.FC = () => {
 
   const getCanvasObjects = () => {
     if (canvas) {
-      const objects = canvas.getObjects();
+      const objects = canvas.getObjects() as CustomFabricObject[];
       console.log(objects);
       objects.forEach((object) => {
         console.log(object.type);
+        console.log(object.zIndex);
       });
       return objects;
     }
@@ -326,12 +321,15 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleSyncCanvas = async () => {
     try {
-      const currentObjects = getCanvasObjects();
+      const currentObjects = getCanvasObjects() as CustomFabricObject[];
+      const filteredObjects = currentObjects.filter((obj, index, self) => {
+        return self.findIndex(o => o.id === obj.id) === index;
+      });
       const updateCanvasPostBody = {
         canvasId: allcanvases[selectedCanvasIndex]._id,
         name: allcanvases[selectedCanvasIndex].name,
         category: allcanvases[selectedCanvasIndex].category,
-        data: currentObjects.map((object: CustomFabricObject) => {
+        data: filteredObjects.map((object: CustomFabricObject) => {
           return {
             type: object.type,
             left: object.left,
@@ -351,10 +349,12 @@ const CanvasParentComponent: React.FC = () => {
         }),
       };
 
+      console.log("body pushed",updateCanvasPostBody);
       // Send data to the backend to update the canvas
-      const log = await updateCanvas(updateCanvasPostBody);
+     await updateCanvas(updateCanvasPostBody);
 
-      console.log("Canvas synced successfully", log);
+      // console.log("Canvas synced successfully", log);
+
       notifySuccess("Canvas synced successfully");
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
@@ -404,9 +404,9 @@ const CanvasParentComponent: React.FC = () => {
               handleScreenChange={handleScreenChange}
             />
             {/* used for debugging */}
-            {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
+             <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>
-            </div> */}
+            </div> 
 
             {isModalOpen && (
               <AddToCanvasModal handleAddCanvas={handleAddCanvas} setIsModalOpen={setIsModalOpen} />
