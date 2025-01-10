@@ -15,8 +15,8 @@ const CanvasScreensComponent: React.FC<CanvasScreensComponentProps> = ({
     handleScreenChange,
 }) => {
 
-    const { allcanvases, setAllCanvases } = useContext(AllCanvasesDataContext)
-    const { selectedCanvasIndex, setSelectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext)
+    const { allcanvases } = useContext(AllCanvasesDataContext)
+    const { selectedCanvasIndex } = useContext(SelectedCanvasObjectIndexDataContext)
 
  
 

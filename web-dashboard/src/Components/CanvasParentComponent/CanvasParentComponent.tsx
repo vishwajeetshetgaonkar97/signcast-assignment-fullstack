@@ -17,6 +17,7 @@ import updateDeviceStatus from "../../api/updateDeviceStatus";
 import { ToastContainer, toast } from 'react-toastify';
 
 interface allcanvases {
+  _id?: string;
   name: string;
   category: string;
   data: [];
@@ -132,13 +133,12 @@ const CanvasParentComponent: React.FC = () => {
 
       canvas.renderAll();
 
-      // Correct usage of enlivenObjects
-      fabric.util.enlivenObjects(objects, (enlivenedObjects) => {
-        enlivenedObjects.forEach((object) => {
-          canvas.add(object);
-        });
-        canvas.renderAll();
-      });
+      // fabric.util.enlivenObjects(objects, (enlivenedObjects) => {
+      //   enlivenedObjects.forEach((object) => {
+      //     canvas.add(object);
+      //   });
+      //   canvas.renderAll();
+      // });
     }
   };
 
@@ -210,10 +210,10 @@ const CanvasParentComponent: React.FC = () => {
 
       websocketRef.current.onclose = () => {
         console.log("WebSocket disconnected");
-        const data = {
-          name: "Master Device",
-          status: "offline",
-        }
+        // const data = {
+        //   name: "Master Device",
+        //   status: "offline",
+        // }
         // sendDeviceMonitoringStatus(data)
         // setIsMonitoring(false)
       };
@@ -294,7 +294,7 @@ const CanvasParentComponent: React.FC = () => {
       progress: undefined,
       className: "bg-green-600 bg-opacity-60 text-sm h-[40px]  text-white rounded shadow-lg",
     });
-  
+
   // Error notification
   const notifyError = () =>
     toast.error("Error syncing canvas. Please try again.", {
@@ -315,7 +315,7 @@ const CanvasParentComponent: React.FC = () => {
         canvasId: allcanvases[selectedCanvasIndex]._id,
         name: allcanvases[selectedCanvasIndex].name,
         category: allcanvases[selectedCanvasIndex].category,
-        data: currentObjects.map(object => {
+        data: currentObjects.map((object: CustomFabricObject) => {
           return {
             type: object.type,
             left: object.left,
@@ -323,11 +323,11 @@ const CanvasParentComponent: React.FC = () => {
             width: object.width,
             height: object.height,
             fill: object.fill,
-            id: object.id,
+            id: object.id ?? "",
             scaleX: object.scaleX,
             scaleY: object.scaleY,
             angle: object.angle,
-            zIndex: object.zIndex,
+            zIndex: object.zIndex || 1,
             imageUrl: object.imageUrl || "",
             visible: object.visible,
           };
@@ -338,7 +338,7 @@ const CanvasParentComponent: React.FC = () => {
       const log = await updateCanvas(updateCanvasPostBody);
 
       console.log("Canvas synced successfully", log);
-    notifySuccess();
+      notifySuccess();
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
       notifyError();
@@ -363,7 +363,7 @@ const CanvasParentComponent: React.FC = () => {
       <SelectedCanvasObjectIndexDataContext.Provider value={selectedCanvasIndexContextValue}>
 
         <>
-        <ToastContainer />
+          <ToastContainer />
           <div className={"flex items-center justify-center "}  >
 
             <div className={"flex items-center justify-center "} style={{ transform: `scale(${scale})` }}>

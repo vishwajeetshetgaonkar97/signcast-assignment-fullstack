@@ -1,5 +1,5 @@
 import * as fabric from 'fabric';
-import { Canvas, Rect, Circle, Text, Triangle } from "fabric";
+import {  Rect, Circle, Text, Triangle } from "fabric";
 
 interface CustomFabricObject extends fabric.Object {
   id?: string;
