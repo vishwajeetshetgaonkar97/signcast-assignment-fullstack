@@ -17,12 +17,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
     const [selectedLayer, setSelectedLayer] = useState<CustomFabricObject | null>(null);
 
 
-    const addIdToObject = (object: CustomFabricObject) => {
-        if (!object.id) {
-            const timestamp = new Date().getTime();
-            object.id = `${object.type}_${timestamp}`;
-        }
-    };
+
 
     const moveSelectedLayer = (direction: 'up' | 'down') => {
         if (!selectedLayer) return;
