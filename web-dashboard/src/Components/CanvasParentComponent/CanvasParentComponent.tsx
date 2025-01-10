@@ -12,7 +12,7 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
-import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle,  addText, addTriangle } from "../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import { BASE_WEB_SOCKET_URL } from '../../../constants';
@@ -159,6 +159,8 @@ const CanvasParentComponent: React.FC = () => {
             selectable: object.selectable,
             visible: object.visible,
           })
+        } else {
+          console.log("Unknown object type:", object.type);
         }
       });
 
@@ -337,7 +339,7 @@ const CanvasParentComponent: React.FC = () => {
             width: object.width,
             height: object.height,
             fill: object.fill,
-            id: object.id ,
+            id: object.id,
             scaleX: object.scaleX,
             scaleY: object.scaleY,
             angle: object.angle,
@@ -349,9 +351,9 @@ const CanvasParentComponent: React.FC = () => {
         }),
       };
 
-      console.log("body pushed",updateCanvasPostBody);
+      console.log("body pushed", updateCanvasPostBody);
       // Send data to the backend to update the canvas
-     await updateCanvas(updateCanvasPostBody);
+      await updateCanvas(updateCanvasPostBody);
 
       // console.log("Canvas synced successfully", log);
 
@@ -403,10 +405,6 @@ const CanvasParentComponent: React.FC = () => {
               setIsModalOpen={setIsModalOpen}
               handleScreenChange={handleScreenChange}
             />
-            {/* used for debugging */}
-             <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
-              <button onClick={getCanvasObjects}>Get Canvas Objects</button>
-            </div> 
 
             {isModalOpen && (
               <AddToCanvasModal handleAddCanvas={handleAddCanvas} setIsModalOpen={setIsModalOpen} />
@@ -416,6 +414,13 @@ const CanvasParentComponent: React.FC = () => {
               <button className={`bg-blue-600 text-xs  text-white px-4 py-2 rounded`}>Apply</button>
             </div>
 
+            {/* disclaimer */}
+            <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images might have some issues </h6>
+
+            {/* used for debugging */}
+            {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
+              <button onClick={getCanvasObjects}>Get Canvas Objects</button>
+            </div> */}
           </div>
         </>
       </SelectedCanvasObjectIndexDataContext.Provider>
