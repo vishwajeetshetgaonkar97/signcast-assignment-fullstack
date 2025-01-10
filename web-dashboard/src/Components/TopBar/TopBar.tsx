@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
+import { MdOutlineOnlinePrediction } from "react-icons/md";
+import { HiStatusOffline } from "react-icons/hi";
 
 interface ThemeSelectionProps {
   themeMode: string;
@@ -23,12 +25,13 @@ const TopBar: React.FC<ThemeSelectionProps> = ({ themeMode, setThemeMode }) => {
     <div className="flex w-full h-[5%] justify-between  items-center dark:text-neutral-100 px-4 py-2">
       <img className="h-7" src="/logo.png" alt="Logo" />
       <div className="text-sm flex gap-2 flex-row items-center ">
-        <div >
+      <div className="relative">
           {isMonitoring ? (
-            <span className="text-green-500">Online</span>
+            <MdOutlineOnlinePrediction className="text-green-500" size={20}  />
           ) : (
-            <span className="text-red-500">Offline</span>
+            <HiStatusOffline className="text-red-500" size={20} />
           )}
+          
         </div>
 
         <button

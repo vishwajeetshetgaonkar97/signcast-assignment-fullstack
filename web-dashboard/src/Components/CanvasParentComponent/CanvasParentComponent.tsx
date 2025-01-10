@@ -16,6 +16,7 @@ import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../u
 import { ToastContainer, toast } from 'react-toastify';
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import { BASE_WEB_SOCKET_URL } from '../../../constants';
+import LoaderComponent from "../LoaderComponent/LoaderComponent";
 
 interface allcanvases {
   _id?: string;
@@ -44,6 +45,32 @@ const CanvasParentComponent: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
+
+  // success notification 
+  const notifySuccess = (message: string) =>
+    toast.success(message, {
+      position: "bottom-left",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      className: "bg-green-600 bg-blur bg-opacity-50 w-fit text-sm h-min py-1 px-4 mb-0 text-white rounded shadow-lg",
+    });
+
+  // Error notification
+  const notifyError = (message: string) =>
+    toast.error(message, {
+      position: "bottom-left",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      className: "bg-red-600 bg-blur bg-opacity-40 w-fit text-sm h-min py-1 px-4 mb-0 text-white rounded shadow-lg",
+    });
 
 
   const renderCanvasObjects = (objects) => {
@@ -178,7 +205,7 @@ const CanvasParentComponent: React.FC = () => {
         // Reconnection constants
         let reconnectAttempts = 0;
         const maxReconnectAttempts = 5;
-        const retryDelay = 5000;
+        const retryDelay = 1000;
     
         const connectWebSocket = () => {
           websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
@@ -216,20 +243,22 @@ const CanvasParentComponent: React.FC = () => {
         };
     
         const attemptReconnect = () => {
-          if (reconnectAttempts < maxReconnectAttempts) {
+          if (reconnectAttempts <= maxReconnectAttempts) {
             reconnectAttempts += 1;
             const delay = retryDelay * reconnectAttempts;
             console.log(`Reconnecting in ${delay} ms...`);
+           
             setTimeout(connectWebSocket, delay);
           } else {
             console.error("Max reconnect attempts reached. Stopping further attempts.");
+            notifyError("Recconnection Failed try again later");
           }
         };
     
         // Initial WebSocket connection
         connectWebSocket();
     
-        // Cleanup on unmount
+        // Cleanup 
         return () => {
           initCanvas.dispose();
           websocketRef.current?.close();
@@ -293,30 +322,6 @@ const CanvasParentComponent: React.FC = () => {
   );
 
 
-  const notifySuccess = () =>
-    toast.success("Canvas synced successfully!", {
-      position: "bottom-left",
-      autoClose: 2000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      progress: undefined,
-      className: "bg-green-600 bg-opacity-60 text-sm h-[40px]  text-white rounded shadow-lg",
-    });
-
-  // Error notification
-  const notifyError = () =>
-    toast.error("Error syncing canvas. Please try again.", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      className: "bg-red-500 text-white font-semibold rounded-lg shadow-lg",
-    });
 
   const handleSyncCanvas = async () => {
     try {
@@ -348,10 +353,11 @@ const CanvasParentComponent: React.FC = () => {
       const log = await updateCanvas(updateCanvasPostBody);
 
       console.log("Canvas synced successfully", log);
-      notifySuccess();
+      notifySuccess("Canvas synced successfully");
+      notifyError("Error to sync canvas");
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
-      notifyError();
+      notifyError("Error to sync canvas");
     }
   };
 
@@ -367,6 +373,9 @@ const CanvasParentComponent: React.FC = () => {
     }
   }, [allcanvases])
 
+  // can be improved
+  const isLoading = allcanvases.length <= 0;
+
 
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>
@@ -374,6 +383,10 @@ const CanvasParentComponent: React.FC = () => {
 
         <>
           <ToastContainer />
+          <div className={`absolute h-screen w-screen bg-bg-color flex items-center justify-center z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isLoading ? "" : "hidden"} `} >
+          <LoaderComponent />
+          </div>
+        
           <div className={"flex items-center justify-center "}  >
 
             <div className={"flex items-center justify-center "} style={{ transform: `scale(${scale})` }}>
