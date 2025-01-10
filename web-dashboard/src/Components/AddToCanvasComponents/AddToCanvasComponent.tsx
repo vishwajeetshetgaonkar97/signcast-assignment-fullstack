@@ -48,7 +48,7 @@ const AddToCanvasComponent: React.FC<AddToCanvasProps> = ({ canvas }) => {
                 size={20} />
             <LuTriangle className="cursor-pointer hover:text-green-500" onClick={() => addTriangle({ canvas })} size={20} />
             <RxText className="cursor-pointer hover:text-blue-500" onClick={() => addText({ canvas })} size={20} />
-
+        
             <label htmlFor="fileUpload" className="cursor-pointer hover:text-rose-500">
                 <MdOutlineImage size={20} />
             </label>
