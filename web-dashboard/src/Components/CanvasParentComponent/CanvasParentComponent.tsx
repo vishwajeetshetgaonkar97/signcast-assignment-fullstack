@@ -42,7 +42,7 @@ const CanvasParentComponent: React.FC = () => {
   const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
 
-  const {setIsMonitoring } = useContext(MonitoringStateContext);
+  const { setIsMonitoring } = useContext(MonitoringStateContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
@@ -193,81 +193,81 @@ const CanvasParentComponent: React.FC = () => {
   };
 
 
-    useEffect(() => {
-      if (canvasRef.current) {
-        // Initialize canvas
-        const initCanvas = new Canvas(canvasRef.current, {
-          width: 1920,
-          height: 1080,
-        });
-        initCanvas.backgroundColor = "#fff";
-        initCanvas.renderAll();
-        setCanvas(initCanvas);
-    
-        // Reconnection constants
-        let reconnectAttempts = 0;
-        const maxReconnectAttempts = 5;
-        const retryDelay = 1000;
-    
-        const connectWebSocket = () => {
-          websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
-    
-          websocketRef.current.onopen = () => {
-            console.log("WebSocket connected");
-            reconnectAttempts = 0; // Reset attempts on successful connection
-            setIsMonitoring(true);
-          };
-    
-          websocketRef.current.onmessage = (event) => {
-            try {
-              const data = JSON.parse(event.data);
-              console.log("Received data:", data);
-    
-              if (data.action === "updateAllCanvas") {
-                setAllCanvases(data.canvases);
-              } else if (data.type === "notification") {
-                console.log("Notification:", data.message);
-              }
-            } catch (error) {
-              console.error("Error parsing WebSocket message:", error);
-            }
-          };
-    
-          websocketRef.current.onclose = () => {
-            console.log("WebSocket disconnected");
-            setIsMonitoring(false);
-            attemptReconnect();
-          };
-    
-          websocketRef.current.onerror = (error) => {
-            console.error("WebSocket error:", error);
-          };
+  useEffect(() => {
+    if (canvasRef.current) {
+      // Initialize canvas
+      const initCanvas = new Canvas(canvasRef.current, {
+        width: 1920,
+        height: 1080,
+      });
+      initCanvas.backgroundColor = "#fff";
+      initCanvas.renderAll();
+      setCanvas(initCanvas);
+
+      // Reconnection constants
+      let reconnectAttempts = 0;
+      const maxReconnectAttempts = 5;
+      const retryDelay = 1000;
+
+      const connectWebSocket = () => {
+        websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
+
+        websocketRef.current.onopen = () => {
+          console.log("WebSocket connected");
+          reconnectAttempts = 0; // Reset attempts on successful connection
+          setIsMonitoring(true);
         };
-    
-        const attemptReconnect = () => {
-          if (reconnectAttempts <= maxReconnectAttempts) {
-            reconnectAttempts += 1;
-            const delay = retryDelay * reconnectAttempts;
-            console.log(`Reconnecting in ${delay} ms...`);
-           
-            setTimeout(connectWebSocket, delay);
-          } else {
-            console.error("Max reconnect attempts reached. Stopping further attempts.");
-            notifyError("Recconnection Failed try again later");
+
+        websocketRef.current.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            console.log("Received data:", data);
+
+            if (data.action === "updateAllCanvas") {
+              setAllCanvases(data.canvases);
+            } else if (data.type === "notification") {
+              console.log("Notification:", data.message);
+            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", error);
           }
         };
-    
-        // Initial WebSocket connection
-        connectWebSocket();
-    
-        // Cleanup 
-        return () => {
-          initCanvas.dispose();
-          websocketRef.current?.close();
+
+        websocketRef.current.onclose = () => {
+          console.log("WebSocket disconnected");
+          setIsMonitoring(false);
+          attemptReconnect();
         };
-      }
-    }, []);
-    
+
+        websocketRef.current.onerror = (error) => {
+          console.error("WebSocket error:", error);
+        };
+      };
+
+      const attemptReconnect = () => {
+        if (reconnectAttempts <= maxReconnectAttempts) {
+          reconnectAttempts += 1;
+          const delay = retryDelay * reconnectAttempts;
+          console.log(`Reconnecting in ${delay} ms...`);
+
+          setTimeout(connectWebSocket, delay);
+        } else {
+          console.error("Max reconnect attempts reached. Stopping further attempts.");
+          notifyError("Recconnection Failed try again later");
+        }
+      };
+
+      // Initial WebSocket connection
+      connectWebSocket();
+
+      // Cleanup 
+      return () => {
+        initCanvas.dispose();
+        websocketRef.current?.close();
+      };
+    }
+  }, []);
+
 
 
 
@@ -386,9 +386,9 @@ const CanvasParentComponent: React.FC = () => {
         <>
           <ToastContainer />
           <div className={`absolute h-screen w-screen bg-bg-color flex items-center justify-center z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isLoading ? "" : "hidden"} `} >
-          <LoaderComponent />
+            <LoaderComponent />
           </div>
-        
+
           <div className={"flex items-center justify-center "}  >
 
             <div className={"flex items-center justify-center "} style={{ transform: `scale(${scale})` }}>
@@ -404,10 +404,10 @@ const CanvasParentComponent: React.FC = () => {
               setIsModalOpen={setIsModalOpen}
               handleScreenChange={handleScreenChange}
             />
-
-            <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
+            {/* used for debugging */}
+            {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>
-            </div>
+            </div> */}
 
             {isModalOpen && (
               <AddToCanvasModal handleAddCanvas={handleAddCanvas} setIsModalOpen={setIsModalOpen} />
