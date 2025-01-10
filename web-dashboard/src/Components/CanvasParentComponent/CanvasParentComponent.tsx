@@ -393,7 +393,6 @@ const CanvasParentComponent: React.FC = () => {
               <canvas id="canvas" ref={canvasRef} />
             </div>
 
-
             <AddToCanvasComponent canvas={canvas} />
             <CanvasZoomInOutComponent scale={scale} setScale={setScale} />
             <DesignEditComponent canvas={canvas} />
@@ -404,13 +403,10 @@ const CanvasParentComponent: React.FC = () => {
               handleScreenChange={handleScreenChange}
             />
 
-
-
             <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>
             </div>
-
-
+            
             {isModalOpen && (
               <AddToCanvasModal handleAddCanvas={handleAddCanvas} setIsModalOpen={setIsModalOpen} />
             )}
