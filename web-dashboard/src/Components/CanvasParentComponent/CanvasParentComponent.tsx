@@ -79,7 +79,9 @@ const CanvasParentComponent: React.FC = () => {
     if (canvas) {
       canvas.clear();
       canvas.backgroundColor = "#fff";
-      objects.forEach((object) => {
+      const sortedObjects = objects.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+
+      sortedObjects.forEach((object) => {
         if (object.type === "rect") {
           addRectangle({
             canvas: canvas,

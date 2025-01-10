@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Canvas, FabricObject } from 'fabric';
 import { FaAngleUp, FaAngleDown, FaEye, FaEyeSlash } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
-import AllCanvasesDataContext from '../../Contexts/AllCanvasesDataContext';
 
 interface CustomFabricObject extends FabricObject {
     id?: string;
@@ -16,7 +15,7 @@ interface LayersListProps {
 const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
     const [layers, setLayers] = useState<CustomFabricObject[]>([]);
     const [selectedLayer, setSelectedLayer] = useState<CustomFabricObject | null>(null);
-    const {allcanvases} = useContext(AllCanvasesDataContext);
+
 
     const addIdToObject = (object: CustomFabricObject) => {
         if (!object.id) {
@@ -29,27 +28,30 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
         if (!selectedLayer) return;
 
         const allObjects = canvas.getObjects() as CustomFabricObject[];
-        const selectedObject = allObjects.find(obj => obj.id === selectedLayer.id);
+        const filteredObjects = allObjects.filter((obj, index, self) => {
+            return self.findIndex(o => o.id === obj.id) === index;
+        })
+        const selectedObject = filteredObjects.find(obj => obj.id === selectedLayer.id);
 
         if (selectedObject) {
-            const currentIndex = allObjects.indexOf(selectedObject);
+            const currentIndex = filteredObjects.indexOf(selectedObject);
 
-            if (direction === 'up' && currentIndex < allObjects.length - 1) {
-                const temp = allObjects[currentIndex];
-                allObjects[currentIndex] = allObjects[currentIndex + 1];
-                allObjects[currentIndex + 1] = temp;
+            if (direction === 'up' && currentIndex < filteredObjects.length - 1) {
+                const temp = filteredObjects[currentIndex];
+                filteredObjects[currentIndex] = filteredObjects[currentIndex + 1];
+                filteredObjects[currentIndex + 1] = temp;
             } else if (direction === 'down' && currentIndex > 0) {
-                const temp = allObjects[currentIndex];
-                allObjects[currentIndex] = allObjects[currentIndex - 1];
-                allObjects[currentIndex - 1] = temp;
+                const temp = filteredObjects[currentIndex];
+                filteredObjects[currentIndex] = filteredObjects[currentIndex - 1];
+                filteredObjects[currentIndex - 1] = temp;
             }
 
             const canvasBgColor = canvas.backgroundColor;
 
             canvas.clear();
-            canvas.add(...allObjects);
+            canvas.add(...filteredObjects);
 
-            allObjects.forEach((obj, index) => {
+            filteredObjects.forEach((obj, index) => {
                 obj.set('zIndex', index);
                 obj.zIndex = index;
             });
