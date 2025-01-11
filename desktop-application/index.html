@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <title>SignCast Application</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src *; connect-src *; script-src *; style-src 'self' 'unsafe-inline'; img-src *; font-src *; media-src *;">
 
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/ui/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SignCast Application</title>
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; connect-src *; script-src *; style-src 'self' 'unsafe-inline'; img-src *; font-src *; media-src *;"> -->
+
+  <!-- 
+This CSP allows loading resources only from trusted sources, enhancing security while still giving necessary access. 
+1. default-src 'self' : Restricts all types of resources to be loaded from the same origin by default unless specified otherwise.
+2. connect-src 'self' api.example.com : Allows connections to the same origin and a specific trusted API domain.
+3. script-src 'self' cdn.example.com : Permits loading scripts only from the same origin and a trusted CDN.
+4. style-src 'self' 'unsafe-inline' : Allows styles from the same origin and inline styles (if necessary). Consider removing 'unsafe-inline' if inline styles are not required.
+5. img-src 'self' data: cdn.example.com : Allows images from the same origin, data URIs, and a trusted CDN.
+6. font-src 'self' cdn.example.com : Permits fonts only from the same origin and a trusted CDN.
+7. media-src 'self' cdn.example.com : Allows media files from the same origin and a trusted CDN.
+-->
+
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; connect-src 'self' api.example.com; script-src 'self' cdn.example.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: cdn.example.com; font-src 'self' cdn.example.com; media-src 'self' cdn.example.com;">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/ui/main.tsx"></script>
+</body>
+
 </html>

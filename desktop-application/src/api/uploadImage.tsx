@@ -17,15 +17,12 @@ const uploadImage = async (file) => {
   // Create FormData object to send file
   const fileinnew = base64ToFile(file, "uploaded-image.png");
 
-  console.log("fileee",file);
-  console.log("fileinnew",fileinnew);
-
   const formData = new FormData();
   formData.append("image", fileinnew); // 'image' must match the key in multer's `upload.single("image")`
 
   const response = await fetch(`${BASE_URL}/uploadImage`, {
     method: 'POST',
-    body: formData, // Send FormData directly
+    body: formData, 
   });
 
   if (!response.ok) {

@@ -323,6 +323,7 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleSyncCanvas = async () => {
     try {
+  
       const currentObjects = getCanvasObjects() as CustomFabricObject[];
       const filteredObjects = currentObjects.filter((obj, index, self) => {
         return self.findIndex(o => o.id === obj.id) === index;

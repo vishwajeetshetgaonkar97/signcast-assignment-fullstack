@@ -3,6 +3,11 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 .light {
   --background: 255, 255, 255;
   --text: 0, 0, 0;

@@ -7,7 +7,7 @@ export function isDev(): boolean {
 }
 
 export function validateEventFrame(frame: WebFrameMain) {
-  if (isDev() && new URL(frame.url).host === 'localhost:5123') {
+  if (isDev() && new URL(frame.url).host === 'localhost:5126') {
     return;
   }
   if (frame.url !== pathToFileURL(getUIPath()).toString()) {

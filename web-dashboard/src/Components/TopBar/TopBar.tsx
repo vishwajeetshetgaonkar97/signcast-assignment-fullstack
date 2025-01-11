@@ -5,7 +5,6 @@ import { HiStatusOffline } from "react-icons/hi";
 
 interface ThemeSelectionProps {
   themeMode: string;
-  // options to add more themes 
   setThemeMode: (mode: "dark" | "light" | "ocean") => void;
 }
 
