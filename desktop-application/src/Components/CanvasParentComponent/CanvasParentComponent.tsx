@@ -311,7 +311,8 @@ const CanvasParentComponent: React.FC<CanvasParentComponentProps> = ({ isConnect
       const retryDelay = 1000;
 
       const connectWebSocket = () => {
-        websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
+        // websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
+        websocketRef.current = new WebSocket("ws://localhost:3003");
 
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");

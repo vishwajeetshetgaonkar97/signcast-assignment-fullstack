@@ -5,12 +5,22 @@ const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
 const path = require("path");
 const WebSocket = require("ws");
+const { set } = require("mongoose");
 
-function CanvasRouter(database,wss) {
+function CanvasRouter(database, wss) {
   var router = express.Router();
 
-  
-console.log("Wssss log Canvas Router file", wss)
+
+  console.log("Wssss log Canvas Router file", wss)
+
+  // health ping
+  setInterval(() => {
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: "ping" }));
+      }
+    });
+  }, 1000);
 
   const notifyClients = async () => {
     const canvases = await database.collections.canvases.find().toArray();
@@ -21,6 +31,8 @@ console.log("Wssss log Canvas Router file", wss)
       }
     });
   };
+
+
 
   // Route for the homepage
   router.get("/", async (req, res) => {
@@ -43,7 +55,7 @@ console.log("Wssss log Canvas Router file", wss)
 
       await notifyClients();
       const allcanvases = await database.collections.canvases.find().toArray();
-      
+
       res.json({ allcanvases });
     } catch (error) {
       console.error("Error inserting canvas:", error);
@@ -67,7 +79,7 @@ console.log("Wssss log Canvas Router file", wss)
       let canvasMongoId = new mongodb.ObjectId(canvasID);
       const updatednewCanvas = await database.collections.canvases.updateOne({ _id: canvasMongoId }, { $set: updatedCanvas });
 
-       await notifyClients();
+      await notifyClients();
 
       res.json({ message: "Canvas updated successfully", updatednewCanvas });
     } catch (error) {
@@ -102,7 +114,7 @@ console.log("Wssss log Canvas Router file", wss)
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
       }
-  
+
       // Save file information in the database
       const imageMetadata = {
         filename: req.file.filename,
@@ -110,9 +122,9 @@ console.log("Wssss log Canvas Router file", wss)
         mimetype: req.file.mimetype,
         uploadedAt: new Date(),
       };
-  
+
       const result = await database.collections.images.insertOne(imageMetadata);
-  
+
       res.json({
         message: "Image uploaded successfully",
         imageId: result.insertedId,
@@ -128,19 +140,19 @@ console.log("Wssss log Canvas Router file", wss)
     const filename = req.params.filename;
     console.log("filename", filename);
     const filepath = path.join(__dirname, "../uploads", filename);
-  
+
     // Check if the file exists
     fs.access(filepath, fs.constants.F_OK, (err) => {
       if (err) {
         return res.status(404).json({ error: "Image not found" });
       }
-  
+
       // Serve the image
       res.sendFile(filepath);
     });
   });
 
-  return router; 
+  return router;
 }
 
 
