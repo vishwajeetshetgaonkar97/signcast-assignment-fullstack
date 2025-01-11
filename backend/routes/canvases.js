@@ -9,8 +9,15 @@ const WebSocket = require("ws");
 function CanvasRouter(database,wss) {
   var router = express.Router();
 
-  
-console.log("Wssss log Canvas Router file", wss)
+
+  // health ping
+  setInterval(() => {
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: "ping" }));
+      }
+    });
+  }, 5000);
 
   const notifyClients = async () => {
     const canvases = await database.collections.canvases.find().toArray();
