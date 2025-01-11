@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as fabric from 'fabric';
-import { get } from 'http';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;

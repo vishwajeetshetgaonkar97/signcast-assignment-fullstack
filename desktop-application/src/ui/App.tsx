@@ -118,8 +118,23 @@ function App() {
     setupWebSocket();
   }, []);
 
+
+  const setLocalData = async () => {
+    localStorage.setItem('canvases', JSON.stringify("yes data gets saved in"));
+  };
+
+  const getLocalData = async () => {
+    const data = localStorage.getItem('canvases');
+    console.log(data);
+  };
+
+  const handleFullscreen = () => {
+    window.electron.toggleFullscreen();
+  };
+
+
   return (
-      <div className={` ${themeMode} bg-bg-color h-screen w-full text-text-color  px-4 py-2 font-poppins`}>
+      <div className={` ${themeMode} bg-bg-color h-screen w-full text-text-color font-poppins`}>
         <TopBar isConnected={isConnected} themeMode={themeMode} setThemeMode={setThemeMode} />
         <main className="flex h-[95%] pb-2 align-center justify-center  pt-2 flex-col ">
           <FabricCanvas 
@@ -134,6 +149,16 @@ function App() {
           isAutoSync={isAutoSync}
           setIsAutoSync={setIsAutoSync}
           />
+
+
+<button onClick={setLocalData}> set data in</button>
+
+<button onClick={getLocalData} > get data</button>
+
+<button onClick={handleFullscreen}>fullscreen</button>
+
+
+
         </main>
         {isModalOpen && (
           <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-blue-800  z-50">

@@ -1,6 +1,7 @@
 {
-  "name": "electron-course",
-  "private": true,
+  "name": "signcast-electron",
+  "description": "A simple Electron app with React and Vite",
+  "author": "Your Name <your.email@example.com>",
   "version": "0.0.0",
   "type": "module",
   "main": "dist-electron/main.js",
@@ -46,5 +47,19 @@
     "typescript": "^5.6.2",
     "vite": "^5.4.7",
     "vitest": "^2.1.1"
+  },
+  "build": {
+    "mac": {
+      "target": "dmg",
+      "icon": "public/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "public/icon.png"
+    }
   }
 }

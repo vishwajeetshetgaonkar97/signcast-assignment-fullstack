@@ -10,4 +10,6 @@ contextBridge.exposeInMainWorld('electron', {
 
   getSocket: async () => ipcRenderer.invoke('get-socket'),
 
+  toggleFullscreen: () => ipcRenderer.send('toggle-fullscreen'),
+
 });

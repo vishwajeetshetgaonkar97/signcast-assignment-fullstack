@@ -3,19 +3,34 @@ import { isDev } from './util.js';
 import { getPreloadPath, getUIPath } from './pathResolver.js';
 import { createTray } from './tray.js';
 import { createMenu } from './menu.js';
-import {WebSocket} from "ws";
 
 app.on('ready', () => {
   const mainWindow = new BrowserWindow({
+    frame: true, 
     webPreferences: { 
       preload: getPreloadPath(),
-    
+      contextIsolation: true,
     },
+  });
+
+  // Handle the fullscreen toggle IPC call
+  ipcMain.on('toggle-fullscreen', () => {
+    const isFullscreen = mainWindow.isFullScreen();
+
+    if (isFullscreen) {
+      // If already fullscreen, remove the frame
+      mainWindow.setFullScreen(false);
+      mainWindow.setBounds({ width: 800, height: 600 }); // Reset the size if needed
+      mainWindow.setResizable(true); // Allow resizing after exiting fullscreen
+    } else {
+      // If not fullscreen, enable the frame
+      mainWindow.setFullScreen(true);
+    }
   });
 
   ipcMain.handle('get-canvases', async () => {
     try {
-      const response = await fetch('https://signcast-assignment-fullstack-production.up.railway.app/canvases');
+      const response = await getAllCanvases();
       const data = await response.json();
       console.log("Data from canvases:", data);
       return data.canvases; 
