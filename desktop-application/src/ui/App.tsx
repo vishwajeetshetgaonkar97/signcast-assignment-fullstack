@@ -6,6 +6,7 @@ import MonitoringStateContext from '../Contexts/MonitoringStateContext';
 import CanvasParentComponent from '../Components/CanvasParentComponent/CanvasParentComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import FullScreenStateContext from '../Contexts/FullScreenStateContext';
+import AutoSyncStateContext from '../Contexts/AutoSyncStateContext';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -21,6 +22,7 @@ function App() {
   const [screenId, setScreenId] = useState('');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isAutoSync, setIsAutoSync] = useState(false);
 
   // error notification 
   const notifyError = (message: string) =>
@@ -91,40 +93,45 @@ function App() {
     [isFullScreen, setIsFullScreen]
   );
 
+  const isAutoSyncStateContextValue = useMemo(
+    () => ({ isAutoSync, setIsAutoSync }),
+    [isAutoSync, setIsAutoSync]
+  );
 
 
   return (
     <MonitoringStateContext.Provider value={monitoringStateContextValue}>
       <FullScreenStateContext.Provider value={fullScreenStateContextValue}>
+        <AutoSyncStateContext.Provider value={isAutoSyncStateContextValue}>
 
+          <div className={` ${themeMode} bg-bg-color h-screen w-full text-text-color   font-poppins`}>
+            {!isFullScreen && <TopBar themeMode={themeMode} setModalOpen={setIsModalOpen} setThemeMode={setThemeMode} />}
+            <main className={`flex  ${isFullScreen ? " absolute top-0 left-0 w-screen h-screen align-center justify-center" : "h-[95%] w-full"} align-center justify-center  flex-col ${themeMode === "light" ? "bg-gray-100 border-gray-100" : "bg-zinc-800 border-zinc-800"} border  overflow-hidden`}>
+              <CanvasParentComponent />
+            </main>
 
-        <div className={` ${themeMode} bg-bg-color h-screen w-full text-text-color   font-poppins`}>
-          {!isFullScreen && <TopBar themeMode={themeMode} setModalOpen={setIsModalOpen} setThemeMode={setThemeMode} />}
-          <main className={`flex  ${isFullScreen ? " absolute top-0 left-0 w-screen h-screen align-center justify-center" : "h-[95%] w-full"} align-center justify-center  flex-col ${themeMode === "light" ? "bg-gray-100 border-gray-100" : "bg-zinc-800 border-zinc-800"} border  overflow-hidden`}>
-            <CanvasParentComponent />
-          </main>
-   
-          {isModalOpen && (
-            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-blue-800  z-50">
-              <div className="bg-white rounded-lg p-6 w-1/3 text-center shadow-lg">
-                <h2 className="text-xl  text-gray-800 font-semibold mb-4">Enter Screen ID to Continue </h2>
-                <input
-                  type="text"
-                  placeholder="Screen ID"
-                  value={screenId}
-                  onChange={(e) => setScreenId(e.target.value)}
-                  className="w-full border rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={handleModalSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                >
-                  Submit
-                </button>
+            {isModalOpen && (
+              <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-blue-800  z-50">
+                <div className="bg-white rounded-lg p-6 w-1/3 text-center shadow-lg">
+                  <h2 className="text-xl  text-gray-800 font-semibold mb-4">Enter Screen ID to Continue </h2>
+                  <input
+                    type="text"
+                    placeholder="Screen ID"
+                    value={screenId}
+                    onChange={(e) => setScreenId(e.target.value)}
+                    className="w-full border rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={handleModalSubmit}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </AutoSyncStateContext.Provider>
       </FullScreenStateContext.Provider>
     </MonitoringStateContext.Provider>
   );

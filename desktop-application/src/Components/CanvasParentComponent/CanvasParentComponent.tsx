@@ -40,12 +40,13 @@ const CanvasParentComponent: React.FC = () => {
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [lastPingTime, setLastPingTime] = useState<number | null>(null);
 
-  
-  const [isAutoSync, setIsAutoSync] = useState(false);
+
+  // const [isAutoSync, setIsAutoSync] = useState(false);
+  const isAutoSyncRef = useRef(false);
   const websocketRef = useRef<WebSocket | null>(null);
 
   const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
-
+ 
   const { isFullScreen } = useContext(FullScreenStateContext);
 
   // success notification 
@@ -168,14 +169,28 @@ const CanvasParentComponent: React.FC = () => {
       canvas.renderAll();
 
     }
-  };
+  }; 
+ 
+  const handleAllCanvasesSocketData = (data) => {
+    console.log("Updating canvas objects for all:", data);
+    console.log("isAutoSync:", isAutoSyncRef.current);
+    if (isAutoSyncRef.current) {
+      console.log("Updating canvas objects for all:", data);
+      setAllCanvases(data); 
+      localStorage.setItem('allCanvases', JSON.stringify(data));
+      renderCanvasObjects(data[0].data);
+    }
+  }
+ 
 
   const getAllCanvases = async () => {
     try {
       const data = await window.electron.getCanvases();
       console.log("Fetched canvases:", data.canvases);
       setAllCanvases(data);
-
+   
+      // store data locally 
+      // localStorage.setItem('allCanvases', JSON.stringify(data));
       // Assuming the first canvas is the one we need
       const objects = data[0].data as CustomFabricObject[];
       console.log("Fetched objects:", objects);
@@ -185,6 +200,7 @@ const CanvasParentComponent: React.FC = () => {
       console.log(`Canvas fetch issue: ${error}`);
     }
   };
+     
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -196,6 +212,13 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
+     
+      // get all Canvases if in localStorage 
+      // const checkIfLocalCanvases = localStorage.getItem('allCanvases') ;
+      // if (checkIfLocalCanvases) {
+      //   setAllCanvases(JSON.parse(checkIfLocalCanvases));
+      //   renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
+      // }
 
       const handlePing = () => {
         setLastPingTime(Date.now());
@@ -217,8 +240,9 @@ const CanvasParentComponent: React.FC = () => {
             // console.log("Received data:", data);
 
             if (data.type === "updateAllCanvas") {
-              // console.log("Updating canvas objects for all:", data);
-              setAllCanvases(data.canvases);
+              handleAllCanvasesSocketData(data.canvases);
+          
+            
             } else if (data.type === "ping") {
               handlePing();
               // console.log("Received ping:", data);
@@ -254,6 +278,7 @@ const CanvasParentComponent: React.FC = () => {
     }
   }, []);
 
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       console.log("Checking ping time...");
@@ -265,20 +290,6 @@ const CanvasParentComponent: React.FC = () => {
 
     return () => clearInterval(interval);
   }, [lastPingTime]);
-
-
-  const getCanvasObjects = () => {
-    if (canvas) {
-      const objects = canvas.getObjects() as CustomFabricObject[];
-      console.log(objects);
-      objects.forEach((object) => {
-        console.log(object.type);
-        console.log(object.zIndex);
-      });
-      return objects;
-    }
-    return [];
-  };
 
   const handleScreenChange = (index: number) => {
     if (canvas) {
@@ -306,39 +317,7 @@ const CanvasParentComponent: React.FC = () => {
   const handleSyncCanvas = async () => {
     try {
 
-      const currentObjects = getCanvasObjects() as CustomFabricObject[];
-      const filteredObjects = currentObjects.filter((obj, index, self) => {
-        return self.findIndex(o => o.id === obj.id) === index;
-      });
-      const updateCanvasPostBody = {
-        canvasId: allcanvases[selectedCanvasIndex]._id,
-        name: allcanvases[selectedCanvasIndex].name,
-        category: allcanvases[selectedCanvasIndex].category,
-        data: filteredObjects.map((object: CustomFabricObject) => {
-          return {
-            type: object.type,
-            left: object.left,
-            top: object.top,
-            width: object.width,
-            height: object.height,
-            fill: object.fill,
-            id: object.id,
-            scaleX: object.scaleX,
-            scaleY: object.scaleY,
-            angle: object.angle,
-            zIndex: object.zIndex,
-            imageUrl: object.imageUrl || "",
-            visible: object.visible,
-            text: object.text || "",
-          };
-        }),
-      };
-
-      console.log("body pushed", updateCanvasPostBody);
-      // Send data to the backend to update the canvas
-
-      // console.log("Canvas synced successfully", log);
-
+      getAllCanvases();
       notifySuccess("Canvas synced successfully");
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
@@ -363,8 +342,11 @@ const CanvasParentComponent: React.FC = () => {
 
 
   const handleAutoSync = () => {
-    setIsAutoSync(!isAutoSync);
+    isAutoSyncRef.current = !isAutoSyncRef.current;  
+    console.log("isAutoSyncRef.current after toggle:", isAutoSyncRef.current);
   };
+
+  console.log("isAutoSync:", isAutoSyncRef.current);
 
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>
@@ -375,13 +357,13 @@ const CanvasParentComponent: React.FC = () => {
           <div className={`absolute h-screen w-screen bg-bg-color flex items-center justify-center z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isLoading ? "" : "hidden"} `} >
             <LoaderComponent />
           </div>
- 
-          <div className={"flex items-center justify-center "}  > 
- 
+
+          <div className={"flex items-center justify-center "}  >
+
             <div className={`flex items-center justify-center ${isFullScreen ? "relative h-screen w-screen" : ""} `} style={{ transform: `scale(${scale})` }}>
               <canvas id="canvas" ref={canvasRef} />
             </div>
-  
+
             {/* <AddToCanvasComponent canvas={canvas} /> */}
             <CanvasZoomInOutComponent scale={scale} setScale={setScale} />
             {/* <DesignEditComponent canvas={canvas} /> */}
@@ -391,22 +373,25 @@ const CanvasParentComponent: React.FC = () => {
               handleScreenChange={handleScreenChange}
             />
             }
-   
+
             {!isFullScreen && <>
 
-              <div className="flex flex-row items-center justify-center absolute z-10 top-12  right-2 " onClick={handleSyncCanvas}>
-                <button
-                  onClick={handleAutoSync}
-                  className={`w-16 h-8 rounded-full p-1 transition-colors duration-300 ${isAutoSync ? 'bg-green-500' : 'bg-gray-300'
-                    }`}
-                >
-                  <div
-                    className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isAutoSync ? 'translate-x-8' : 'translate-x-0'
-                      }`}
-                  ></div>
-                </button>
+              <div className="flex flex-row items-center justify-center absolute z-10 top-12  gap-2 right-2 " >
+                <div className="relative group mt-1">
+                  <button 
+                    onClick={handleAutoSync}
+                    className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${isAutoSyncRef.current ? 'bg-yellow-400' : 'bg-gray-300'}`}
+                  >  
+                    <div
+                      className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isAutoSyncRef.current ? 'translate-x-6' : 'translate-x-0'}`}
+                    ></div>
+                  </button>
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {isAutoSyncRef.current ? 'Auto Sync is ON' : 'Auto Sync is OFF'}
+                  </div>
+                </div> 
 
-                <button className={`bg-green-600 text-xs  text-white px-4 py-2 rounded`}>Sync Data</button>
+                <button onClick={handleSyncCanvas} className={`bg-green-600 text-xs  text-white px-4 py-2 rounded`}>Sync Data</button>
               </div>
 
               {/* disclaimer */}

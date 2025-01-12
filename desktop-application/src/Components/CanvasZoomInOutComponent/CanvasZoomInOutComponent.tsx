@@ -28,7 +28,7 @@ const CanvasZoomInOutComponent: React.FC<CanvasZoomInOutComponentProps> = ({ sca
     } else {
       document.documentElement.requestFullscreen();
       setIsFullScreen(true);
-      setScale(1);
+      setScale(0.9);
     }
   };
  
