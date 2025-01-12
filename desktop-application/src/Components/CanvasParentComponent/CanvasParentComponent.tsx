@@ -30,6 +30,8 @@ interface CustomFabricObject extends FabricObject {
   text?: string;
 }
 
+const BaseUrl = 'https://signcast-assignment-fullstack-production-32ab.up.railway.app';
+
 
 const CanvasParentComponent: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -213,12 +215,12 @@ const CanvasParentComponent: React.FC = () => {
             // console.log("Received data:", data);
     
             if (data.type === "updateAllCanvas") {
-              console.log("Updating canvas objects for all:", data);
+              // console.log("Updating canvas objects for all:", data);
               setAllCanvases(data.canvases);
             } else if (data.type === "ping") {
               handlePing();
-              console.log("Received ping:", data);
-              console.log("isMonitoring:", isMonitoring);
+              // console.log("Received ping:", data);
+              // console.log("isMonitoring:", isMonitoring);
               if(!isMonitoring){
                 setIsMonitoring(true);
               }
@@ -275,9 +277,6 @@ const CanvasParentComponent: React.FC = () => {
     }
     return [];
   };
-
-
-
 
   const handleScreenChange = (index: number) => {
     if (canvas) {
@@ -386,9 +385,9 @@ const CanvasParentComponent: React.FC = () => {
               setIsModalOpen={setIsModalOpen}
               handleScreenChange={handleScreenChange}
             />
-
+ 
             <div className="flex flex-row items-center justify-center absolute z-10 top-12  right-2 " onClick={handleSyncCanvas}>
-              <button className={`bg-blue-600 text-xs  text-white px-4 py-2 rounded`}>Apply</button>
+              <button className={`bg-green-600 text-xs  text-white px-4 py-2 rounded`}>Sync Data</button>
             </div>
 
             {/* disclaimer */}

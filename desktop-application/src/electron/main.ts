@@ -43,6 +43,7 @@ app.on('ready', () => {
 
   ipcMain.handle('get-devices', async () => {
     try {
+      // this can be upgraded for multiple devices
       const response = await fetch(`${BaseUrl}/devices/device/6782dc6b78a3d0fd12176d96`);
       console.log("Response", response);
       const data = await response.json();
