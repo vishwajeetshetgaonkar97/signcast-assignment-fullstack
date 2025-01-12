@@ -5,7 +5,6 @@ const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
 const path = require("path");
 const WebSocket = require("ws");
-const { set } = require("mongoose");
 
 function CanvasRouter(database, wss) {
   var router = express.Router();
