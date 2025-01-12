@@ -1,27 +1,30 @@
-import React from "react";
+import React,{useContext} from "react";
 import logoImg from '../../assets/logo.png';
 import { MdOutlineOnlinePrediction } from "react-icons/md";
 import { HiStatusOffline } from "react-icons/hi";
+import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 
 interface TopBarProps {
-  isConnected: boolean;
   themeMode: string;
   setThemeMode: (mode: "dark" | "light" | "ocean") => void;
 }
+ 
+const TopBar: React.FC<TopBarProps> = ({ setThemeMode, themeMode }) => {
 
-const TopBar: React.FC<TopBarProps> = ({ isConnected, setThemeMode, themeMode }) => {
-
+  const {isMonitoring} = useContext(MonitoringStateContext);
   const toggleDMode = () => {
     setThemeMode(themeMode === "light" ? "dark" : "light");
    
   };
 
+  console.log("isMonitoring: from top bar", isMonitoring);
+ 
   return (
     <div className="flex w-full h-[5%] justify-between  items-center dark:text-neutral-100 px-4 py-2">
     <img className="h-7" src={logoImg} alt="Logo" />
     <div className="text-sm flex gap-2 flex-row items-center ">
     <div className="relative">
-        {isConnected ? (
+        {isMonitoring ? (
           <MdOutlineOnlinePrediction className="text-green-500" size={20}  />
         ) : (
           <HiStatusOffline className="text-red-500" size={20} />

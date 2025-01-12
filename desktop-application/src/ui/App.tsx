@@ -15,11 +15,7 @@ function App() {
   const [deviceInfo, setDeviceInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [screenId, setScreenId] = useState('');
-
-  const [canvasObjects, setCanvasObjects] = useState<any[]>([]);
-  const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
-  const [isAutoSync, setIsAutoSync] = useState<boolean>(true);
-  const isAutoSyncRef = useRef(isAutoSync);
+  const [isMonitoring, setIsMonitoring] = useState(false);
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -52,35 +48,42 @@ function App() {
     getDeviceInfo();
   }, []);
 
-  console.log("isConnected", isConnected);
+  console.log("isConnected", isMonitoring);
+
+  const monitoringStateContextValue = useMemo(
+    () => ({ isMonitoring, setIsMonitoring }),
+    [isMonitoring, setIsMonitoring]
+  );
 
   return (
-    <div className={` ${themeMode} bg-bg-color h-screen w-full text-text-color  px-4 py-2 font-poppins`}>
-      <TopBar isConnected={isConnected} themeMode={themeMode} setThemeMode={setThemeMode} />
-      <main className={`flex h-[95%] w-full align-center justify-center  pt-2 flex-col ${themeMode === "light" ? "bg-gray-100 border-gray-100" : "bg-zinc-800 border-zinc-800"} border  overflow-hidden`}>
-      <CanvasParentComponent  isConnected={isConnected} setIsConnected={setIsConnected}/>
-      </main>
-      {isModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-blue-800  z-50">
-          <div className="bg-white rounded-lg p-6 w-1/3 text-center shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Enter Screen ID</h2>
-            <input
-              type="text"
-              placeholder="Screen ID"
-              value={screenId}
-              onChange={(e) => setScreenId(e.target.value)}
-              className="w-full border rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={handleModalSubmit}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              Submit
-            </button>
+    <MonitoringStateContext.Provider value={monitoringStateContextValue}>
+      <div className={` ${themeMode} bg-bg-color h-screen w-full text-text-color  px-4 py-2 font-poppins`}>
+        <TopBar themeMode={themeMode} setThemeMode={setThemeMode} />
+        <main className={`flex h-[95%] w-full align-center justify-center  pt-2 flex-col ${themeMode === "light" ? "bg-gray-100 border-gray-100" : "bg-zinc-800 border-zinc-800"} border  overflow-hidden`}>
+          <CanvasParentComponent />
+        </main>
+        {isModalOpen && (
+          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-blue-800  z-50">
+            <div className="bg-white rounded-lg p-6 w-1/3 text-center shadow-lg">
+              <h2 className="text-xl font-semibold mb-4">Enter Screen ID</h2>
+              <input
+                type="text"
+                placeholder="Screen ID"
+                value={screenId}
+                onChange={(e) => setScreenId(e.target.value)}
+                className="w-full border rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={handleModalSubmit}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Submit
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </MonitoringStateContext.Provider>
   );
 }
 

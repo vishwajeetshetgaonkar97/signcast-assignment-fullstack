@@ -11,6 +11,7 @@ import { addCircle, addImage, addRectangle,  addText, addTriangle } from "../../
 import { ToastContainer, toast } from 'react-toastify';
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
+import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 
 interface allcanvases {
   _id?: string;
@@ -29,21 +30,19 @@ interface CustomFabricObject extends FabricObject {
   text?: string;
 }
 
-interface CanvasParentComponentProps {
-  isConnected: boolean;
-  setIsConnected: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
-const CanvasParentComponent: React.FC<CanvasParentComponentProps> = ({ isConnected , setIsConnected}) => {
+const CanvasParentComponent: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [scale, setScale] = useState(0.5);
   const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
-
+  const [lastPingTime, setLastPingTime] = useState<number | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
+
+  const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
 
   // success notification 
   const notifySuccess = (message: string) =>
@@ -167,8 +166,6 @@ const CanvasParentComponent: React.FC<CanvasParentComponentProps> = ({ isConnect
     }
   };
 
-
-
   const getAllCanvases = async () => {
     try {
       const data = await window.electron.getCanvases();
@@ -184,116 +181,7 @@ const CanvasParentComponent: React.FC<CanvasParentComponentProps> = ({ isConnect
       console.log(`Canvas fetch issue: ${error}`);
     }
   };
-
-
-  // useEffect(() => {
-  //   if (canvasRef.current) {
-  //     const initCanvas = new Canvas(canvasRef.current, {
-  //       width: 1920,
-  //       height: 1080,
-  //     });
-  //     initCanvas.backgroundColor = "#fff";
-  //     initCanvas.renderAll();
-  //     setCanvas(initCanvas);
-  
-  //     let reconnectAttempts = 0;
-  //     const maxReconnectAttempts = 5;
-  //     const retryDelay = 1000;
-  //     let heartbeatInterval;
-  //     let missedPongs = 0;
-  //     const maxMissedPongs = 10;
    
-  //     const connectWebSocket = () => {
-  //       websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
-  
-  //       websocketRef.current.onopen = () => {
-  //         console.log("WebSocket connected");
-  //         reconnectAttempts = 0;
-  //         missedPongs = 0;
-  //         setIsConnected(true);
-  
-  //         // Start heartbeat
-  //         startHeartbeat();
-  //       };
-  
-  //       websocketRef.current.onmessage = (event) => {
-  //         try {
-  //           const data = JSON.parse(event.data);
-  //           console.log("Received data:", data);
-
-  //           if(!isConnected){
-  //             setIsConnected(true);
-  //           }
-  
-  //           if (data.action === "updateAllCanvas") {
-  //             setAllCanvases(data.canvases);
-  //           } else if (data.type === "notification") {
-  //             console.log("Notification:", data.message);
-  //           } else if (data.type === "pong") {
-  //             // Reset missed pongs on receiving pong response
-  //             missedPongs = 0;
-  //           }
-  //         } catch (error) {
-  //           console.error("Error parsing WebSocket message:", error);
-  //         }
-  //       };
-  
-  //       websocketRef.current.onclose = () => {
-  //         console.log("WebSocket disconnected");
-  //         setIsConnected(false);
-  //         stopHeartbeat();
-  //         attemptReconnect();
-  //       };
-  
-  //       websocketRef.current.onerror = (error) => {
-  //         console.error("WebSocket error:", error);
-  //       };
-  //     };
-  
-  //     const attemptReconnect = () => {
-  //       if (reconnectAttempts <= maxReconnectAttempts) {
-  //         reconnectAttempts += 1;
-  //         const delay = retryDelay * reconnectAttempts;
-  //         console.log(`Reconnecting in ${delay} ms...`);
-  
-  //         setTimeout(connectWebSocket, delay);
-  //       } else {
-  //         console.error("Max reconnect attempts reached. Stopping further attempts.");
-  //         notifyError("Reconnection failed. Try again later.");
-  //       }
-  //     };
-  
-  //     const startHeartbeat = () => {
-  //       heartbeatInterval = setInterval(() => {
-  //         if (websocketRef.current.readyState === WebSocket.OPEN) {
-  //           websocketRef.current.send(JSON.stringify({ type: "ping" }));
-  //           missedPongs += 1;
-  
-  //           if (missedPongs >= maxMissedPongs) {
-  //             console.error("Missed too many pongs. Closing connection.");
-  //             websocketRef.current.close();
-  //           }
-  //         }
-  //       }, 5000); // Send ping every 5 seconds
-  //     };
-  
-  //     const stopHeartbeat = () => {
-  //       clearInterval(heartbeatInterval);
-  //     };
-  
-  //     // Initial WebSocket connection
-  //     connectWebSocket();
-  
-  //     // Cleanup
-  //     return () => {
-  //       initCanvas.dispose();
-  //       websocketRef.current?.close();
-  //       stopHeartbeat();
-  //     };
-  //   }
-  // }, []);
-   
-
   useEffect(() => {
     if (canvasRef.current) {
       // Initialize canvas
@@ -304,74 +192,77 @@ const CanvasParentComponent: React.FC<CanvasParentComponentProps> = ({ isConnect
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-
-      // Reconnection constants
-      let reconnectAttempts = 0; 
-      const maxReconnectAttempts = 5;
-      const retryDelay = 1000;
-
+  
+      const handlePing = () => {
+        setLastPingTime(Date.now());
+      };
+  
       const connectWebSocket = () => {
-        // websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
-        websocketRef.current = new WebSocket("ws://localhost:3003");
-
+        // websocketRef.current = new WebSocket("ws://localhost:3003");
+        websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
+  
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");
-          reconnectAttempts = 0; // Reset attempts on successful connection
-          setIsConnected(true);
+          setIsMonitoring(true);
         };
+         
 
         websocketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log("Received data:", data);
-
-            if (data.action === "updateAllCanvas") {
+            // console.log("Received data:", data);
+    
+            if (data.type === "updateAllCanvas") {
+              console.log("Updating canvas objects for all:", data);
               setAllCanvases(data.canvases);
-            } else if (data.type === "notification") {
-              console.log("Notification:", data.message);
+            } else if (data.type === "ping") {
+              handlePing();
+              console.log("Received ping:", data);
+              console.log("isMonitoring:", isMonitoring);
+              if(!isMonitoring){
+                setIsMonitoring(true);
+              }
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
           }
         };
-
+  
         websocketRef.current.onclose = () => {
           console.log("WebSocket disconnected");
-          setIsConnected(false);
-          attemptReconnect();
+          setIsMonitoring(false);
         };
-
+  
         websocketRef.current.onerror = (error) => {
           console.error("WebSocket error:", error);
         };
       };
 
-      const attemptReconnect = () => {
-        if (reconnectAttempts <= maxReconnectAttempts) {
-          reconnectAttempts += 1;
-          const delay = retryDelay * reconnectAttempts;
-          console.log(`Reconnecting in ${delay} ms...`);
-
-          setTimeout(connectWebSocket, delay);
-        } else {
-          console.error("Max reconnect attempts reached. Stopping further attempts.");
-          notifyError("Recconnection Failed try again later");
-        }
-      };
-
+  
       // Initial WebSocket connection
       connectWebSocket();
-
-      // Cleanup 
+  
+      // Cleanup
       return () => {
         initCanvas.dispose();
         websocketRef.current?.close();
       };
     }
   }, []);
-
-   
-
+    
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Checking ping time...");
+      if (lastPingTime && Date.now() - lastPingTime > 6000) {
+        console.warn("No ping received in the last 6 seconds. Backend may be down.");
+        setIsMonitoring(false);
+      }
+    }, 6000);
+  
+    return () => clearInterval(interval);
+  }, [lastPingTime]);
+  
+  
   const getCanvasObjects = () => {
     if (canvas) {
       const objects = canvas.getObjects() as CustomFabricObject[];
