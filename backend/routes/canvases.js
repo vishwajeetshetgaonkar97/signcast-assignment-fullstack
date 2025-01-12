@@ -11,8 +11,6 @@ function CanvasRouter(database, wss) {
   var router = express.Router();
 
 
-  console.log("Wssss log Canvas Router file", wss)
-
   // health ping
   setInterval(() => {
     wss.clients.forEach((client) => {
@@ -20,14 +18,14 @@ function CanvasRouter(database, wss) {
         client.send(JSON.stringify({ type: "ping" }));
       }
     });
-  }, 1000);
+  }, 5000);
 
   const notifyClients = async () => {
     const canvases = await database.collections.canvases.find().toArray();
     console.log("canvases", canvases);
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ action: "updateAllCanvas", canvases }));
+        client.send(JSON.stringify({ type: "updateAllCanvas", canvases }));
       }
     });
   };
