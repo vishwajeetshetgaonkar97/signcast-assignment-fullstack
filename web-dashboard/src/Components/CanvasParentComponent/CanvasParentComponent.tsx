@@ -204,9 +204,8 @@ const CanvasParentComponent: React.FC = () => {
       const maxReconnectAttempts = 5;
       const retryDelay = 1000;
   
-      const handlePing = (data) => {
-        console.log("Health ping received:", data);
-        setLastPingTime(Date.now()); // Update the last ping time
+      const handlePing = () => {
+        setLastPingTime(Date.now());
       };
   
       const connectWebSocket = () => {
@@ -221,12 +220,13 @@ const CanvasParentComponent: React.FC = () => {
         websocketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log("Received data:", data);
+            // console.log("Received data:", data);
   
             if (data.type === "updateAllCanvas") {
+              console.log("Updating canvas objects for all:", data);
               setAllCanvases(data.canvases);
             } else if (data.type === "ping") {
-              handlePing(data);
+              handlePing();
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
