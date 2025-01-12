@@ -1,5 +1,8 @@
 import React from "react";
 import { FiZoomIn, FiZoomOut } from "react-icons/fi";
+import { MdFullscreen } from "react-icons/md";
+import { MdFullscreenExit } from "react-icons/md";
+import FullScreenStateContext from "../../Contexts/FullScreenStateContext";
 
 interface CanvasZoomInOutComponentProps {
   scale: number;
@@ -7,6 +10,8 @@ interface CanvasZoomInOutComponentProps {
 }
 
 const CanvasZoomInOutComponent: React.FC<CanvasZoomInOutComponentProps> = ({ scale, setScale }) => {
+
+  const { isFullScreen, setIsFullScreen } = React.useContext(FullScreenStateContext);
   const zoomIn = () => {
     setScale((prevScale) => prevScale * 1.1);
   };
@@ -15,8 +20,23 @@ const CanvasZoomInOutComponent: React.FC<CanvasZoomInOutComponentProps> = ({ sca
     setScale((prevScale) => prevScale / 1.1);
   };
 
+  const toggleFullScreen = () => {
+    if (isFullScreen) {
+      document.exitFullscreen();
+      setIsFullScreen(false);
+      setScale(0.6);
+    } else {
+      document.documentElement.requestFullscreen();
+      setIsFullScreen(true);
+      setScale(1);
+    }
+  };
+ 
   return (
     <div className="flex flex-row align-center justify-center w-min gap-2 absolute z-10 bottom-2 right-2 bg-bg-color py-2 px-3 rounded shadow">
+      {isFullScreen ? <MdFullscreenExit onClick={toggleFullScreen}  className="cursor-pointer hover:text-rose-500 mt-1" size={20} /> :
+        <MdFullscreen onClick={toggleFullScreen} className="cursor-pointer hover:text-fuchsia-700 mt-1" size={20} />}
+
       <FiZoomIn className="cursor-pointer hover:text-fuchsia-700 mt-1" onClick={zoomIn} size={18} />
       <FiZoomOut className="cursor-pointer hover:text-rose-500 mt-1" onClick={zoomOut} size={18} />
 

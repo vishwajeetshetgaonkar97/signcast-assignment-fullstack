@@ -1,17 +1,16 @@
 import React, { useRef, useState, useEffect, useMemo, useContext } from "react";
 import { Canvas, FabricObject } from "fabric";
 import * as fabric from "fabric";
-import DesignEditComponent from "../DesignEditComponent/DesignEditComponent";
 import LayersComponent from "../LayersComponent/LayersComponent";
-import AddToCanvasComponent from "../AddToCanvasComponents/AddToCanvasComponent";
 import CanvasZoomInOutComponent from "../CanvasZoomInOutComponent/CanvasZoomInOutComponent";
 import CanvasScreensComponent from "../CanvasScreensComponent/CanvasScreensComponent";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
-import { addCircle, addImage, addRectangle,  addText, addTriangle } from "../../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
+import FullScreenStateContext from "../../Contexts/FullScreenStateContext";
 
 interface allcanvases {
   _id?: string;
@@ -41,10 +40,13 @@ const CanvasParentComponent: React.FC = () => {
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [lastPingTime, setLastPingTime] = useState<number | null>(null);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const [isAutoSync, setIsAutoSync] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
 
   const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
+
+  const { isFullScreen } = useContext(FullScreenStateContext);
 
   // success notification 
   const notifySuccess = (message: string) =>
@@ -183,7 +185,7 @@ const CanvasParentComponent: React.FC = () => {
       console.log(`Canvas fetch issue: ${error}`);
     }
   };
-   
+
   useEffect(() => {
     if (canvasRef.current) {
       // Initialize canvas
@@ -194,26 +196,26 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-  
+
       const handlePing = () => {
         setLastPingTime(Date.now());
       };
-  
+
       const connectWebSocket = () => {
         // websocketRef.current = new WebSocket("ws://localhost:3003");
         websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
-  
+
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");
           setIsMonitoring(true);
         };
-         
+
 
         websocketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
             // console.log("Received data:", data);
-    
+
             if (data.type === "updateAllCanvas") {
               // console.log("Updating canvas objects for all:", data);
               setAllCanvases(data.canvases);
@@ -221,7 +223,7 @@ const CanvasParentComponent: React.FC = () => {
               handlePing();
               // console.log("Received ping:", data);
               // console.log("isMonitoring:", isMonitoring);
-              if(!isMonitoring){
+              if (!isMonitoring) {
                 setIsMonitoring(true);
               }
             }
@@ -229,21 +231,21 @@ const CanvasParentComponent: React.FC = () => {
             console.error("Error parsing WebSocket message:", error);
           }
         };
-  
+
         websocketRef.current.onclose = () => {
           console.log("WebSocket disconnected");
           setIsMonitoring(false);
         };
-  
+
         websocketRef.current.onerror = (error) => {
           console.error("WebSocket error:", error);
         };
       };
 
-  
+
       // Initial WebSocket connection
       connectWebSocket();
-  
+
       // Cleanup
       return () => {
         initCanvas.dispose();
@@ -251,7 +253,7 @@ const CanvasParentComponent: React.FC = () => {
       };
     }
   }, []);
-    
+
   useEffect(() => {
     const interval = setInterval(() => {
       console.log("Checking ping time...");
@@ -260,11 +262,11 @@ const CanvasParentComponent: React.FC = () => {
         setIsMonitoring(false);
       }
     }, 6000);
-  
+
     return () => clearInterval(interval);
   }, [lastPingTime]);
-  
-  
+
+
   const getCanvasObjects = () => {
     if (canvas) {
       const objects = canvas.getObjects() as CustomFabricObject[];
@@ -303,7 +305,7 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleSyncCanvas = async () => {
     try {
-  
+
       const currentObjects = getCanvasObjects() as CustomFabricObject[];
       const filteredObjects = currentObjects.filter((obj, index, self) => {
         return self.findIndex(o => o.id === obj.id) === index;
@@ -360,6 +362,10 @@ const CanvasParentComponent: React.FC = () => {
   const isLoading = allcanvases.length <= 0;
 
 
+  const handleAutoSync = () => {
+    setIsAutoSync(!isAutoSync);
+  };
+
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>
       <SelectedCanvasObjectIndexDataContext.Provider value={selectedCanvasIndexContextValue}>
@@ -369,30 +375,43 @@ const CanvasParentComponent: React.FC = () => {
           <div className={`absolute h-screen w-screen bg-bg-color flex items-center justify-center z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isLoading ? "" : "hidden"} `} >
             <LoaderComponent />
           </div>
-
-          <div className={"flex items-center justify-center "}  >
-
-            <div className={"flex items-center justify-center "} style={{ transform: `scale(${scale})` }}>
+ 
+          <div className={"flex items-center justify-center "}  > 
+ 
+            <div className={`flex items-center justify-center ${isFullScreen ? "relative h-screen w-screen" : ""} `} style={{ transform: `scale(${scale})` }}>
               <canvas id="canvas" ref={canvasRef} />
             </div>
-
+  
             {/* <AddToCanvasComponent canvas={canvas} /> */}
             <CanvasZoomInOutComponent scale={scale} setScale={setScale} />
             {/* <DesignEditComponent canvas={canvas} /> */}
-            <LayersComponent canvas={canvas} />
+            {!isFullScreen && <LayersComponent canvas={canvas} />}
 
-            <CanvasScreensComponent canvas={canvas}
-              setIsModalOpen={setIsModalOpen}
+            {!isFullScreen && <CanvasScreensComponent canvas={canvas}
               handleScreenChange={handleScreenChange}
             />
- 
-            <div className="flex flex-row items-center justify-center absolute z-10 top-12  right-2 " onClick={handleSyncCanvas}>
-              <button className={`bg-green-600 text-xs  text-white px-4 py-2 rounded`}>Sync Data</button>
-            </div>
+            }
+   
+            {!isFullScreen && <>
 
-            {/* disclaimer */}
-            <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images might have some issues </h6>
+              <div className="flex flex-row items-center justify-center absolute z-10 top-12  right-2 " onClick={handleSyncCanvas}>
+                <button
+                  onClick={handleAutoSync}
+                  className={`w-16 h-8 rounded-full p-1 transition-colors duration-300 ${isAutoSync ? 'bg-green-500' : 'bg-gray-300'
+                    }`}
+                >
+                  <div
+                    className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isAutoSync ? 'translate-x-8' : 'translate-x-0'
+                      }`}
+                  ></div>
+                </button>
 
+                <button className={`bg-green-600 text-xs  text-white px-4 py-2 rounded`}>Sync Data</button>
+              </div>
+
+              {/* disclaimer */}
+              <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images might have some issues </h6>
+            </>}
             {/* used for debugging */}
             {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>

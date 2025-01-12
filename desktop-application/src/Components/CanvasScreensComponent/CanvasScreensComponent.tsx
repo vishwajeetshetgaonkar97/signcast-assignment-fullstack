@@ -6,12 +6,10 @@ import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 
 interface CanvasScreensComponentProps {
     canvas: Canvas;
-    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     handleScreenChange: (index: number) => void;
 }
 
 const CanvasScreensComponent: React.FC<CanvasScreensComponentProps> = ({
-    setIsModalOpen,
     handleScreenChange,
 }) => {
 
