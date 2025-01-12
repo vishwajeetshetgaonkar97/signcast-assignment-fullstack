@@ -218,10 +218,10 @@ const CanvasParentComponent: React.FC = () => {
             const data = JSON.parse(event.data);
             console.log("Received data:", data);
 
-            if (data.action === "updateAllCanvas") {
+            if (data.type === "updateAllCanvas") {
               setAllCanvases(data.canvases);
-            } else if (data.type === "notification") {
-              console.log("Notification:", data.message);
+            } else if (data.type === "ping") {
+              console.log("health ping:", data);
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);

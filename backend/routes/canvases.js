@@ -24,7 +24,7 @@ function CanvasRouter(database,wss) {
     console.log("canvases", canvases);
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ action: "updateAllCanvas", canvases }));
+        client.send(JSON.stringify({ type: "updateAllCanvas", canvases }));
       }
     });
   };
