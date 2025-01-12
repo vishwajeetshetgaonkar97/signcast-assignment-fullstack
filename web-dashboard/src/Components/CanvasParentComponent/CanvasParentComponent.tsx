@@ -41,8 +41,9 @@ const CanvasParentComponent: React.FC = () => {
   const [scale, setScale] = useState(0.5);
   const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
+  const [lastPingTime, setLastPingTime] = useState<number | null>(null);
 
-  const { setIsMonitoring } = useContext(MonitoringStateContext);
+  const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
@@ -187,7 +188,6 @@ const CanvasParentComponent: React.FC = () => {
     }
   };
 
-
   useEffect(() => {
     if (canvasRef.current) {
       // Initialize canvas
@@ -198,71 +198,89 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-
+  
       // Reconnection constants
       let reconnectAttempts = 0;
       const maxReconnectAttempts = 5;
       const retryDelay = 1000;
-
+  
+      const handlePing = (data) => {
+        console.log("Health ping received:", data);
+        setLastPingTime(Date.now()); // Update the last ping time
+      };
+  
       const connectWebSocket = () => {
         websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
-
+  
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");
           reconnectAttempts = 0; // Reset attempts on successful connection
           setIsMonitoring(true);
         };
-
+  
         websocketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
             console.log("Received data:", data);
-
+  
             if (data.type === "updateAllCanvas") {
               setAllCanvases(data.canvases);
             } else if (data.type === "ping") {
-              console.log("health ping:", data);
+              handlePing(data);
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
           }
         };
-
+  
         websocketRef.current.onclose = () => {
           console.log("WebSocket disconnected");
           setIsMonitoring(false);
           attemptReconnect();
         };
-
+  
         websocketRef.current.onerror = (error) => {
           console.error("WebSocket error:", error);
         };
       };
-
+  
       const attemptReconnect = () => {
         if (reconnectAttempts <= maxReconnectAttempts) {
           reconnectAttempts += 1;
           const delay = retryDelay * reconnectAttempts;
           console.log(`Reconnecting in ${delay} ms...`);
-
+  
           setTimeout(connectWebSocket, delay);
         } else {
           console.error("Max reconnect attempts reached. Stopping further attempts.");
-          notifyError("Recconnection Failed try again later");
+          notifyError("Reconnection failed. Try again later.");
         }
       };
-
+  
       // Initial WebSocket connection
       connectWebSocket();
-
-      // Cleanup 
+  
+      // Cleanup
       return () => {
         initCanvas.dispose();
         websocketRef.current?.close();
       };
     }
   }, []);
-
+   
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lastPingTime && Date.now() - lastPingTime > 6000) {
+        console.warn("No ping received in the last 6 seconds. Backend may be down.");
+        setIsMonitoring(false);
+      }else if(!isMonitoring){
+        setIsMonitoring(true);
+      }
+    }, 6000);
+  
+    return () => clearInterval(interval);
+  }, [lastPingTime]);
+  
 
 
 
@@ -284,7 +302,6 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleAddCanvas = async (postData) => {
     try {
-
       await addCanvas(postData);
       const data = await getCanvases();
       console.log("dataaa canvass", data);
