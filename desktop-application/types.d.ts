@@ -1,5 +1,4 @@
 
-
 type UnsubscribeFunction = () => void;
 
 interface Window {

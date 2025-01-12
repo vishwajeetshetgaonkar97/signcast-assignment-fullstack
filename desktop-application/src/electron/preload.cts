@@ -10,6 +10,4 @@ contextBridge.exposeInMainWorld('electron', {
 
   getSocket: async () => ipcRenderer.invoke('get-socket'),
 
-  isOnline: () => ipcRenderer.invoke('network-status'),
-
 });

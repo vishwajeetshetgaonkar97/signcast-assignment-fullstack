@@ -54,10 +54,6 @@ app.on('ready', () => {
     }
   });
 
-  ipcMain.on('check-network-status', (event) => {
-    const isOnline = net.isOnline();
-    event.sender.send('network-status', isOnline);
-  });
 
   if (isDev()) {
     mainWindow.loadURL('http://localhost:5123');
