@@ -61,7 +61,7 @@ function App() {
   };
   const handleModalSubmit = () => {
     if (!isMonitoring) {
-      notifyError('Please Connect to Internet');
+      notifyError('Please Connect to Internet First or Try Again Later'); 
       return;
     }
     if (screenId) {
@@ -80,8 +80,6 @@ function App() {
   useEffect(() => {
     getDeviceInfo();
   }, []);
-
-  console.log("isConnected", isMonitoring);
 
   const monitoringStateContextValue = useMemo(
     () => ({ isMonitoring, setIsMonitoring }),

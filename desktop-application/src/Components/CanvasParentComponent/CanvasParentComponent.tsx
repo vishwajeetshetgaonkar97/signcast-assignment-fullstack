@@ -170,7 +170,7 @@ const CanvasParentComponent: React.FC = () => {
 
     }
   }; 
- 
+    
   const handleAllCanvasesSocketData = (data) => {
     console.log("Updating canvas objects for all:", data);
     console.log("isAutoSync:", isAutoSyncRef.current);
@@ -181,20 +181,20 @@ const CanvasParentComponent: React.FC = () => {
       renderCanvasObjects(data[0].data);
     }
   }
- 
 
   const getAllCanvases = async () => {
     try {
       const data = await window.electron.getCanvases();
       console.log("Fetched canvases:", data.canvases);
+      if(!data) return;
       setAllCanvases(data);
-   
+    
       // store data locally 
-      // localStorage.setItem('allCanvases', JSON.stringify(data));
+      localStorage.setItem('allCanvases', JSON.stringify(data));
       // Assuming the first canvas is the one we need
       const objects = data[0].data as CustomFabricObject[];
       console.log("Fetched objects:", objects);
-
+ 
       renderCanvasObjects(objects);
     } catch (error) {
       console.log(`Canvas fetch issue: ${error}`);
@@ -212,13 +212,14 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-     
+        
       // get all Canvases if in localStorage 
-      // const checkIfLocalCanvases = localStorage.getItem('allCanvases') ;
-      // if (checkIfLocalCanvases) {
-      //   setAllCanvases(JSON.parse(checkIfLocalCanvases));
-      //   renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
-      // }
+      const checkIfLocalCanvases = localStorage.getItem('allCanvases') ;
+      console.log("checkIfLocalCanvases rrrrrrr", checkIfLocalCanvases);  
+      if (checkIfLocalCanvases) {
+        setAllCanvases(JSON.parse(checkIfLocalCanvases));
+        renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
+      }
 
       const handlePing = () => {
         setLastPingTime(Date.now());
@@ -343,10 +344,7 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleAutoSync = () => {
     isAutoSyncRef.current = !isAutoSyncRef.current;  
-    console.log("isAutoSyncRef.current after toggle:", isAutoSyncRef.current);
   };
-
-  console.log("isAutoSync:", isAutoSyncRef.current);
 
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>
