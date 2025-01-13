@@ -235,7 +235,7 @@ const CanvasParentComponent: React.FC = () => {
             if (data.type === "updateAllCanvas") {
               setAllCanvases(data.canvases);
             } else if (data.type === "ping") {
-              console.log("Received ping: isMonitoring", isMonitoring);
+          
               handlePing();
               setIsMonitoring(true);
             }
@@ -376,7 +376,6 @@ const CanvasParentComponent: React.FC = () => {
       await updateCanvas(updateCanvasPostBody);
 
       // console.log("Canvas synced successfully", log);
-
       notifySuccess("Canvas synced successfully");
     } catch (error) {
       console.log(`Canvas sync issue: ${error}`);
@@ -392,7 +391,7 @@ const CanvasParentComponent: React.FC = () => {
 
   useEffect(() => {
     if (canvas && allcanvases.length > 0) {
-      // renderCanvasObjects(allcanvases[selectedCanvasIndex].data);
+      renderCanvasObjects(allcanvases[selectedCanvasIndex].data);
     }
   }, [allcanvases])
 
