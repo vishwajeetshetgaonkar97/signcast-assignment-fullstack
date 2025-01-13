@@ -9,9 +9,6 @@ import FullScreenStateContext from '../Contexts/FullScreenStateContext';
 import AutoSyncStateContext from '../Contexts/AutoSyncStateContext';
 import getIfDeviceOperational from '../api/getIfDeviceOperational';
 
-interface CanvasProps {
-  fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
-}
 
 function App() {
   
