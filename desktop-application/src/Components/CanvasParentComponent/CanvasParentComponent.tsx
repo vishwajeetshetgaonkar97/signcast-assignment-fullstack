@@ -228,7 +228,7 @@ useEffect(() => {
     setCanvas(initCanvas);
 
     const checkIfLocalCanvases = localStorage.getItem('allCanvases');
-    if (checkIfLocalCanvases) {
+    if (checkIfLocalCanvases && !isMonitoring) {
       setAllCanvases(JSON.parse(checkIfLocalCanvases));
       renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
     }
