@@ -29,31 +29,101 @@ app.on('ready', () => {
     }
   });
 
-  ipcMain.handle('get-canvases', async () => {
-    try {
-      const response = await fetch(`${BaseUrl}/canvases`);
-      const data = await response.json();
-      console.log("Data from canvases:", data);
-      return data.canvases;
-    } catch (error) {
-      console.error(`Error fetching canvases: ${error}`);
-      throw new Error('Error fetching canvases');
-    }
-  });
+// ipcMain.handle('get-canvases', async () => {
+//   return new Promise((resolve, reject) => {
+//     const request = net.request(`${BaseUrl}/canvases`);
+    
+//     request.on('response', (response) => {
+//       let data = '';
+//       response.on('data', (chunk) => {
+//         data += chunk;
+//       });
 
-  ipcMain.handle('get-devices', async () => {
-    try {
-      // this can be upgraded for multiple devices
-      const response = await fetch(`${BaseUrl}/devices/device/6782dc6b78a3d0fd12176d96`);
-      console.log("Response", response);
-      const data = await response.json();
-      console.log("Device Data", data.deviceop);
-      return data.deviceop;
-    } catch (error) {
-      console.error(`Error fetching Devices: ${error}`);
-      throw new Error('Error fetching Devices');
-    }
+//       response.on('end', () => {
+//         try {
+//           const parsedData = JSON.parse(data);
+//           console.log("Data from canvases:", parsedData);
+//           resolve(parsedData.canvases);
+//         } catch (error) {
+//           console.error('Error parsing response:', error);
+//           reject(new Error('Error parsing response'));
+//         }
+//       });
+//     });
+
+//     request.on('error', (error) => {
+//       console.error(`Error fetching canvases: ${error}`);
+//       reject(new Error('Error fetching canvases'));
+//     });
+
+//     request.end();
+//   });
+// });
+
+
+ipcMain.handle('get-canvases', async () => {
+  return new Promise((resolve, reject) => {
+    const request = net.request(`${BaseUrl}/canvases`);
+    
+    request.on('response', (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      response.on('end', () => {
+        try {
+          const parsedData = JSON.parse(data);
+          console.log("Data from canvases:", parsedData);
+          resolve(parsedData.canvases);
+        } catch (error) {
+          console.error('Error parsing response:', error);
+          reject(new Error('Error parsing response'));
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      console.error(`Error fetching canvases: ${error}`);
+      reject(new Error('Error fetching canvases'));
+    });
+
+    request.end();
   });
+});
+
+ipcMain.handle('get-devices', async () => {
+  return new Promise((resolve, reject) => {
+    const request = net.request(`${BaseUrl}/devices/device/6782dc6b78a3d0fd12176d96`);
+
+    request.on('response', (response) => {
+      let data = '';
+      
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      response.on('end', () => {
+        try {
+          const parsedData = JSON.parse(data);
+          console.log("Device Data:", parsedData.deviceop);
+          resolve(parsedData.deviceop);
+        } catch (error) {
+          console.error('Error parsing response:', error);
+          reject(new Error('Error parsing response'));
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      console.error(`Error fetching devices: ${error}`);
+      reject(new Error('Error fetching devices'));
+    });
+
+    request.end();
+  });
+});
+
 
 
   if (isDev()) {
