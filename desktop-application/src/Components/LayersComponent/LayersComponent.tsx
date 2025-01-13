@@ -138,13 +138,13 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
     return (
         <div className="flex flex-col w-fit min-w-[150px] absolute top-12 left-2 bg-bg-color py-2 px-2 rounded shadow">
             <div className="flex justify-between items-center pb-2 mb-2 border-b border-border-color">
-                <h6 className="text-xs opacity-80 font-semibold min-w-[150px]">Layers</h6>
-                <div className="flex items-center gap-1">
+                <h6 className="text-xs opacity-80 font-semibold min-w-[150px]">Layers Preview</h6>
+                {/* <div className="flex items-center gap-1">
                     <FaAngleUp size={14} onClick={() => moveSelectedLayer('up')} className="text-xs opacity-80 hover:opacity-100 cursor-pointer hover:text-green-600" />
                     <FaAngleDown size={14} onClick={() => moveSelectedLayer('down')} className="text-xs opacity-80 hover:opacity-100 cursor-pointer hover:text-yellow-600" />
-                </div>
+                </div> */}
             </div>
-
+ 
             <ul className='flex flex-col gap-1 max-h-[88vh] overflow-y-auto'>
                 {layers.map((layer) => (
                     <li
@@ -167,11 +167,11 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
                                 />
                             }
 
-                            <RxCross2
+                            {/* <RxCross2
                                 size={14}
                                 onClick={() => deleteLayer(layer.id)}
                                 className="text-xs  cursor-pointer hover:text-red-500"
-                            />
+                            /> */}
                         </div>
                     </li>
                 ))}

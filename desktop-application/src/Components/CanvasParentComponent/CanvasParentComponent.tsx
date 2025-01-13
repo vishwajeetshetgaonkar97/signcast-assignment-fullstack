@@ -41,8 +41,8 @@ const CanvasParentComponent: React.FC = () => {
   const [lastPingTime, setLastPingTime] = useState<number | null>(null);
 
 
-  // const [isAutoSync, setIsAutoSync] = useState(false);
-  const isAutoSyncRef = useRef(false);
+  const [isAutoSync, setIsAutoSync] = useState(true);
+  const isAutoSyncRef = useRef(true);
   const websocketRef = useRef<WebSocket | null>(null);
 
   const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
@@ -346,6 +346,19 @@ const CanvasParentComponent: React.FC = () => {
     isAutoSyncRef.current = !isAutoSyncRef.current;  
   };
 
+  const syncStateWithRef = () => {
+    setIsAutoSync(isAutoSyncRef.current);
+    }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      syncStateWithRef();
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, []);
+
+ 
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>
       <SelectedCanvasObjectIndexDataContext.Provider value={selectedCanvasIndexContextValue}>
@@ -373,19 +386,19 @@ const CanvasParentComponent: React.FC = () => {
             }
 
             {!isFullScreen && <>
-
+ 
               <div className="flex flex-row items-center justify-center absolute z-10 top-12  gap-2 right-2 " >
                 <div className="relative group mt-1">
                   <button 
                     onClick={handleAutoSync}
-                    className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${isAutoSyncRef.current ? 'bg-yellow-400' : 'bg-gray-300'}`}
+                    className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${isAutoSync ? 'bg-yellow-400' : 'bg-gray-300'}`}
                   >  
                     <div
-                      className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isAutoSyncRef.current ? 'translate-x-6' : 'translate-x-0'}`}
+                      className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isAutoSync ? 'translate-x-6' : 'translate-x-0'}`}
                     ></div>
                   </button>
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {isAutoSyncRef.current ? 'Auto Sync is ON' : 'Auto Sync is OFF'}
+                    {isAutoSync ? 'Auto Sync is ON' : 'Auto Sync is OFF'}
                   </div>
                 </div> 
 

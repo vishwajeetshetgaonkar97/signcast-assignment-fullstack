@@ -43,7 +43,7 @@ function App() {
 
       const checkIfSignedIn = JSON.parse(localStorage.getItem('signedIn') || 'false');
       if (checkIfSignedIn) {
-        notifyError('Already Signed In');
+        // notifyError('Already Signed In');
         setIsModalOpen(false);
         return;
       }
