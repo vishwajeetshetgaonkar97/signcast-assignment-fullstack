@@ -10,18 +10,17 @@
   <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; connect-src *; script-src *; style-src 'self' 'unsafe-inline'; img-src *; font-src *; media-src *;"> -->
 
   <!-- 
-This CSP allows loading resources only from trusted sources, enhancing security while still giving necessary access. 
-1. default-src 'self' : Restricts all types of resources to be loaded from the same origin by default unless specified otherwise.
-2. connect-src 'self' api.example.com : Allows connections to the same origin and a specific trusted API domain.
-3. script-src 'self' cdn.example.com : Permits loading scripts only from the same origin and a trusted CDN.
-4. style-src 'self' 'unsafe-inline' : Allows styles from the same origin and inline styles (if necessary). Consider removing 'unsafe-inline' if inline styles are not required.
-5. img-src 'self' data: cdn.example.com : Allows images from the same origin, data URIs, and a trusted CDN.
-6. font-src 'self' cdn.example.com : Permits fonts only from the same origin and a trusted CDN.
-7. media-src 'self' cdn.example.com : Allows media files from the same origin and a trusted CDN.
+Content Security Policy (CSP) allows loading resources only from trusted sources, enhancing security by mitigating attacks like XSS.
+1. default-src 'self' : Restricts all resources to be loaded from the same origin unless specified otherwise.
+2. connect-src 'self' https: wss: ws: : Allows connections (AJAX, WebSockets, etc.) only to the same origin or trusted protocols (HTTPS, WebSocket).
+3. script-src 'self' : Permits loading scripts only from the same origin (restricting third-party scripts).
+4. style-src 'self' 'unsafe-inline' : Permits styles from the same origin and inline styles. 'unsafe-inline' should be avoided if not needed.
+5. img-src 'self' data: : Allows images from the same origin and data URIs (base64-encoded images).
+6. font-src 'self' : Permits fonts only from the same origin.
+7. media-src 'self' : Allows media (videos, audios) only from the same origin.
 -->
-
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; connect-src 'self' https: wss: ws:; script-src 'self' cdn.example.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: cdn.example.com; font-src 'self' cdn.example.com; media-src 'self' cdn.example.com;">
+    content="default-src 'self'; connect-src 'self' https: wss: ws:; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: ; font-src 'self' ; media-src 'self'">
 </head>
 
 <body>
