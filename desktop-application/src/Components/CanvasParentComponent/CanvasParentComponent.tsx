@@ -5,7 +5,7 @@ import LayersComponent from "../LayersComponent/LayersComponent";
 import CanvasZoomInOutComponent from "../CanvasZoomInOutComponent/CanvasZoomInOutComponent";
 import CanvasScreensComponent from "../CanvasScreensComponent/CanvasScreensComponent";
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
-import { addCircle, addImage, addRectangle, addText, addTriangle } from "../../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addImageSlider, addRectangle, addText, addTriangle } from "../../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
@@ -83,7 +83,21 @@ const CanvasParentComponent: React.FC = () => {
       const sortedObjects = objects.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
 
       sortedObjects.forEach((object) => {
-        if (object.type === "rect") {
+        if (object.isSlider) {
+          addImageSlider({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            width: object.width,
+            height: object.height,
+            angle: object.angle,
+            id: object.id,
+            zIndex: object.zIndex,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY,
+            visible: object.visible,
+          })
+        } else if (object.type === "rect") {
           addRectangle({
             canvas: canvas,
             top: object.top,
