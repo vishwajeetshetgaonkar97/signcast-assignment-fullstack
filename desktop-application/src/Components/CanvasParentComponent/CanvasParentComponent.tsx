@@ -181,7 +181,7 @@ const CanvasParentComponent: React.FC = () => {
 
     }
   };
- 
+  
   const handleAllCanvasesSocketData = (data) => {
     if (isAutoSyncRef.current) {
       // console.log("Updating canvas objects for all:", data);
@@ -190,7 +190,7 @@ const CanvasParentComponent: React.FC = () => {
       renderCanvasObjects(data[0].data);
     }
   }
-
+  
   const getAllCanvases = async () => {
     try {
       // removed for electron application build
@@ -203,6 +203,7 @@ const CanvasParentComponent: React.FC = () => {
         return
       }
       setAllCanvases(dataDestructured);
+      renderCanvasObjects(JSON.parse(dataDestructured)[0].data);
 
       // store data locally 
       localStorage.setItem('allCanvases', JSON.stringify(dataDestructured));
@@ -226,9 +227,9 @@ useEffect(() => {
     initCanvas.backgroundColor = "#fff";
     initCanvas.renderAll();
     setCanvas(initCanvas);
-   
+    
     const checkIfLocalCanvases = localStorage.getItem('allCanvases');
-    if (checkIfLocalCanvases && !isMonitoring) {
+    if (checkIfLocalCanvases) {
       setAllCanvases(JSON.parse(checkIfLocalCanvases));
       renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
     }
@@ -347,7 +348,7 @@ useEffect(() => {
   };
 
   useEffect(() => {
-    if (canvas && allcanvases.length <= 0) {
+    if (canvas) {
       getAllCanvases();
     }
   }, [canvas])
