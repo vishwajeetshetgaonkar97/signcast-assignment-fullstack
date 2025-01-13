@@ -12,18 +12,16 @@ interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
 }
 
-
-
 function App() {
-
+  
   const [themeMode, setThemeMode] = useState("light");
   const [deviceInfo, setDeviceInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [screenId, setScreenId] = useState('');
-  const [isMonitoring, setIsMonitoring] = useState(false);
+  const [isMonitoring, setIsMonitoring] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isAutoSync, setIsAutoSync] = useState(false);
-
+ 
   // error notification 
   const notifyError = (message: string) =>
     toast.error(message, {

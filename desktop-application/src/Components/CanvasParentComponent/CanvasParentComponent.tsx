@@ -46,7 +46,7 @@ const CanvasParentComponent: React.FC = () => {
   const websocketRef = useRef<WebSocket | null>(null);
 
   const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
- 
+
   const { isFullScreen } = useContext(FullScreenStateContext);
 
   // success notification 
@@ -169,14 +169,14 @@ const CanvasParentComponent: React.FC = () => {
       canvas.renderAll();
 
     }
-  }; 
-    
+  };
+
   const handleAllCanvasesSocketData = (data) => {
     console.log("Updating canvas objects for all:", data);
     console.log("isAutoSync:", isAutoSyncRef.current);
     if (isAutoSyncRef.current) {
       console.log("Updating canvas objects for all:", data);
-      setAllCanvases(data); 
+      setAllCanvases(data);
       localStorage.setItem('allCanvases', JSON.stringify(data));
       renderCanvasObjects(data[0].data);
     }
@@ -186,102 +186,92 @@ const CanvasParentComponent: React.FC = () => {
     try {
       const data = await window.electron.getCanvases();
       console.log("Fetched canvases:", data.canvases);
-      if(!data){ 
+      if (!data) {
         notifyError("Error")
         return
       }
       setAllCanvases(data);
-    
+
       // store data locally 
       localStorage.setItem('allCanvases', JSON.stringify(data));
       // Assuming the first canvas is the one we need
       const objects = data[0].data as CustomFabricObject[];
       console.log("Fetched objects:", objects);
- 
+
       renderCanvasObjects(objects);
     } catch (error) {
       console.log(`Canvas fetch issue: ${error}`);
     }
   };
-     
 
-  useEffect(() => {
-    if (canvasRef.current) {
-      // Initialize canvas
-      const initCanvas = new Canvas(canvasRef.current, {
-        width: 1920,
-        height: 1080,
-      });
-      initCanvas.backgroundColor = "#fff";
-      initCanvas.renderAll();
-      setCanvas(initCanvas);
-        
-      // get all Canvases if in localStorage 
-      const checkIfLocalCanvases = localStorage.getItem('allCanvases') ;
-      console.log("checkIfLocalCanvases rrrrrrr", checkIfLocalCanvases);  
-      if (checkIfLocalCanvases) {
-        setAllCanvases(JSON.parse(checkIfLocalCanvases));
-        renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
-      }
+useEffect(() => {
+  if (canvasRef.current) {
+    // Initialize canvas
+    const initCanvas = new Canvas(canvasRef.current, {
+      width: 1920,
+      height: 1080,
+    });
+    initCanvas.backgroundColor = "#fff";
+    initCanvas.renderAll();
+    setCanvas(initCanvas);
 
-      const handlePing = () => {
-        setLastPingTime(Date.now());
+    const checkIfLocalCanvases = localStorage.getItem('allCanvases');
+    if (checkIfLocalCanvases) {
+      setAllCanvases(JSON.parse(checkIfLocalCanvases));
+      renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
+    }
+
+    const handlePing = () => {
+      setLastPingTime(Date.now());
+    };
+
+    const retryDelay = 3000; // 3 seconds
+
+    const connectWebSocket = () => {
+      websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
+
+      websocketRef.current.onopen = () => {
+        console.log("WebSocket connected");
         setIsMonitoring(true);
       };
 
-      const connectWebSocket = () => {
-        // websocketRef.current = new WebSocket("ws://localhost:3003");
-        websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
-
-        websocketRef.current.onopen = () => {
-          console.log("WebSocket connected");
-          setIsMonitoring(true);
-        };
-
-
-        websocketRef.current.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            // console.log("Received data:", data);
-
-            if (data.type === "updateAllCanvas") {
-              handleAllCanvasesSocketData(data.canvases);
-          
-             
-            } else if (data.type === "ping") {
-              console.log("Received ping: isMonitoreing",isMonitoring );
-              handlePing();
-              // console.log("Received ping:", data);
-              // console.log("isMonitoring:", isMonitoring);
-
-              
-            }
-          } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
+      websocketRef.current.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "updateAllCanvas") {
+            handleAllCanvasesSocketData(data.canvases);
+          } else if (data.type === "ping") {
+            console.log("Received ping: isMonitoring", isMonitoring);
+            handlePing();
+            setIsMonitoring(true);
           }
-        };
-
-        websocketRef.current.onclose = () => {
-          console.log("WebSocket disconnected");
-          setIsMonitoring(false);
-        };
-
-        websocketRef.current.onerror = (error) => {
-          console.error("WebSocket error:", error);
-        };
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
       };
 
-
-      // Initial WebSocket connection
-      connectWebSocket();
-
-      // Cleanup
-      return () => {
-        initCanvas.dispose();
-        websocketRef.current?.close();
+      websocketRef.current.onclose = () => {
+        console.log("WebSocket disconnected. Retrying...");
+        setIsMonitoring(false);
+        setTimeout(connectWebSocket, retryDelay); // Retry infinite retry connection after 3 every seconds
       };
-    }
-  }, []);
+
+      websocketRef.current.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        websocketRef.current.close(); // Ensure the socket is closed before retrying to avoid replecated connections
+      };
+    };
+
+    // Initial WebSocket connection
+    connectWebSocket();
+
+    // Cleanup
+    return () => {
+      initCanvas.dispose();
+      websocketRef.current?.close();
+    };
+  }
+}, []);
 
  
   useEffect(() => {
@@ -290,7 +280,7 @@ const CanvasParentComponent: React.FC = () => {
       if (lastPingTime && Date.now() - lastPingTime > 6000) {
         console.warn("No ping received in the last 6 seconds. Backend may be down.");
         setIsMonitoring(false);
-      }  
+      }
     }, 6000);
 
     return () => clearInterval(interval);
@@ -311,7 +301,6 @@ const CanvasParentComponent: React.FC = () => {
     [allcanvases, setAllCanvases]
   );
 
-
   const selectedCanvasIndexContextValue = useMemo(
     () => ({ selectedCanvasIndex, setSelectedCanvasIndex }),
     [selectedCanvasIndex, setSelectedCanvasIndex]
@@ -321,8 +310,8 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleSyncCanvas = async () => {
     try {
- 
-      if (!isMonitoring){ 
+
+      if (!isMonitoring) {
         notifyError("Please Connect to Internet")
         return
       }
@@ -351,22 +340,22 @@ const CanvasParentComponent: React.FC = () => {
 
 
   const handleAutoSync = () => {
-    isAutoSyncRef.current = !isAutoSyncRef.current;  
+    isAutoSyncRef.current = !isAutoSyncRef.current;
   };
 
   const syncStateWithRef = () => {
     setIsAutoSync(isAutoSyncRef.current);
-    }
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
       syncStateWithRef();
     }, 1000);
-  
+
     return () => clearInterval(interval);
   }, []);
 
- 
+
   return (
     <AllCanvasesDataContext.Provider value={allCanvasDataContextValue}>
       <SelectedCanvasObjectIndexDataContext.Provider value={selectedCanvasIndexContextValue}>
@@ -394,13 +383,13 @@ const CanvasParentComponent: React.FC = () => {
             }
 
             {!isFullScreen && <>
- 
+
               <div className="flex flex-row items-center justify-center absolute z-10 top-12  gap-2 right-2 " >
                 <div className="relative group mt-1">
-                  <button 
+                  <button
                     onClick={handleAutoSync}
                     className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${isAutoSync ? 'bg-yellow-400' : 'bg-gray-300'}`}
-                  >  
+                  >
                     <div
                       className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isAutoSync ? 'translate-x-6' : 'translate-x-0'}`}
                     ></div>
@@ -408,7 +397,7 @@ const CanvasParentComponent: React.FC = () => {
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     {isAutoSync ? 'Auto Sync is ON' : 'Auto Sync is OFF'}
                   </div>
-                </div> 
+                </div>
 
                 <button onClick={handleSyncCanvas} className={`bg-green-600 text-xs  text-white px-4 py-2 rounded`}>Sync Data</button>
               </div>
