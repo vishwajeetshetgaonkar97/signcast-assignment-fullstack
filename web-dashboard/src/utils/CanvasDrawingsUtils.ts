@@ -311,11 +311,11 @@ const addImage = ({
 const addImageSlider = ({
   canvas,
   images = [
-    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736740708871.png",
-    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736740749919.png",
-    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736740772518.png"
+    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736742619065.png",
+    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736742649345.png",
+    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736742674063.png"
   ],
-  interval = 3000,
+  interval = 5000,
   top = 0,
   left = 0,
   scaleX = 1,
