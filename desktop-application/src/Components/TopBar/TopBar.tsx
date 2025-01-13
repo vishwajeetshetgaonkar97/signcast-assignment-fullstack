@@ -22,6 +22,7 @@ const TopBar: React.FC<TopBarProps> = ({ setThemeMode,setModalOpen, themeMode })
 
   const handleLogout = () => {
     localStorage.removeItem('signedIn');
+    localStorage.removeItem('allCanvases');
     setModalOpen(true);
   };
 
