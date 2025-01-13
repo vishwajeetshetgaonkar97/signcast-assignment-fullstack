@@ -12,7 +12,7 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
-import { addCircle, addImage, addRectangle,  addText, addTriangle, createCarousel } from "../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider } from "../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import { BASE_WEB_SOCKET_URL } from '../../../constants';
@@ -85,7 +85,7 @@ const CanvasParentComponent: React.FC = () => {
 
       sortedObjects.forEach((object) => {
         if (object.isSlider) {
-          createCarousel({
+          addImageSlider({
             canvas: canvas,
             top: object.top,
             left: object.left,
@@ -214,21 +214,21 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-  
+
       const handlePing = () => {
         setLastPingTime(Date.now());
       };
-  
+
       const retryDelay = 3000; // 3 seconds
-  
+
       const connectWebSocket = () => {
         websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
-  
+
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");
           setIsMonitoring(true);
         };
-  
+
         websocketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
@@ -243,22 +243,22 @@ const CanvasParentComponent: React.FC = () => {
             console.error("Error parsing WebSocket message:", error);
           }
         };
-  
+
         websocketRef.current.onclose = () => {
           console.log("WebSocket disconnected. Retrying...");
           setIsMonitoring(false);
           setTimeout(connectWebSocket, retryDelay); // Retry infinite retry connection after 3 every seconds
         };
-  
+
         websocketRef.current.onerror = (error) => {
           console.error("WebSocket error:", error);
           websocketRef.current.close(); // Ensure the socket is closed before retrying to avoid replecated connections
         };
       };
-  
+
       // Initial WebSocket connection
       connectWebSocket();
-  
+
       // Cleanup
       return () => {
         initCanvas.dispose();
@@ -268,20 +268,20 @@ const CanvasParentComponent: React.FC = () => {
   }, []);
 
 
-   
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (lastPingTime && Date.now() - lastPingTime > 6000) {
         console.warn("No ping received in the last 6 seconds. Backend may be down.");
         setIsMonitoring(false);
-      }else if(!isMonitoring){
+      } else if (!isMonitoring) {
         setIsMonitoring(true);
       }
     }, 6000);
-  
+
     return () => clearInterval(interval);
   }, [lastPingTime]);
-  
+
 
 
 
@@ -341,7 +341,7 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleSyncCanvas = async () => {
     try {
-  
+
       const currentObjects = getCanvasObjects() as CustomFabricObject[];
       const filteredObjects = currentObjects.filter((obj, index, self) => {
         return self.findIndex(o => o.id === obj.id) === index;
@@ -438,9 +438,9 @@ const CanvasParentComponent: React.FC = () => {
             <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images might have some issues </h6>
 
             {/* used for debugging */}
-            <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
+            {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>
-            </div>
+            </div> */}
           </div>
         </>
       </SelectedCanvasObjectIndexDataContext.Provider>

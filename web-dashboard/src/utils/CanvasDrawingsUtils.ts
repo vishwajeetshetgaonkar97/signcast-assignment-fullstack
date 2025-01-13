@@ -308,7 +308,7 @@ const addImage = ({
 
 
 
-const createCarousel = ({
+const addImageSlider = ({
   canvas,
   images = [
     "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736740708871.png",
@@ -378,4 +378,4 @@ const createCarousel = ({
 
 
 
-export { addRectangle, addCircle, addTriangle, addText, addImage, createCarousel };
+export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider };
