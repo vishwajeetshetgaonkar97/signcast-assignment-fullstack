@@ -9,7 +9,6 @@ import FullScreenStateContext from '../Contexts/FullScreenStateContext';
 import AutoSyncStateContext from '../Contexts/AutoSyncStateContext';
 import getIfDeviceOperational from '../api/getIfDeviceOperational';
 
-
 function App() {
   
   const [themeMode, setThemeMode] = useState("light");
@@ -61,6 +60,10 @@ function App() {
   const handleModalSubmit = () => {
     if (!isMonitoring) {
       notifyError('Please Connect to Internet First or Try Again Later'); 
+      return;
+    }
+    if (!deviceInfo) {
+      getDeviceInfo();
       return;
     }
     if (screenId) {
