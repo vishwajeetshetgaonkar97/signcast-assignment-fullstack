@@ -53,7 +53,7 @@ const AddToCanvasComponent: React.FC<AddToCanvasProps> = ({ canvas }) => {
             <label htmlFor="fileUpload" className="cursor-pointer hover:text-rose-500">
                 <MdOutlineImage size={20} />
             </label>
-            <FaRegImages className="cursor-pointer hover:text-green-500" onClick={() => addImageSlider({ canvas })} size={20} />
+            {/* <FaRegImages className="cursor-pointer hover:text-green-500" onClick={() => addImageSlider({ canvas })} size={20} /> */}
             <input
                 id="fileUpload"
                 type="file"
