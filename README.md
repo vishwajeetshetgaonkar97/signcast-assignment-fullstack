@@ -5,8 +5,15 @@ SignCast is a digital signage application built using the MERN stack, WebSockets
 Dashboard Link
 https://signcast-assignment-fullstack-dashboard.vercel.app/
 
+
+Dashboard Link V2
+https://signcast-assignment-fullstack-web-vishwajeets-projects-f8f64537.vercel.app/
+
 Demo Video Link
 https://youtu.be/N4J2S27Xxts
+
+Demo Video Link V2
+https://youtu.be/epX8wJemyik
 
 
 ## Project Architecture Overview
@@ -96,5 +103,21 @@ Offline support for the Electron application is not implemented yet. The plan in
 - Validating WebSocket clients more rigorously.
 - Securing the screen ID mechanism.
 - Add advanced features such as:
+- Video playback capabilities.
+- Live streaming support.
+
+
+#Version 2 
+
+## Known Limitations
+- Indexing issues may occur during image uploads.
+- The image slider is currently restricted to demo links.
+- Password hashing and encrypted communication are not yet implemented for Electron applications.
+
+## Future Improvements
+- Fix image indexing bug.
+- Introduce more complex and dynamic components and functionality Such as: Video playback capabilities, Live streaming support.
+- Enhance security by implementing password hashing.
+- Securing the screen ID mechanism.
 - Video playback capabilities.
 - Live streaming support.
