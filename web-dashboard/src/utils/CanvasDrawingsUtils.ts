@@ -1,5 +1,5 @@
 import * as fabric from 'fabric';
-import {  Rect, Circle, Text, Triangle , FabricImage} from "fabric";
+import { Rect, Circle, Text, Triangle, FabricImage } from "fabric";
 
 interface CustomFabricObject extends fabric.Object {
   id?: string;
@@ -8,6 +8,7 @@ interface CustomFabricObject extends fabric.Object {
   fontSize?: number;
   imageUrl?: string;
   text?: string;
+  isSlider?: boolean;
 }
 
 interface RectangleOptions {
@@ -90,6 +91,22 @@ interface ImageOptions {
   visible?: boolean;
 }
 
+interface CarouselOptions {
+  canvas: fabric.Canvas;
+  images?: string[];
+  interval?: number;
+  top?: number;
+  left?: number;
+  scaleX?: number;
+  scaleY?: number;
+  angle?: number;
+  id?: string;
+  zIndex?: number;
+  visible?: boolean;
+  height?: number;
+  width?: number;
+}
+
 const addRectangle = ({
   canvas,
   top = 100,
@@ -128,7 +145,7 @@ const addRectangle = ({
 const getCanvasObjectsLength = ({ canvas }) => {
   if (canvas) {
     const objects = canvas.getObjects() as CustomFabricObject[];
-    return objects.length ;
+    return objects.length;
   }
   return [];
 };
@@ -164,8 +181,8 @@ const addCircle = ({
     circle.id = id;
 
     const canvasObjectsLength = getCanvasObjectsLength({ canvas });
-    circle.zIndex = typeof canvasObjectsLength === 'number' 
-      ? canvasObjectsLength + 1 
+    circle.zIndex = typeof canvasObjectsLength === 'number'
+      ? canvasObjectsLength + 1
       : zIndex;
 
     canvas.add(circle);
@@ -202,9 +219,9 @@ const addTriangle = ({
     }) as CustomFabricObject;
     triangle.id = id;
     const canvasObjectsLength = getCanvasObjectsLength({ canvas });
-    triangle.zIndex = typeof canvasObjectsLength === 'number' 
-    ? canvasObjectsLength + 1 
-    : zIndex;
+    triangle.zIndex = typeof canvasObjectsLength === 'number'
+      ? canvasObjectsLength + 1
+      : zIndex;
 
     canvas.add(triangle);
   }
@@ -212,7 +229,7 @@ const addTriangle = ({
 
 const addText = ({
   canvas,
-  text = "Hello!" ,
+  text = "Hello!",
   top = 100,
   left = 50,
   fontSize = 24,
@@ -226,7 +243,7 @@ const addText = ({
   visible = true,
 }: TextOptions) => {
 
-  
+
 
   if (canvas) {
     const fabricText = new Text(text, {
@@ -242,9 +259,9 @@ const addText = ({
     }) as CustomFabricObject;
     fabricText.id = id;
     const canvasObjectsLength = getCanvasObjectsLength({ canvas });
-    fabricText.zIndex = typeof canvasObjectsLength === 'number' 
-    ? canvasObjectsLength + 1 
-    : zIndex;
+    fabricText.zIndex = typeof canvasObjectsLength === 'number'
+      ? canvasObjectsLength + 1
+      : zIndex;
     fabricText.text = text;
 
     canvas.add(fabricText);
@@ -277,9 +294,9 @@ const addImage = ({
     }) as CustomFabricObject;
     fabricImage.id = id;
     const canvasObjectsLength = getCanvasObjectsLength({ canvas });
-    fabricImage.zIndex = typeof canvasObjectsLength === 'number' 
-    ? canvasObjectsLength + 1 
-    : zIndex;
+    fabricImage.zIndex = typeof canvasObjectsLength === 'number'
+      ? canvasObjectsLength + 1
+      : zIndex;
     fabricImage.imageUrl = imageUrl;
 
     if (canvas) {
@@ -290,6 +307,75 @@ const addImage = ({
 };
 
 
-export { addRectangle, addCircle, addTriangle, addText, addImage };
 
-    
+const createCarousel = ({
+  canvas,
+  images = [
+    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736740708871.png",
+    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736740749919.png",
+    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736740772518.png"
+  ],
+  interval = 3000,
+  top = 0,
+  left = 0,
+  scaleX = 1,
+  scaleY = 1,
+  angle = 0,
+  height = 1080,
+  width = 1920,
+  id = `carousel-${new Date().getTime()}`,
+  zIndex = 1,
+  visible = true,
+}: CarouselOptions) => {
+
+
+  if (!images || images.length === 0) return;
+
+  let currentIndex = 0;
+  const imgElement = new Image();
+
+  const slideshowImage = new fabric.Image(imgElement, {
+    top,
+    left,
+    scaleX,
+    scaleY,
+    angle,
+    visible,
+    width,
+    height,
+  } ) as CustomFabricObject;
+
+  slideshowImage.id = id;
+  const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+  slideshowImage.zIndex = typeof canvasObjectsLength === 'number'
+    ? canvasObjectsLength + 1
+    : zIndex;
+
+    slideshowImage.isSlider = true;
+
+  canvas.add(slideshowImage);
+  canvas.renderAll();
+
+  const updateImage = () => {
+    currentIndex = (currentIndex + 1) % images.length;
+    imgElement.src = images[currentIndex];
+    imgElement.onload = () => {
+      slideshowImage.set({
+        scaleX: scaleX,
+        scaleY: scaleY,
+        height: height,
+        width: width,
+
+      });
+      canvas.renderAll();
+    };
+  };
+
+  imgElement.src = images[currentIndex];
+  setInterval(updateImage, interval);
+
+};
+
+
+
+export { addRectangle, addCircle, addTriangle, addText, addImage, createCarousel };

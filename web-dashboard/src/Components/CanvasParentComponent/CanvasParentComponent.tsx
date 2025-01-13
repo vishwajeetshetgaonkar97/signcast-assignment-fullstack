@@ -12,7 +12,7 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
-import { addCircle, addImage, addRectangle,  addText, addTriangle } from "../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle,  addText, addTriangle, createCarousel } from "../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import { BASE_WEB_SOCKET_URL } from '../../../constants';
@@ -33,6 +33,7 @@ interface CustomFabricObject extends FabricObject {
   fontSize?: number;
   imageUrl?: string;
   text?: string;
+  isSlider?: boolean;
 }
 
 const CanvasParentComponent: React.FC = () => {
@@ -83,7 +84,21 @@ const CanvasParentComponent: React.FC = () => {
       const sortedObjects = objects.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
 
       sortedObjects.forEach((object) => {
-        if (object.type === "rect") {
+        if (object.isSlider) {
+          createCarousel({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            width: object.width,
+            height: object.height,
+            angle: object.angle,
+            id: object.id,
+            zIndex: object.zIndex,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY,
+            visible: object.visible,
+          })
+        } else if (object.type === "rect") {
           addRectangle({
             canvas: canvas,
             top: object.top,
@@ -207,7 +222,7 @@ const CanvasParentComponent: React.FC = () => {
       const retryDelay = 3000; // 3 seconds
   
       const connectWebSocket = () => {
-        websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
+        websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
   
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");
@@ -351,6 +366,7 @@ const CanvasParentComponent: React.FC = () => {
             imageUrl: object.imageUrl || "",
             visible: object.visible,
             text: object.text || "",
+            isSlider: object.isSlider || false
           };
         }),
       };
@@ -376,7 +392,7 @@ const CanvasParentComponent: React.FC = () => {
 
   useEffect(() => {
     if (canvas && allcanvases.length > 0) {
-      renderCanvasObjects(allcanvases[selectedCanvasIndex].data);
+      // renderCanvasObjects(allcanvases[selectedCanvasIndex].data);
     }
   }, [allcanvases])
 
@@ -422,9 +438,9 @@ const CanvasParentComponent: React.FC = () => {
             <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images might have some issues </h6>
 
             {/* used for debugging */}
-            {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
+            <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>
-            </div> */}
+            </div>
           </div>
         </>
       </SelectedCanvasObjectIndexDataContext.Provider>

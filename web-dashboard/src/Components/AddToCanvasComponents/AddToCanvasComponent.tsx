@@ -6,7 +6,7 @@ import { RxText } from "react-icons/rx";
 import { LuTriangle } from "react-icons/lu";
 import { MdOutlineImage } from "react-icons/md";
 import uploadImage from '../../api/uploadImage';
-import { addCircle, addImage, addRectangle, addText, addTriangle } from '../../utils/CanvasDrawingsUtils';
+import { addCircle, addImage, addRectangle, addText, addTriangle, createCarousel } from '../../utils/CanvasDrawingsUtils';
 
 interface AddToCanvasProps {
     canvas: Canvas;
@@ -52,7 +52,7 @@ const AddToCanvasComponent: React.FC<AddToCanvasProps> = ({ canvas }) => {
             <label htmlFor="fileUpload" className="cursor-pointer hover:text-rose-500">
                 <MdOutlineImage size={20} />
             </label>
-
+            <LuTriangle className="cursor-pointer hover:text-green-500" onClick={() => createCarousel({ canvas })} size={20} />
             <input
                 id="fileUpload"
                 type="file"
