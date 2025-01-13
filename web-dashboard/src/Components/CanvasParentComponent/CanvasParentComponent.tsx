@@ -434,7 +434,7 @@ const CanvasParentComponent: React.FC = () => {
             </div>
 
             {/* disclaimer */}
-            <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images might have some issues </h6>
+            <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images/Slider might have some issues </h6>
 
             {/* used for debugging */}
             {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
