@@ -62,6 +62,7 @@ function App() {
       notifyError('Please Connect to Internet First or Try Again Later'); 
       return;
     }
+    // can be improved 
     if (!deviceInfo) {
       getDeviceInfo();
       return;
