@@ -7,7 +7,6 @@ import CanvasScreensComponent from "../CanvasScreensComponent/CanvasScreensCompo
 import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasObjectIndexDataContext";
 import { addCircle, addImage, addImageSlider, addRectangle, addText, addTriangle } from "../../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
-import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import FullScreenStateContext from "../../Contexts/FullScreenStateContext";
@@ -29,7 +28,6 @@ interface CustomFabricObject extends FabricObject {
   imageUrl?: string;
   text?: string;
 }
-
 
 const CanvasParentComponent: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -320,6 +318,18 @@ useEffect(() => {
   );
 
 
+  const syncStateWithRef = () => {
+    setIsAutoSync(isAutoSyncRef.current);
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      syncStateWithRef();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
 
   const handleSyncCanvas = async () => {
     try {
@@ -348,25 +358,10 @@ useEffect(() => {
     }
   }, [allcanvases])
 
-  // can be improved
-  const isLoading = allcanvases.length <= 0;
-
 
   const handleAutoSync = () => {
     isAutoSyncRef.current = !isAutoSyncRef.current;
   };
-
-  const syncStateWithRef = () => {
-    setIsAutoSync(isAutoSyncRef.current);
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      syncStateWithRef();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
 
   return (
@@ -375,9 +370,6 @@ useEffect(() => {
 
         <>
           <ToastContainer />
-          <div className={`absolute h-screen w-screen bg-bg-color flex items-center justify-center z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isLoading ? "" : "hidden"} `} >
-            <LoaderComponent />
-          </div>
 
           <div className={"flex items-center justify-center "}  >
 
