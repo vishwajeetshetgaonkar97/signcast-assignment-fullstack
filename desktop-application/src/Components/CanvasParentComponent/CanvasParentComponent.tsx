@@ -37,7 +37,7 @@ const CanvasParentComponent: React.FC = () => {
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [lastPingTime, setLastPingTime] = useState<number | null>(null);
 
-  
+
   const [isAutoSync, setIsAutoSync] = useState(true);
   const isAutoSyncRef = useRef(true);
   const websocketRef = useRef<WebSocket | null>(null);
@@ -181,16 +181,16 @@ const CanvasParentComponent: React.FC = () => {
 
     }
   };
-  
+
   const handleAllCanvasesSocketData = (data) => {
     if (isAutoSyncRef.current) {
       // console.log("Updating canvas objects for all:", data);
       setAllCanvases(data);
       localStorage.setItem('allCanvases', JSON.stringify(data));
-      renderCanvasObjects(data[0].data);
+      renderCanvasObjects(data[selectedCanvasIndex].data);
     }
   }
-  
+
   const getAllCanvases = async () => {
     try {
       // removed for electron application build
@@ -203,7 +203,9 @@ const CanvasParentComponent: React.FC = () => {
         return
       }
       setAllCanvases(dataDestructured);
-      renderCanvasObjects(JSON.parse(dataDestructured)[0].data);
+      renderCanvasObjects(dataDestructured[selectedCanvasIndex].data);
+
+      console.log("get all canvases", JSON.stringify(dataDestructured))
 
       // store data locally 
       localStorage.setItem('allCanvases', JSON.stringify(dataDestructured));
@@ -217,75 +219,75 @@ const CanvasParentComponent: React.FC = () => {
     }
   };
 
-useEffect(() => {
-  if (canvasRef.current) {
-    // Initialize canvas
-    const initCanvas = new Canvas(canvasRef.current, {
-      width: 1920,
-      height: 1080,
-    });
-    initCanvas.backgroundColor = "#fff";
-    initCanvas.renderAll();
-    setCanvas(initCanvas);
-    
-    const checkIfLocalCanvases = localStorage.getItem('allCanvases');
-    if (checkIfLocalCanvases) {
-      setAllCanvases(JSON.parse(checkIfLocalCanvases));
-      renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
-    }
+  useEffect(() => {
+    if (canvasRef.current) {
+      // Initialize canvas
+      const initCanvas = new Canvas(canvasRef.current, {
+        width: 1920,
+        height: 1080,
+      });
+      initCanvas.backgroundColor = "#fff";
+      initCanvas.renderAll();
+      setCanvas(initCanvas);
 
-    const handlePing = () => {
-      setLastPingTime(Date.now());
-    };
+      const checkIfLocalCanvases = localStorage.getItem('allCanvases');
+      if (checkIfLocalCanvases) {
+        setAllCanvases(JSON.parse(checkIfLocalCanvases));
+        renderCanvasObjects(JSON.parse(checkIfLocalCanvases)[0].data);
+      }
 
-    const retryDelay = 3000; // 3 seconds
-
-    const connectWebSocket = () => {
-      websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
-
-      websocketRef.current.onopen = () => {
-        console.log("WebSocket connected");
-        setIsMonitoring(true);
+      const handlePing = () => {
+        setLastPingTime(Date.now());
       };
 
-      websocketRef.current.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.type === "updateAllCanvas") {
-            handleAllCanvasesSocketData(data.canvases);
-          } else if (data.type === "ping") {
-            handlePing();
-            setIsMonitoring(true);
+      const retryDelay = 3000; // 3 seconds
+
+      const connectWebSocket = () => {
+        websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
+
+        websocketRef.current.onopen = () => {
+          console.log("WebSocket connected");
+          setIsMonitoring(true);
+        };
+
+        websocketRef.current.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type === "updateAllCanvas") {
+              handleAllCanvasesSocketData(data.canvases);
+            } else if (data.type === "ping") {
+              handlePing();
+              setIsMonitoring(true);
+            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", error);
           }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
+        };
+
+        websocketRef.current.onclose = () => {
+          console.log("WebSocket disconnected. Retrying...");
+          setIsMonitoring(false);
+          setTimeout(connectWebSocket, retryDelay); // Retry infinite retry connection after 3 every seconds
+        };
+
+        websocketRef.current.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          websocketRef.current.close(); // Ensure the socket is closed before retrying to avoid replecated connections
+        };
       };
 
-      websocketRef.current.onclose = () => {
-        console.log("WebSocket disconnected. Retrying...");
-        setIsMonitoring(false);
-        setTimeout(connectWebSocket, retryDelay); // Retry infinite retry connection after 3 every seconds
+      // Initial WebSocket connection
+      connectWebSocket();
+
+      // Cleanup
+      return () => {
+        initCanvas.dispose();
+        websocketRef.current?.close();
       };
+    }
+  }, []);
 
-      websocketRef.current.onerror = (error) => {
-        console.error("WebSocket error:", error);
-        websocketRef.current.close(); // Ensure the socket is closed before retrying to avoid replecated connections
-      };
-    };
 
-    // Initial WebSocket connection
-    connectWebSocket();
-
-    // Cleanup
-    return () => {
-      initCanvas.dispose();
-      websocketRef.current?.close();
-    };
-  }
-}, []);
-
-   
   useEffect(() => {
     const interval = setInterval(() => {
       console.log("Checking ping time...");
@@ -331,7 +333,7 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, []);
 
- 
+
   const handleSyncCanvas = async () => {
     try {
 
@@ -346,7 +348,7 @@ useEffect(() => {
       notifyError("Error to sync canvas");
     }
   };
- 
+
   useEffect(() => {
     if (canvas) {
       getAllCanvases();
