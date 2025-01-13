@@ -227,6 +227,7 @@ const CanvasParentComponent: React.FC = () => {
               setAllCanvases(data.canvases);
             } else if (data.type === "ping") {
               handlePing();
+              setIsMonitoring(true);
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
