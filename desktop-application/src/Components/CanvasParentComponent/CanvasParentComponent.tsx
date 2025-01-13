@@ -170,7 +170,7 @@ const CanvasParentComponent: React.FC = () => {
 
     }
   };
-
+ 
   const handleAllCanvasesSocketData = (data) => {
     console.log("Updating canvas objects for all:", data);
     console.log("isAutoSync:", isAutoSyncRef.current);
