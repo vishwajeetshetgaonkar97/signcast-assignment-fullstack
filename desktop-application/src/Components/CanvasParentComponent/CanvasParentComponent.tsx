@@ -11,6 +11,7 @@ import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import FullScreenStateContext from "../../Contexts/FullScreenStateContext";
+import getCanvases from "../../api/getCanvases";
 
 interface allcanvases {
   _id?: string;
@@ -28,8 +29,6 @@ interface CustomFabricObject extends FabricObject {
   imageUrl?: string;
   text?: string;
 }
-
-const BaseUrl = 'https://signcast-assignment-fullstack-production-32ab.up.railway.app';
 
 
 const CanvasParentComponent: React.FC = () => {
@@ -184,18 +183,21 @@ const CanvasParentComponent: React.FC = () => {
 
   const getAllCanvases = async () => {
     try {
-      const data = await window.electron.getCanvases();
-      console.log("Fetched canvases:", data.canvases);
-      if (!data) {
+      // removed for electron application build
+      // const data = await window.electron.getCanvases();
+      const data = await getCanvases();
+      const dataDestructured = data.canvases
+      console.log("Fetched canvases:", dataDestructured);
+      if (!dataDestructured) {
         notifyError("Error")
         return
       }
-      setAllCanvases(data);
+      setAllCanvases(dataDestructured);
 
       // store data locally 
-      localStorage.setItem('allCanvases', JSON.stringify(data));
+      localStorage.setItem('allCanvases', JSON.stringify(dataDestructured));
       // Assuming the first canvas is the one we need
-      const objects = data[0].data as CustomFabricObject[];
+      const objects = dataDestructured[0].data as CustomFabricObject[];
       console.log("Fetched objects:", objects);
 
       renderCanvasObjects(objects);

@@ -7,6 +7,7 @@ import CanvasParentComponent from '../Components/CanvasParentComponent/CanvasPar
 import { ToastContainer, toast } from 'react-toastify';
 import FullScreenStateContext from '../Contexts/FullScreenStateContext';
 import AutoSyncStateContext from '../Contexts/AutoSyncStateContext';
+import getIfDeviceOperational from '../api/getIfDeviceOperational';
 
 interface CanvasProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -47,9 +48,12 @@ function App() {
       }
       if (isMonitoring) {
         console.log('Getting device info...');
-        const deviceInfo = await window.electron.getDevices();
+        // const deviceInfo = await window.electron.getDevices();
+        const deviceInfo = await getIfDeviceOperational();
         console.log('Device info:', deviceInfo);
-        setDeviceInfo(deviceInfo);
+        const devicInfoDestructured = deviceInfo.deviceop;
+        console.log('Device info:', devicInfoDestructured);
+        setDeviceInfo(devicInfoDestructured);
       }
 
     }
