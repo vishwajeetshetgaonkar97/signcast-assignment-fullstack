@@ -1,28 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import TopBar from "./Components/TopBar/TopBar";
 import MonitoringStateContext from "./Contexts/MonitoringStateContext";
 import CanvasParentComponent from "./Components/CanvasParentComponent/CanvasParentComponent";
 
 const App: React.FC = () => {
   const [themeMode, setThemeMode] = useState("light");
-const [isMonitoring, setIsMonitoring] = useState(false);
+const [isMonitoring, setIsMonitoring] = useState(true);
 
 const monitoringStateContextValue = useMemo(
   () => ({ isMonitoring, setIsMonitoring}), 
   [isMonitoring, setIsMonitoring]
 );
-const updateOnlineStatus = () => setIsMonitoring(navigator.onLine);
 
-
-useEffect(() => {
-  window.addEventListener('offline', updateOnlineStatus);
-  window.addEventListener('online', updateOnlineStatus);
-
-  return () => {
-    window.removeEventListener('online', updateOnlineStatus);
-    window.removeEventListener('offline', updateOnlineStatus);
-  };
-}, []);
 
   return (
     <MonitoringStateContext.Provider value={monitoringStateContextValue}>

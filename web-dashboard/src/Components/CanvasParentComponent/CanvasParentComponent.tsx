@@ -188,6 +188,7 @@ const CanvasParentComponent: React.FC = () => {
     }
   };
 
+
   useEffect(() => {
     if (canvasRef.current) {
       // Initialize canvas
@@ -199,34 +200,29 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.renderAll();
       setCanvas(initCanvas);
   
-      // Reconnection constants
-      let reconnectAttempts = 0;
-      const maxReconnectAttempts = 5;
-      const retryDelay = 1000;
-  
       const handlePing = () => {
         setLastPingTime(Date.now());
       };
   
+      const retryDelay = 3000; // 3 seconds
+  
       const connectWebSocket = () => {
-        websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
+        websocketRef.current = new WebSocket("wss://signcast-assignment-fullstack-production-32ab.up.railway.app/");
   
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");
-          reconnectAttempts = 0; // Reset attempts on successful connection
           setIsMonitoring(true);
         };
   
         websocketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            // console.log("Received data:", data);
-  
             if (data.type === "updateAllCanvas") {
-              console.log("Updating canvas objects for all:", data);
               setAllCanvases(data.canvases);
             } else if (data.type === "ping") {
+              console.log("Received ping: isMonitoring", isMonitoring);
               handlePing();
+              setIsMonitoring(true);
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
@@ -234,27 +230,15 @@ const CanvasParentComponent: React.FC = () => {
         };
   
         websocketRef.current.onclose = () => {
-          console.log("WebSocket disconnected");
+          console.log("WebSocket disconnected. Retrying...");
           setIsMonitoring(false);
-          attemptReconnect();
+          setTimeout(connectWebSocket, retryDelay); // Retry infinite retry connection after 3 every seconds
         };
   
         websocketRef.current.onerror = (error) => {
           console.error("WebSocket error:", error);
+          websocketRef.current.close(); // Ensure the socket is closed before retrying to avoid replecated connections
         };
-      };
-  
-      const attemptReconnect = () => {
-        if (reconnectAttempts <= maxReconnectAttempts) {
-          reconnectAttempts += 1;
-          const delay = retryDelay * reconnectAttempts;
-          console.log(`Reconnecting in ${delay} ms...`);
-  
-          setTimeout(connectWebSocket, delay);
-        } else {
-          console.error("Max reconnect attempts reached. Stopping further attempts.");
-          notifyError("Reconnection failed. Try again later.");
-        }
       };
   
       // Initial WebSocket connection
@@ -267,6 +251,8 @@ const CanvasParentComponent: React.FC = () => {
       };
     }
   }, []);
+
+
    
   useEffect(() => {
     const interval = setInterval(() => {
