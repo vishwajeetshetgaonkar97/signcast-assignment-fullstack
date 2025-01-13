@@ -135,6 +135,14 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
         return null;
     }
 
+    const getLayerName = (layer) => {
+        if (layer.isSlider) {
+            return `Slider ${layer.zIndex}`;
+        }
+        return `${layer.type} ${layer.zIndex}`;
+    }
+
+
     return (
         <div className="flex flex-col w-fit min-w-[150px] absolute top-12 left-2 bg-bg-color py-2 px-2 rounded shadow">
             <div className="flex justify-between items-center pb-2 mb-2 border-b border-border-color">
@@ -152,7 +160,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
                         onClick={() => selectLayerInCanvas(layer.id)}
                         className={`flex text-xs items-center w-full bg-bg-color hover:bg-card-color py-1 px-2 cursor-pointer rounded gap-2 ${layer.id === selectedLayer?.id ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}
                     >
-                        {layer.type} {layer.zIndex}
+                        {getLayerName(layer)}
 
                         <div className="flex items-center gap-1 ml-auto">
                             {layer.visible ?

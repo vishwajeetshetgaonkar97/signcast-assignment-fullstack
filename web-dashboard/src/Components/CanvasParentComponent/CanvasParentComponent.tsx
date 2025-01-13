@@ -29,7 +29,7 @@ interface allcanvases {
 interface CustomFabricObject extends FabricObject {
   id?: string;
   zIndex?: number;
-  radius?: number;
+  radius?: number; 
   fontSize?: number;
   imageUrl?: string;
   text?: string;
