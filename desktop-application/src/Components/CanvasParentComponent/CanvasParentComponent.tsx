@@ -331,7 +331,7 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, []);
 
-
+ 
   const handleSyncCanvas = async () => {
     try {
 
@@ -346,7 +346,7 @@ useEffect(() => {
       notifyError("Error to sync canvas");
     }
   };
-
+ 
   useEffect(() => {
     if (canvas) {
       getAllCanvases();
