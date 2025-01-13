@@ -5,7 +5,7 @@ import CanvasParentComponent from "./Components/CanvasParentComponent/CanvasPare
 
 const App: React.FC = () => {
   const [themeMode, setThemeMode] = useState("light");
-const [isMonitoring, setIsMonitoring] = useState(false);
+const [isMonitoring, setIsMonitoring] = useState(true);
 
 const monitoringStateContextValue = useMemo(
   () => ({ isMonitoring, setIsMonitoring}), 
