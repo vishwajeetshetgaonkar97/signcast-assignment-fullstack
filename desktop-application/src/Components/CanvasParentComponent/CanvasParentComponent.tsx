@@ -226,7 +226,7 @@ useEffect(() => {
     initCanvas.backgroundColor = "#fff";
     initCanvas.renderAll();
     setCanvas(initCanvas);
-
+   
     const checkIfLocalCanvases = localStorage.getItem('allCanvases');
     if (checkIfLocalCanvases && !isMonitoring) {
       setAllCanvases(JSON.parse(checkIfLocalCanvases));
