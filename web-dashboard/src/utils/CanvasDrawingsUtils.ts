@@ -306,14 +306,12 @@ const addImage = ({
   };
 };
 
-
-
 const addImageSlider = ({
   canvas,
   images = [
-    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736742619065.png",
-    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736742649345.png",
-    "https://signcast-assignment-fullstack-production-32ab.up.railway.app/uploads/1736742674063.png"
+    "https://i.ibb.co/xs2kCZJ/t1.png",
+    "https://i.ibb.co/V96PRPD/t2.jpg",
+    "https://i.ibb.co/s6CxZ3C/t3.jpg"
   ],
   interval = 5000,
   top = 0,
@@ -321,8 +319,8 @@ const addImageSlider = ({
   scaleX = 1,
   scaleY = 1,
   angle = 0,
-  height = 1080,
-  width = 1920,
+  height = 360,
+  width = 640,
   id = `carousel-${new Date().getTime()}`,
   zIndex = 1,
   visible = true,
