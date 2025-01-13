@@ -186,7 +186,10 @@ const CanvasParentComponent: React.FC = () => {
     try {
       const data = await window.electron.getCanvases();
       console.log("Fetched canvases:", data.canvases);
-      if(!data) return;
+      if(!data){ 
+        notifyError("Error")
+        return
+      }
       setAllCanvases(data);
     
       // store data locally 
@@ -223,6 +226,7 @@ const CanvasParentComponent: React.FC = () => {
 
       const handlePing = () => {
         setLastPingTime(Date.now());
+        setIsMonitoring(true);
       };
 
       const connectWebSocket = () => {
@@ -243,14 +247,14 @@ const CanvasParentComponent: React.FC = () => {
             if (data.type === "updateAllCanvas") {
               handleAllCanvasesSocketData(data.canvases);
           
-            
+             
             } else if (data.type === "ping") {
+              console.log("Received ping: isMonitoreing",isMonitoring );
               handlePing();
               // console.log("Received ping:", data);
               // console.log("isMonitoring:", isMonitoring);
-              if (!isMonitoring) {
-                setIsMonitoring(true);
-              }
+
+              
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
@@ -286,7 +290,7 @@ const CanvasParentComponent: React.FC = () => {
       if (lastPingTime && Date.now() - lastPingTime > 6000) {
         console.warn("No ping received in the last 6 seconds. Backend may be down.");
         setIsMonitoring(false);
-      }
+      }  
     }, 6000);
 
     return () => clearInterval(interval);
@@ -317,7 +321,11 @@ const CanvasParentComponent: React.FC = () => {
 
   const handleSyncCanvas = async () => {
     try {
-
+ 
+      if (!isMonitoring){ 
+        notifyError("Please Connect to Internet")
+        return
+      }
       getAllCanvases();
       notifySuccess("Canvas synced successfully");
     } catch (error) {
