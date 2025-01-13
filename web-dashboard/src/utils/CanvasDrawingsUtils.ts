@@ -125,6 +125,15 @@ const addRectangle = ({
   }
 };
 
+const getCanvasObjectsLength = ({ canvas }) => {
+  if (canvas) {
+    const objects = canvas.getObjects() as CustomFabricObject[];
+    return objects.length ;
+  }
+  return [];
+};
+
+
 const addCircle = ({
   canvas,
   top = 100,
@@ -140,6 +149,7 @@ const addCircle = ({
   visible = true
 }: CircleOptions) => {
   if (canvas) {
+
     const circle = new Circle({
       top,
       left,
@@ -152,7 +162,11 @@ const addCircle = ({
       visible
     }) as CustomFabricObject;
     circle.id = id;
-    circle.zIndex = zIndex;
+
+    const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+    circle.zIndex = typeof canvasObjectsLength === 'number' 
+      ? canvasObjectsLength + 1 
+      : zIndex;
 
     canvas.add(circle);
   }
@@ -187,7 +201,10 @@ const addTriangle = ({
       visible
     }) as CustomFabricObject;
     triangle.id = id;
-    triangle.zIndex = zIndex;
+    const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+    triangle.zIndex = typeof canvasObjectsLength === 'number' 
+    ? canvasObjectsLength + 1 
+    : zIndex;
 
     canvas.add(triangle);
   }
@@ -208,6 +225,9 @@ const addText = ({
   scaleY = 1,
   visible = true,
 }: TextOptions) => {
+
+  
+
   if (canvas) {
     const fabricText = new Text(text, {
       top,
@@ -221,7 +241,10 @@ const addText = ({
       visible
     }) as CustomFabricObject;
     fabricText.id = id;
-    fabricText.zIndex = zIndex;
+    const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+    fabricText.zIndex = typeof canvasObjectsLength === 'number' 
+    ? canvasObjectsLength + 1 
+    : zIndex;
     fabricText.text = text;
 
     canvas.add(fabricText);
@@ -253,7 +276,10 @@ const addImage = ({
       visible,
     }) as CustomFabricObject;
     fabricImage.id = id;
-    fabricImage.zIndex = zIndex;
+    const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+    fabricImage.zIndex = typeof canvasObjectsLength === 'number' 
+    ? canvasObjectsLength + 1 
+    : zIndex;
     fabricImage.imageUrl = imageUrl;
 
     if (canvas) {
