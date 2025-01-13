@@ -19,7 +19,6 @@ const TopBar: React.FC<TopBarProps> = ({ setThemeMode,setModalOpen, themeMode })
 
   };
 
-  console.log("isMonitoring: from top bar", isMonitoring);
 
   const handleLogout = () => {
     localStorage.removeItem('signedIn');

@@ -39,7 +39,7 @@ const CanvasParentComponent: React.FC = () => {
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [lastPingTime, setLastPingTime] = useState<number | null>(null);
 
-
+  
   const [isAutoSync, setIsAutoSync] = useState(true);
   const isAutoSyncRef = useRef(true);
   const websocketRef = useRef<WebSocket | null>(null);
@@ -185,10 +185,8 @@ const CanvasParentComponent: React.FC = () => {
   };
  
   const handleAllCanvasesSocketData = (data) => {
-    console.log("Updating canvas objects for all:", data);
-    console.log("isAutoSync:", isAutoSyncRef.current);
     if (isAutoSyncRef.current) {
-      console.log("Updating canvas objects for all:", data);
+      // console.log("Updating canvas objects for all:", data);
       setAllCanvases(data);
       localStorage.setItem('allCanvases', JSON.stringify(data));
       renderCanvasObjects(data[0].data);
@@ -257,7 +255,6 @@ useEffect(() => {
           if (data.type === "updateAllCanvas") {
             handleAllCanvasesSocketData(data.canvases);
           } else if (data.type === "ping") {
-            console.log("Received ping: isMonitoring", isMonitoring);
             handlePing();
             setIsMonitoring(true);
           }
@@ -289,7 +286,7 @@ useEffect(() => {
   }
 }, []);
 
- 
+   
   useEffect(() => {
     const interval = setInterval(() => {
       console.log("Checking ping time...");

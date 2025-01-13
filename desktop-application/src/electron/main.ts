@@ -12,6 +12,8 @@ app.on('ready', () => {
     frame: true,
     webPreferences: {
       preload: getPreloadPath(),
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 
@@ -131,7 +133,7 @@ ipcMain.handle('get-devices', async () => {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(getUIPath());
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   }
 
   createTray(mainWindow);
