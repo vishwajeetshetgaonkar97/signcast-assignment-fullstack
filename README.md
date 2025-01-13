@@ -107,7 +107,7 @@ Offline support for the Electron application is not implemented yet. The plan in
 - Live streaming support.
 
 
-#Version 2 
+# Version 2 
 
 ## Known Limitations
 - Indexing issues may occur during image uploads.
