@@ -9,15 +9,12 @@ const cors = require("cors");
 const WebSocket = require("ws");
 
 const PORT = 3003;
- 
-
 
 const app = express();
 app.use(cors({
   origin: "*",
 }));
 
-// app.use(bodyParser());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
@@ -39,10 +36,6 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
-app.use("/public", express.static("public"));
-app.use("/uploads", express.static("uploads"));
-
-
 
 // Configure multer for file upload
 const storage = multer.diskStorage({
