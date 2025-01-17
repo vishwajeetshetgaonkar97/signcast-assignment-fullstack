@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Canvas, FabricObject } from 'fabric';
 import { FaAngleUp, FaAngleDown, FaEye, FaEyeSlash } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
+import { handleObjectMoving, clearGuidelines } from "../../utils/handlers";
+
 
 interface CustomFabricObject extends FabricObject {
     id?: string;
@@ -15,6 +17,7 @@ interface LayersListProps {
 const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
     const [layers, setLayers] = useState<CustomFabricObject[]>([]);
     const [selectedLayer, setSelectedLayer] = useState<CustomFabricObject | null>(null);
+    const [guidelines, setGuidelines] = useState<CustomFabricObject[]>([]);
 
 
 
@@ -71,7 +74,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
             canvas.renderAll();
         }
     };
- 
+
     const toggleLayerVisibility = (layerId: string) => {
         const selectedLayer = layers.find(layer => layer.id === layerId);
         if (selectedLayer) {
@@ -91,44 +94,69 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
 
     const updateLayers = () => {
         const objects = canvas.getObjects() as CustomFabricObject[];
-   
-        // removes dublicasted objects 
+
+        // Filter out objects of type 'line' where the 'id' contains 'guideline'
         const filteredObjects = objects.filter((obj, index, self) => {
+            // Only include objects that are not lines with 'guideline' in the id
+            return obj.type !== 'line' || !obj.id.includes('guideline');
+        });
+
+        // Remove duplicates based on the 'id' property
+        const uniqueObjects = filteredObjects.filter((obj, index, self) => {
             return self.findIndex(o => o.id === obj.id) === index;
-          });
-        // console.log("filtered",filteredObjects);
-        filteredObjects.sort((a, b) => a.zIndex - b.zIndex);
-        filteredObjects.forEach((obj, index) => {
-            // addIdToObject(obj);
+        });
+
+        // Sort objects by zIndex
+        uniqueObjects.sort((a, b) => a.zIndex - b.zIndex);
+
+        // Update zIndex of each object
+        uniqueObjects.forEach((obj, index) => {
             obj.zIndex = index;
         });
 
-        setLayers([...filteredObjects].reverse());
+        // Set the updated layers in reverse order
+        setLayers([...uniqueObjects].reverse());
     };
 
+    console.log("layyyy", layers);
     useEffect(() => {
         if (canvas) {
             updateLayers();
 
             canvas.on('object:added', updateLayers);
-            canvas.on('object:modified', updateLayers);
-            canvas.on('object:removed', updateLayers);
+            canvas.on('object:modified', () => {
 
+                clearGuidelines(canvas);
+                updateLayers();
+            });
+
+            canvas.on('object:removed', updateLayers);
+            canvas.on('object:moving', (e) => {
+                if (e.target) {
+                    handleObjectMoving(canvas, e.target, guidelines, setGuidelines);
+                }
+            });
             canvas.on('selection:created', handleObjectSelection);
             canvas.on('selection:updated', handleObjectSelection);
             canvas.on('selection:cleared', handleObjectSelection);
 
             return () => {
-                canvas.off('object:added', updateLayers);
-                canvas.off('object:modified', updateLayers);
-                canvas.off('object:removed', updateLayers);
 
+                canvas.off('object:added', updateLayers);
+                canvas.off('object:modified', () => {
+                    updateLayers();
+                });
+
+                canvas.off('object:removed', updateLayers);
+                canvas.off("object:moving", updateLayers);
                 canvas.off('selection:created', handleObjectSelection);
                 canvas.off('selection:updated', handleObjectSelection);
                 canvas.off('selection:cleared', handleObjectSelection);
+
             };
         }
     }, [canvas]);
+    console.log("guidelines", guidelines);
 
     if (!canvas || layers.length === 0) {
         return null;
@@ -158,7 +186,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
                         onClick={() => selectLayerInCanvas(layer.id)}
                         className={`flex text-xs items-center w-full bg-bg-color hover:bg-card-color py-1 px-2 cursor-pointer rounded gap-2 ${layer.id === selectedLayer?.id ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}
                     >
-                      {getLayerName(layer)}
+                        {getLayerName(layer)}
 
                         <div className="flex items-center gap-1 ml-auto">
                             {layer.visible ?

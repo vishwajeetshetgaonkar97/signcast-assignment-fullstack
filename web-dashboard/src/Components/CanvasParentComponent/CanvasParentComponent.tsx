@@ -43,6 +43,7 @@ const CanvasParentComponent: React.FC = () => {
   const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const [lastPingTime, setLastPingTime] = useState<number | null>(null);
+  const [guidelines, setGuidelines] = useState([]);
 
   const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
 
@@ -215,6 +216,11 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.renderAll();
       setCanvas(initCanvas);
 
+      // initCanvas.on("object:moving", (e) => {
+      //   // console.log("Mouse down event:", e);
+      //   handleObjectMoving(canvas, e.target, guidelines, setGuidelines);
+      // });
+
       const handlePing = () => {
         setLastPingTime(Date.now());
       };
@@ -258,6 +264,8 @@ const CanvasParentComponent: React.FC = () => {
 
       // Initial WebSocket connection
       connectWebSocket();
+
+
 
       // Cleanup
       return () => {
