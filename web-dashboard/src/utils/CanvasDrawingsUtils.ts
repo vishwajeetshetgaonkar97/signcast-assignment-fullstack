@@ -535,113 +535,113 @@ const addBarGraph = ({
 
 // not working
 
-const addBarGraphWithChartJS = ({
-  canvas,
-  data = [30, 60, 90, 120, 150],
-  barWidth = 50,
-  maxBarHeight = 200,
-  spaceBetweenBars = 20,
-  barColor = '#4CAF50',
-  top = 100,
-  left = 50,
-  id = `graph-${new Date().getTime()}`,
-  zIndex = 1,
-  scaleX = 1,
-  scaleY = 1,
-  visible = true
-}: {
-  canvas: fabric.Canvas;
-  data?: number[];
-  barWidth?: number;
-  maxBarHeight?: number;
-  spaceBetweenBars?: number;
-  barColor?: string;
-  top?: number;
-  left?: number;
-  id?: string;
-  zIndex?: number;
-  scaleX?: number;
-  scaleY?: number;
-  visible?: boolean;
-}) => {
-  if (canvas) {
-    console.log('Canvas is initialized, creating bar graph with Chart.js');
+// const addBarGraphWithChartJS = ({
+//   canvas,
+//   data = [30, 60, 90, 120, 150],
+//   barWidth = 50,
+//   maxBarHeight = 200,
+//   spaceBetweenBars = 20,
+//   barColor = '#4CAF50',
+//   top = 100,
+//   left = 50,
+//   id = `graph-${new Date().getTime()}`,
+//   zIndex = 1,
+//   scaleX = 1,
+//   scaleY = 1,
+//   visible = true
+// }: {
+//   canvas: fabric.Canvas;
+//   data?: number[];
+//   barWidth?: number;
+//   maxBarHeight?: number;
+//   spaceBetweenBars?: number;
+//   barColor?: string;
+//   top?: number;
+//   left?: number;
+//   id?: string;
+//   zIndex?: number;
+//   scaleX?: number;
+//   scaleY?: number;
+//   visible?: boolean;
+// }) => {
+//   if (canvas) {
+//     console.log('Canvas is initialized, creating bar graph with Chart.js');
 
-    // Create a hidden canvas element for Chart.js
-    const chartCanvas = document.createElement('canvas');
-    chartCanvas.width = (barWidth + spaceBetweenBars) * data.length;
-    chartCanvas.height = maxBarHeight;
+//     // Create a hidden canvas element for Chart.js
+//     const chartCanvas = document.createElement('canvas');
+//     chartCanvas.width = (barWidth + spaceBetweenBars) * data.length;
+//     chartCanvas.height = maxBarHeight;
 
-    const ctx = chartCanvas.getContext('2d');
+//     const ctx = chartCanvas.getContext('2d');
 
-    if (!ctx) {
-      console.error('Failed to get canvas context for Chart.js.');
-      return;
-    }
+//     if (!ctx) {
+//       console.error('Failed to get canvas context for Chart.js.');
+//       return;
+//     }
 
-    // Use Chart.js to draw the chart
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: data.map((_, index) => `Label ${index + 1}`),
-        datasets: [{
-          label: 'Bar Graph',
-          data: data,
-          backgroundColor: barColor,
-          borderWidth: 1,
-        }]
-      },
-      options: {
-        responsive: false,
-        scales: {
-          x: { beginAtZero: true },
-          y: { beginAtZero: true, max: maxBarHeight }
-        },
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    });
+//     // Use Chart.js to draw the chart
+//     new Chart(ctx, {
+//       type: 'bar',
+//       data: {
+//         labels: data.map((_, index) => `Label ${index + 1}`),
+//         datasets: [{
+//           label: 'Bar Graph',
+//           data: data,
+//           backgroundColor: barColor,
+//           borderWidth: 1,
+//         }]
+//       },
+//       options: {
+//         responsive: false,
+//         scales: {
+//           x: { beginAtZero: true },
+//           y: { beginAtZero: true, max: maxBarHeight }
+//         },
+//         plugins: {
+//           legend: { display: false }
+//         }
+//       }
+//     });
 
-    // Convert the chart to an image
-    const chartImage = chartCanvas.toDataURL();
-    console.log('Chart image data URL created:', chartImage);
+//     // Convert the chart to an image
+//     const chartImage = chartCanvas.toDataURL();
+//     console.log('Chart image data URL created:', chartImage);
 
-    // Correctly load the image using Fabric.js Image.fromURL
-    fabric.Image.fromURL(chartImage, (img) => {
-      console.log('Image loaded into Fabric.js:', img);
-      img.set({
-        top,
-        left,
-        scaleX,
-        scaleY,
-        visible
-      });
+//     // Correctly load the image using Fabric.js Image.fromURL
+//     fabric.Image.fromURL(chartImage, (img) => {
+//       console.log('Image loaded into Fabric.js:', img);
+//       img.set({
+//         top,
+//         left,
+//         scaleX,
+//         scaleY,
+//         visible
+//       });
 
-      // Set custom ID and zIndex
-      img.id = id;
+//       // Set custom ID and zIndex
+//       img.id = id;
 
-      const canvasObjectsLength = canvas.getObjects().length;
-      img.zIndex = typeof canvasObjectsLength === 'number'
-        ? canvasObjectsLength + 1
-        : zIndex;
+//       const canvasObjectsLength = canvas.getObjects().length;
+//       img.zIndex = typeof canvasObjectsLength === 'number'
+//         ? canvasObjectsLength + 1
+//         : zIndex;
 
-      // Add the image to the canvas
-      canvas.add(img);
-      console.log('Image added to the canvas:', img);
+//       // Add the image to the canvas
+//       canvas.add(img);
+//       console.log('Image added to the canvas:', img);
 
-      canvas.renderAll();
-      console.log('Canvas rendered with the new image.');
-    }, (error) => {
-      console.error('Failed to load the image into Fabric.js', error);
-    });
+//       canvas.renderAll();
+//       console.log('Canvas rendered with the new image.');
+//     }, (error) => {
+//       console.error('Failed to load the image into Fabric.js', error);
+//     });
 
-    // Return the canvas for further manipulation if needed
-    return canvas;
-  } else {
-    console.error('Canvas not initialized or provided.');
-  }
-};
+//     // Return the canvas for further manipulation if needed
+//     return canvas;
+//   } else {
+//     console.error('Canvas not initialized or provided.');
+//   }
+// };
 
 
 // const addIframe = ({
@@ -785,4 +785,4 @@ const addVideo = ({
 
 
 
-export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider,addWeatherInfo, addBarGraph, addBarGraphWithChartJS , addVideo };
+export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider,addWeatherInfo, addBarGraph , addVideo };
