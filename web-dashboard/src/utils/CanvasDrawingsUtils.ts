@@ -9,6 +9,7 @@ interface CustomFabricObject extends fabric.Object {
   imageUrl?: string;
   text?: string;
   isSlider?: boolean;
+  isWeather?: boolean;
 }
 
 interface RectangleOptions {
@@ -376,7 +377,80 @@ const addImageSlider = ({
   setInterval(updateImage, interval);
 };
 
+const addWeatherInfo = async ({
+  canvas,
+  latitude = 43.7,   // Default latitude for Toronto
+  longitude = -79.42, // Default longitude for Toronto
+  left = 10,
+  top = 10,
+  fontSize = 20,
+  fill = "black",
+  id = `weather-${new Date().getTime()}`,
+  zIndex = 1,
+  visible = true
+}: {
+  canvas: fabric.Canvas;
+  latitude?: number;
+  longitude?: number;
+  left?: number;
+  top?: number;
+  fontSize?: number;
+  fill?: string;
+  id?: string;
+  zIndex?: number;
+  visible?: boolean
+}) => {
+  if (!canvas) return;
+
+  // Function to fetch weather data from Open-Meteo
+  const fetchWeatherData = async (lat: number, lon: number) => {
+    try {
+      // Open-Meteo API endpoint
+      const weatherResponse = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+      );
+
+      const weatherData = await weatherResponse.json();
+
+      if (!weatherData.current_weather) {
+        throw new Error("Weather data not found");
+      }
+
+      const temperature = weatherData.current_weather.temperature;
+      const description = weatherData.current_weather.weathercode;
+
+      return `Toronto Weather: ${temperature}°C, Condition: ${description}`;
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+      return "Unable to fetch weather data";
+    }
+  };
+
+  // Fetch weather data for the given coordinates
+  const weatherInfo = await fetchWeatherData(latitude, longitude);
+
+  // Create a Fabric.js Text object for weather information
+  const weatherText = new fabric.Text(weatherInfo, {
+    left,
+    top,
+    fontSize,
+    fill,
+    visible
+  }) as any;
+
+  // Add custom properties to the weatherText object
+  weatherText.id = id;
+  weatherText.isWeather = true;
+
+  // Calculate zIndex
+  const canvasObjectsLength = canvas.getObjects().length;
+  weatherText.zIndex =
+    typeof canvasObjectsLength === "number" ? canvasObjectsLength + 1 : zIndex;
+
+  // Add the weatherText object to the canvas
+  canvas.add(weatherText);
+  canvas.renderAll();
+};
 
 
-
-export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider };
+export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider,addWeatherInfo };

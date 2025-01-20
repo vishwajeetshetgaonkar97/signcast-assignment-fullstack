@@ -12,7 +12,7 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
-import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider } from "../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo } from "../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import { BASE_WEB_SOCKET_URL } from '../../../constants';
@@ -34,6 +34,7 @@ interface CustomFabricObject extends FabricObject {
   imageUrl?: string;
   text?: string;
   isSlider?: boolean;
+  isWeather?: boolean
 }
 
 const CanvasParentComponent: React.FC = () => {
@@ -96,6 +97,15 @@ const CanvasParentComponent: React.FC = () => {
             zIndex: object.zIndex,
             scaleX: object.scaleX,
             scaleY: object.scaleY,
+            visible: object.visible,
+          })
+        } else if (object.isWeather) {
+          addWeatherInfo({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            id: object.id,
+            zIndex: object.zIndex,
             visible: object.visible,
           })
         } else if (object.type === "rect") {
@@ -376,7 +386,9 @@ const CanvasParentComponent: React.FC = () => {
             imageUrl: object.imageUrl || "",
             visible: object.visible,
             text: object.text || "",
-            isSlider: object.isSlider || false
+            isSlider: object.isSlider || false,
+            isWeather: object.isWeather || false
+
           };
         }),
       };

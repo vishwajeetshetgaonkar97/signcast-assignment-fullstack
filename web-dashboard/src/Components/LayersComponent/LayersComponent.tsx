@@ -165,6 +165,9 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
     const getLayerName = (layer) => {
         if (layer.isSlider) {
             return `Slider ${layer.zIndex}`;
+        } 
+        if (layer.isWeather) {
+            return `Weather ${layer.zIndex}`;
         }
         return `${layer.type} ${layer.zIndex}`;
     }
