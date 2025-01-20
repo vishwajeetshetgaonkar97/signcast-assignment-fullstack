@@ -7,7 +7,9 @@ import { LuTriangle } from "react-icons/lu";
 import { MdOutlineImage } from "react-icons/md";
 import uploadImage from '../../api/uploadImage';
 import { FaRegImages } from "react-icons/fa";
-import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo } from '../../utils/CanvasDrawingsUtils';
+import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph, addBarGraphWithChartJS } from '../../utils/CanvasDrawingsUtils';
+import { TiWeatherPartlySunny } from "react-icons/ti";
+import { BsGraphUp } from "react-icons/bs";
 
 interface AddToCanvasProps {
     canvas: Canvas;
@@ -56,8 +58,10 @@ const AddToCanvasComponent: React.FC<AddToCanvasProps> = ({ canvas }) => {
             
 
             <FaRegImages className="cursor-pointer hover:text-green-500" onClick={() => addImageSlider({ canvas })} size={20} />
-            <RxText className="cursor-pointer hover:text-blue-500" onClick={() => addWeatherInfo({ canvas })} size={20} />
-        
+            <TiWeatherPartlySunny className="cursor-pointer hover:text-blue-500" onClick={() => addWeatherInfo({ canvas })} size={20} />
+            <BsGraphUp className="cursor-pointer hover:text-blue-500" onClick={() => addBarGraph({ canvas })} size={20} />
+            {/* <RxText className="cursor-pointer hover:text-blue-500" onClick={() => addBarGraphWithChartJS({ canvas })} size={20} />
+         */}
             <input
                 id="fileUpload"
                 type="file"

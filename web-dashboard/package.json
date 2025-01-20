@@ -12,6 +12,7 @@
   "dependencies": {
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
+    "chart.js": "^4.4.7",
     "fabric": "^6.5.1",
     "fabricjs-react": "^2.0.0",
     "jspdf": "^2.5.2",

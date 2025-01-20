@@ -12,7 +12,7 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
-import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo } from "../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph } from "../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import { BASE_WEB_SOCKET_URL } from '../../../constants';
@@ -185,7 +185,21 @@ const CanvasParentComponent: React.FC = () => {
             selectable: object.selectable,
             visible: object.visible,
           })
-        } else {
+        } else if (object.type === "group") {
+          addBarGraph({
+            canvas: canvas,
+            top: object.top,
+            left: object.left,
+            id: object.id,
+            zIndex: object.zIndex,
+            scaleX: object.scaleX,
+            scaleY: object.scaleY,
+            visible: object.visible,
+            
+          });
+        }
+        
+        else {
           console.log("Unknown object type:", object.type);
         }
       });
@@ -459,9 +473,9 @@ const CanvasParentComponent: React.FC = () => {
             <h6 className="flex flex-row items-center justify-center text-xs text-yellow-500 absolute z-10 bottom-2 left-2 ">Note: Images/Slider might have some issues </h6>
 
             {/* used for debugging */}
-            {/* <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
+            <div className="flex flex-row items-center justify-center absolute z-10 bottom-2 left-2 ">
               <button onClick={getCanvasObjects}>Get Canvas Objects</button>
-            </div> */}
+            </div>
           </div>
         </>
       </SelectedCanvasObjectIndexDataContext.Provider>
