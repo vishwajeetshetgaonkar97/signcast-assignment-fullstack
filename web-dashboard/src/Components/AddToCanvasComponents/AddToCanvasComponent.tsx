@@ -7,9 +7,10 @@ import { LuTriangle } from "react-icons/lu";
 import { MdOutlineImage } from "react-icons/md";
 import uploadImage from '../../api/uploadImage';
 import { FaRegImages } from "react-icons/fa";
-import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph, addBarGraphWithChartJS } from '../../utils/CanvasDrawingsUtils';
+import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph, addBarGraphWithChartJS, addIframe, addVideo } from '../../utils/CanvasDrawingsUtils';
 import { TiWeatherPartlySunny } from "react-icons/ti";
 import { BsGraphUp } from "react-icons/bs";
+import { IoVideocamOutline } from "react-icons/io5";
 
 interface AddToCanvasProps {
     canvas: Canvas;
@@ -51,17 +52,21 @@ const AddToCanvasComponent: React.FC<AddToCanvasProps> = ({ canvas }) => {
                 size={20} />
             <LuTriangle className="cursor-pointer hover:text-green-500" onClick={() => addTriangle({ canvas })} size={20} />
             <RxText className="cursor-pointer hover:text-blue-500" onClick={() => addText({ canvas })} size={20} />
-        
+
             <label htmlFor="fileUpload" className="cursor-pointer hover:text-rose-500">
                 <MdOutlineImage size={20} />
             </label>
-            
+
 
             <FaRegImages className="cursor-pointer hover:text-green-500" onClick={() => addImageSlider({ canvas })} size={20} />
             <TiWeatherPartlySunny className="cursor-pointer hover:text-blue-500" onClick={() => addWeatherInfo({ canvas })} size={20} />
             <BsGraphUp className="cursor-pointer hover:text-blue-500" onClick={() => addBarGraph({ canvas })} size={20} />
             {/* <RxText className="cursor-pointer hover:text-blue-500" onClick={() => addBarGraphWithChartJS({ canvas })} size={20} />
          */}
+
+            <IoVideocamOutline className="cursor-pointer hover:text-fuchsia-500"
+                onClick={() => addVideo({ canvas })}
+                size={20} />
             <input
                 id="fileUpload"
                 type="file"

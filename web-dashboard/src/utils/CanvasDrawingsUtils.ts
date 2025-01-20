@@ -110,6 +110,21 @@ interface CarouselOptions {
   width?: number;
 }
 
+interface IframeOptions {
+  canvas: fabric.Canvas;
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
+  src?: string;
+  selectable?: boolean;
+  id?: string;
+  zIndex?: number;
+  scaleX?: number;
+  scaleY?: number;
+  visible?: boolean;
+}
+
 const addRectangle = ({
   canvas,
   top = 100,
@@ -644,6 +659,145 @@ const addBarGraphWithChartJS = ({
 };
 
 
+const addIframe = ({
+  canvas,
+  top = 100,
+  left = 50,
+  width = 300,
+  height = 200,
+  src = "https://signcast.ca/",
+  selectable = true,
+  id = `iframe-${new Date().getTime()}`,
+  zIndex = 1,
+  scaleX = 1,
+  scaleY = 1,
+  visible = true
+}) => {
+  if (canvas) {
+    // Create an offscreen HTML element to load the iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.width = width;
+    iframe.height = height;
+    iframe.style.border = "0";
+
+    // Wait for the iframe to load
+    iframe.onload = () => {
+      try {
+        const iframeCanvas = document.createElement('canvas');
+        iframeCanvas.width = width;
+        iframeCanvas.height = height;
+
+        const context = iframeCanvas.getContext('2d');
+        context.drawImage(iframe.contentWindow.document.body, 0, 0, width, height);
+
+        // Convert canvas to a data URL and create a Fabric.js image
+        const dataURL = iframeCanvas.toDataURL();
+        fabric.Image.fromURL(dataURL, (img) => {
+          img.set({
+            top,
+            left,
+            width,
+            height,
+            selectable,
+            scaleX,
+            scaleY,
+            visible
+          });
+          img.id = id;
+
+          // Set zIndex
+          const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+          img.zIndex =
+            typeof canvasObjectsLength === 'number'
+              ? canvasObjectsLength + 1
+              : zIndex;
+
+          // Add image to Fabric.js canvas
+          canvas.add(img);
+        });
+      } catch (error) {
+        console.error("Error rendering iframe content:", error);
+      }
+    };
+
+    document.body.appendChild(iframe); // Append temporarily to load content
+    setTimeout(() => document.body.removeChild(iframe), 5000); // Clean up after load
+  }
+};
+
+const addVideo = ({
+  canvas,
+  top = 100,
+  left = 50,
+  height = 360,
+  width = 640,
+  src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  selectable = true,
+  id = `video-${new Date().getTime()}`,
+  zIndex = 1,
+  scaleX = 1,
+  scaleY = 1,
+  visible = true,
+  autoplay = true,
+  loop = true,
+  muted = true
+}) => {
+  if (canvas) {
+    // Create video element
+    const videoEl = document.createElement('video');
+    videoEl.width = width;
+    videoEl.height = height;
+    videoEl.src = src;
+    videoEl.autoplay = autoplay;
+    videoEl.loop = loop;
+    videoEl.muted = muted;
+
+    // Create fabric.js video object
+    const video = new fabric.Image(videoEl, {
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+      scaleX: scaleX,
+      scaleY: scaleY,
+      selectable: selectable,
+      visible: visible
+    });
+
+    video.id = id;
+    video.isVideo = true;
+
+    // Set zIndex
+    const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+    video.zIndex = typeof canvasObjectsLength === 'number'
+      ? canvasObjectsLength + 1
+      : zIndex;
+
+    // Add video to canvas
+    canvas.add(video);
+
+    // Ensure the video plays and the canvas updates
+    videoEl.play();
+    
+    fabric.util.requestAnimFrame(function render() {
+      canvas.renderAll();
+      fabric.util.requestAnimFrame(render);
+    });
+
+    // Optional: Add custom controls
+    video.on('mousedown', function() {
+      if (videoEl.paused) {
+        videoEl.play();
+      } else {
+        videoEl.pause();
+      }
+    });
+
+    return video; // Return the fabric object for further manipulation if needed
+  }
+};
 
 
-export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider,addWeatherInfo, addBarGraph, addBarGraphWithChartJS };
+
+export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider,addWeatherInfo, addBarGraph, addBarGraphWithChartJS, addIframe , addVideo };
