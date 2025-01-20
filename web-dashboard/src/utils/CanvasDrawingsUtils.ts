@@ -1,6 +1,6 @@
 import * as fabric from 'fabric';
 import { Rect, Circle, Text, Triangle, FabricImage } from "fabric";
-import Chart from 'chart.js/auto';
+// import Chart from 'chart.js/auto';
 
 
 interface CustomFabricObject extends fabric.Object {
