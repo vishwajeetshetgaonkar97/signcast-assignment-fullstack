@@ -42,8 +42,7 @@ const CanvasParentComponent: React.FC = () => {
   const [scale, setScale] = useState(0.5);
   const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
-  const lastPingTimeRef = useRef(null); // Use ref for ping tracking
-  const [guidelines, setGuidelines] = useState([]);
+  const lastPingTimeRef = useRef(null);
 
   const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
 

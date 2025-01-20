@@ -305,13 +305,12 @@ const addImage = ({
     }
   };
 };
-
 const addImageSlider = ({
   canvas,
   images = [
     "https://i.ibb.co/xs2kCZJ/t1.png",
     "https://i.ibb.co/V96PRPD/t2.jpg",
-    "https://i.ibb.co/s6CxZ3C/t3.jpg"
+    "https://i.ibb.co/s6CxZ3C/t3.jpg",
   ],
   interval = 5000,
   top = 0,
@@ -325,8 +324,6 @@ const addImageSlider = ({
   zIndex = 1,
   visible = true,
 }: CarouselOptions) => {
-
-
   if (!images || images.length === 0) return;
 
   let currentIndex = 0;
@@ -341,15 +338,15 @@ const addImageSlider = ({
     visible,
     width,
     height,
-  } ) as CustomFabricObject;
+  }) as CustomFabricObject;
 
   slideshowImage.id = id;
   const canvasObjectsLength = getCanvasObjectsLength({ canvas });
-  slideshowImage.zIndex = typeof canvasObjectsLength === 'number'
+  slideshowImage.zIndex = typeof canvasObjectsLength === "number"
     ? canvasObjectsLength + 1
     : zIndex;
 
-    slideshowImage.isSlider = true;
+  slideshowImage.isSlider = true;
 
   canvas.add(slideshowImage);
   canvas.renderAll();
@@ -358,21 +355,27 @@ const addImageSlider = ({
     currentIndex = (currentIndex + 1) % images.length;
     imgElement.src = images[currentIndex];
     imgElement.onload = () => {
-      slideshowImage.set({
-        scaleX: scaleX,
-        scaleY: scaleY,
-        height: height,
-        width: width,
+      // Preserve the current scale and dimensions
+      const currentScaleX = slideshowImage.scaleX;
+      const currentScaleY = slideshowImage.scaleY;
+      const currentWidth = slideshowImage.width;
+      const currentHeight = slideshowImage.height;
 
+      slideshowImage.set({
+        scaleX: currentScaleX,
+        scaleY: currentScaleY,
+        width: currentWidth,
+        height: currentHeight,
       });
+
       canvas.renderAll();
     };
   };
 
   imgElement.src = images[currentIndex];
   setInterval(updateImage, interval);
-
 };
+
 
 
 
