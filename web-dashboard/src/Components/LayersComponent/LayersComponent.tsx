@@ -96,7 +96,7 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
         const objects = canvas.getObjects() as CustomFabricObject[];
 
         // Filter out objects of type 'line' where the 'id' contains 'guideline'
-        const filteredObjects = objects.filter((obj, index, self) => {
+        const filteredObjects = objects.filter((obj) => {
             // Only include objects that are not lines with 'guideline' in the id
             return obj.type !== 'line' || !obj.id.includes('guideline');
         });

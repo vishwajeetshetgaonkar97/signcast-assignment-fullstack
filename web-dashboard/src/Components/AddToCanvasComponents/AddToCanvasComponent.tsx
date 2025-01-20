@@ -7,7 +7,7 @@ import { LuTriangle } from "react-icons/lu";
 import { MdOutlineImage } from "react-icons/md";
 import uploadImage from '../../api/uploadImage';
 import { FaRegImages } from "react-icons/fa";
-import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph, addBarGraphWithChartJS, addIframe, addVideo } from '../../utils/CanvasDrawingsUtils';
+import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph,  addVideo } from '../../utils/CanvasDrawingsUtils';
 import { TiWeatherPartlySunny } from "react-icons/ti";
 import { BsGraphUp } from "react-icons/bs";
 import { IoVideocamOutline } from "react-icons/io5";

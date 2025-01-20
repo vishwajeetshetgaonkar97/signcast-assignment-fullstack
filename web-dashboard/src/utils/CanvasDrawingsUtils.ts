@@ -12,6 +12,8 @@ interface CustomFabricObject extends fabric.Object {
   text?: string;
   isSlider?: boolean;
   isWeather?: boolean;
+  isVideo?: boolean;
+  isBarGraph?: boolean;
 }
 
 interface RectangleOptions {
@@ -108,21 +110,6 @@ interface CarouselOptions {
   visible?: boolean;
   height?: number;
   width?: number;
-}
-
-interface IframeOptions {
-  canvas: fabric.Canvas;
-  top?: number;
-  left?: number;
-  width?: number;
-  height?: number;
-  src?: string;
-  selectable?: boolean;
-  id?: string;
-  zIndex?: number;
-  scaleX?: number;
-  scaleY?: number;
-  visible?: boolean;
 }
 
 const addRectangle = ({
@@ -453,7 +440,7 @@ const addWeatherInfo = async ({
     fontSize,
     fill,
     visible
-  }) as any;
+  }) as CustomFabricObject;
 
   // Add custom properties to the weatherText object
   weatherText.id = id;
@@ -510,7 +497,7 @@ const addBarGraph = ({
         height: barHeight,
         fill: barColor,
         visible
-      }) as any;
+      }) as CustomFabricObject;
 
       // Setting a custom ID
       bar.id = `${id}-${index}`;
@@ -529,11 +516,10 @@ const addBarGraph = ({
     const barGroup = new fabric.Group(bars, {
       left: left,
       top: top,
-      zIndex: zIndex,
       visible: visible,
       scaleX,  // Apply scaling here for the entire group
       scaleY   // Apply scaling here for the entire group
-    }) as any;
+    }) as CustomFabricObject;
 
     // Set custom ID for the group
     barGroup.id = id;
@@ -624,7 +610,6 @@ const addBarGraphWithChartJS = ({
     // Correctly load the image using Fabric.js Image.fromURL
     fabric.Image.fromURL(chartImage, (img) => {
       console.log('Image loaded into Fabric.js:', img);
-
       img.set({
         top,
         left,
@@ -659,72 +644,72 @@ const addBarGraphWithChartJS = ({
 };
 
 
-const addIframe = ({
-  canvas,
-  top = 100,
-  left = 50,
-  width = 300,
-  height = 200,
-  src = "https://signcast.ca/",
-  selectable = true,
-  id = `iframe-${new Date().getTime()}`,
-  zIndex = 1,
-  scaleX = 1,
-  scaleY = 1,
-  visible = true
-}) => {
-  if (canvas) {
-    // Create an offscreen HTML element to load the iframe
-    const iframe = document.createElement('iframe');
-    iframe.src = src;
-    iframe.width = width;
-    iframe.height = height;
-    iframe.style.border = "0";
+// const addIframe = ({
+//   canvas,
+//   top = 100,
+//   left = 50,
+//   width = 300,
+//   height = 200,
+//   src = "https://signcast.ca/",
+//   selectable = true,
+//   id = `iframe-${new Date().getTime()}`,
+//   zIndex = 1,
+//   scaleX = 1,
+//   scaleY = 1,
+//   visible = true
+// }) => {
+//   if (canvas) {
+//     // Create an offscreen HTML element to load the iframe
+//     const iframe = document.createElement('iframe');
+//     iframe.src = src;
+//     iframe.width = width;
+//     iframe.height = height;
+//     iframe.style.border = "0";
 
-    // Wait for the iframe to load
-    iframe.onload = () => {
-      try {
-        const iframeCanvas = document.createElement('canvas');
-        iframeCanvas.width = width;
-        iframeCanvas.height = height;
+//     // Wait for the iframe to load
+//     iframe.onload = () => {
+//       try {
+//         const iframeCanvas = document.createElement('canvas');
+//         iframeCanvas.width = width;
+//         iframeCanvas.height = height;
 
-        const context = iframeCanvas.getContext('2d');
-        context.drawImage(iframe.contentWindow.document.body, 0, 0, width, height);
+//         const context = iframeCanvas.getContext('2d');
+//         context.drawImage(iframe.contentWindow.document.body, 0, 0, width, height);
 
-        // Convert canvas to a data URL and create a Fabric.js image
-        const dataURL = iframeCanvas.toDataURL();
-        fabric.Image.fromURL(dataURL, (img) => {
-          img.set({
-            top,
-            left,
-            width,
-            height,
-            selectable,
-            scaleX,
-            scaleY,
-            visible
-          });
-          img.id = id;
+//         // Convert canvas to a data URL and create a Fabric.js image
+//         const dataURL = iframeCanvas.toDataURL();
+//         fabric.Image.fromURL(dataURL, (img) => {
+//           img.set({
+//             top,
+//             left,
+//             width,
+//             height,
+//             selectable,
+//             scaleX,
+//             scaleY,
+//             visible
+//           });
+//           img.id = id;
 
-          // Set zIndex
-          const canvasObjectsLength = getCanvasObjectsLength({ canvas });
-          img.zIndex =
-            typeof canvasObjectsLength === 'number'
-              ? canvasObjectsLength + 1
-              : zIndex;
+//           // Set zIndex
+//           const canvasObjectsLength = getCanvasObjectsLength({ canvas });
+//           img.zIndex =
+//             typeof canvasObjectsLength === 'number'
+//               ? canvasObjectsLength + 1
+//               : zIndex;
 
-          // Add image to Fabric.js canvas
-          canvas.add(img);
-        });
-      } catch (error) {
-        console.error("Error rendering iframe content:", error);
-      }
-    };
+//           // Add image to Fabric.js canvas
+//           canvas.add(img);
+//         });
+//       } catch (error) {
+//         console.error("Error rendering iframe content:", error);
+//       }
+//     };
 
-    document.body.appendChild(iframe); // Append temporarily to load content
-    setTimeout(() => document.body.removeChild(iframe), 5000); // Clean up after load
-  }
-};
+//     document.body.appendChild(iframe); // Append temporarily to load content
+//     setTimeout(() => document.body.removeChild(iframe), 5000); // Clean up after load
+//   }
+// };
 
 const addVideo = ({
   canvas,
@@ -763,7 +748,7 @@ const addVideo = ({
       scaleY: scaleY,
       selectable: selectable,
       visible: visible
-    });
+    }) as CustomFabricObject;
 
     video.id = id;
     video.isVideo = true;
@@ -800,4 +785,4 @@ const addVideo = ({
 
 
 
-export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider,addWeatherInfo, addBarGraph, addBarGraphWithChartJS, addIframe , addVideo };
+export { addRectangle, addCircle, addTriangle, addText, addImage, addImageSlider,addWeatherInfo, addBarGraph, addBarGraphWithChartJS , addVideo };

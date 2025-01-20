@@ -12,7 +12,7 @@ import SelectedCanvasObjectIndexDataContext from "../../Contexts/SelectedCanvasO
 import AllCanvasesDataContext from "../../Contexts/AllCanvasesDataContext";
 import AddToCanvasModal from "../AddCanvasModal/AddCanvasModal";
 import updateCanvas from "../../api/updateCanvas";
-import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph, addIframe, addVideo } from "../../utils/CanvasDrawingsUtils";
+import { addCircle, addImage, addRectangle, addText, addTriangle, addImageSlider, addWeatherInfo, addBarGraph, addVideo } from "../../utils/CanvasDrawingsUtils";
 import { ToastContainer, toast } from 'react-toastify';
 import MonitoringStateContext from "../../Contexts/MonitoringStateContext";
 import { BASE_WEB_SOCKET_URL } from '../../../constants';
@@ -47,7 +47,7 @@ const CanvasParentComponent: React.FC = () => {
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
   const lastPingTimeRef = useRef(null);
 
-  const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
+  const {  setIsMonitoring } = useContext(MonitoringStateContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const websocketRef = useRef<WebSocket | null>(null);
@@ -125,21 +125,6 @@ const CanvasParentComponent: React.FC = () => {
           })
           
         }
-         else if (object.isIframe ) {
-          addIframe({
-            canvas: canvas,
-            src: object.imageUrl,
-            top: object.top,
-            left: object.left,
-            width: object.width,
-            height: object.height,
-            id: object.id,
-            zIndex: object.zIndex,
-            scaleX: object.scaleX,
-            scaleY: object.scaleY,
-            visible: object.visible,
-          });
-        } 
         else if (object.type === "rect") {
           addRectangle({
             canvas: canvas,
