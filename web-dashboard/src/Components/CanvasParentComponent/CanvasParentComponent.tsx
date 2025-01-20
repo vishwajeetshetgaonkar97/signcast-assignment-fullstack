@@ -42,7 +42,7 @@ const CanvasParentComponent: React.FC = () => {
   const [scale, setScale] = useState(0.5);
   const [allcanvases, setAllCanvases] = useState<allcanvases[]>([]);
   const [selectedCanvasIndex, setSelectedCanvasIndex] = useState<number>(0);
-  const [lastPingTime, setLastPingTime] = useState<number | null>(null);
+  const lastPingTimeRef = useRef(null); // Use ref for ping tracking
   const [guidelines, setGuidelines] = useState([]);
 
   const { isMonitoring, setIsMonitoring } = useContext(MonitoringStateContext);
@@ -215,58 +215,60 @@ const CanvasParentComponent: React.FC = () => {
       initCanvas.backgroundColor = "#fff";
       initCanvas.renderAll();
       setCanvas(initCanvas);
-
-      // initCanvas.on("object:moving", (e) => {
-      //   // console.log("Mouse down event:", e);
-      //   handleObjectMoving(canvas, e.target, guidelines, setGuidelines);
-      // });
-
-      const handlePing = () => {
-        setLastPingTime(Date.now());
-      };
-
+  
+     
       const retryDelay = 3000; // 3 seconds
-
+  
+      const handlePing = () => {
+        lastPingTimeRef.current = Date.now(); // Update ref
+      };
+  
       const connectWebSocket = () => {
         websocketRef.current = new WebSocket(BASE_WEB_SOCKET_URL);
-
+  
         websocketRef.current.onopen = () => {
           console.log("WebSocket connected");
-          setIsMonitoring(true);
+          setIsMonitoring((prev) => {
+            if (!prev) return true; // Update state only if it changes
+            return prev;
+          });
         };
-
+  
         websocketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
             if (data.type === "updateAllCanvas") {
               setAllCanvases(data.canvases);
             } else if (data.type === "ping") {
-          
               handlePing();
-              setIsMonitoring(true);
+              setIsMonitoring((prev) => {
+                if (!prev) return true; // Update state only if it changes
+                return prev;
+              });
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
           }
         };
-
+  
         websocketRef.current.onclose = () => {
           console.log("WebSocket disconnected. Retrying...");
-          setIsMonitoring(false);
-          setTimeout(connectWebSocket, retryDelay); // Retry infinite retry connection after 3 every seconds
+          setIsMonitoring((prev) => {
+            if (prev) return false; // Update state only if it changes
+            return prev;
+          });
+          setTimeout(connectWebSocket, retryDelay); // Retry connection
         };
-
+  
         websocketRef.current.onerror = (error) => {
           console.error("WebSocket error:", error);
-          websocketRef.current.close(); // Ensure the socket is closed before retrying to avoid replecated connections
+          websocketRef.current.close(); // Ensure socket is closed before retrying
         };
       };
-
+  
       // Initial WebSocket connection
       connectWebSocket();
-
-
-
+  
       // Cleanup
       return () => {
         initCanvas.dispose();
@@ -274,22 +276,25 @@ const CanvasParentComponent: React.FC = () => {
       };
     }
   }, []);
-
-
-
+  
   useEffect(() => {
     const interval = setInterval(() => {
-      if (lastPingTime && Date.now() - lastPingTime > 6000) {
+      const currentTime = Date.now();
+      if (
+        lastPingTimeRef.current &&
+        currentTime - lastPingTimeRef.current > 6000
+      ) {
         console.warn("No ping received in the last 6 seconds. Backend may be down.");
-        setIsMonitoring(false);
-      } else if (!isMonitoring) {
-        setIsMonitoring(true);
+        setIsMonitoring((prev) => {
+          if (prev) return false; // Update state only if it changes
+          return prev;
+        });
       }
-    }, 6000);
-
+    }, 1000); // Check every second
+  
     return () => clearInterval(interval);
-  }, [lastPingTime]);
-
+  }, []);
+  
 
 
 
@@ -305,8 +310,6 @@ const CanvasParentComponent: React.FC = () => {
     }
     return [];
   };
-
-
 
 
   const handleAddCanvas = async (postData) => {
