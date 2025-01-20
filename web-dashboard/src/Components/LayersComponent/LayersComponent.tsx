@@ -169,6 +169,9 @@ const LayersComponent: React.FC<LayersListProps> = ({ canvas }) => {
         if (layer.isWeather) {
             return `Weather ${layer.zIndex}`;
         }
+        if (layer.isVideo) {
+            return `Video ${layer.zIndex}`;
+        }
         return `${layer.type} ${layer.zIndex}`;
     }
 

@@ -47,6 +47,8 @@ const storage = multer.diskStorage({
   },
 });
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 const upload = multer({ storage: storage });
 
 app.post("/uploadImage", upload.single("image"), async (req, res) => {
